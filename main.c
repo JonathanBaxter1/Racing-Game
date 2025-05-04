@@ -12,7 +12,7 @@
 #include "models.h"
 #include "scene.h"
 
-// kek
+// kek 2
 
 int main(void)
 {
