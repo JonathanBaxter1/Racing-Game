@@ -1,6 +1,4 @@
-#ifndef TYPES_H
-#define TYPES_H
-
+#pragma once
 typedef float mat4[16];
 typedef unsigned int Shader;
 typedef unsigned int Texture;
@@ -61,11 +59,15 @@ typedef struct {
 	float quad;
 } PointLight;
 
-void PointLight_setPos(PointLight* pointLight, float x, float y, float z)
-{
-	pointLight->pos.x = x;
-	pointLight->pos.y = y;
-	pointLight->pos.z = z;
-}
+typedef struct {
+	vec3 pos;
+	vec3 norm;
+	vec2 texCoords;
+} Vertex;
 
-#endif
+typedef struct {
+	unsigned int id;
+	std::string type;
+	std::string path;
+} Texture2;
+

@@ -1,6 +1,8 @@
-#define _GNU_SOURCE
+//#define _GNU_SOURCE
 #include <stdio.h>
+#include <iostream>
 #include <stdlib.h>
+#include <vector>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <math.h>
@@ -12,12 +14,12 @@
 
 #include "types.h"
 #include "utils.h"
+#include "mesh.h"
+#include "model.h"
 #include "models.h"
 #include "scene.h"
 
-// kek 2
-
-int main(void)
+int main()
 {
 	windowInit(&window);
 
@@ -31,11 +33,14 @@ int main(void)
 	int deltaT_GPU = 0;
 	unsigned int frameCount = 0;
 
-	// Enable depth buffer and backface culling
+	// OpenGL settings
+	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
+
+	Model2 monkey("models/monkey/monkey.obj");
 
 	// Main Loop
 	while (!glfwWindowShouldClose(window)) {
@@ -59,7 +64,8 @@ int main(void)
 		float newTime2 = glfwGetTime();
 		deltaT_CPU = (int)((newTime2 - newTime)*1000000);
 
-		render();
+		render(monkey);
+//		monkey.Draw(containerObj.shader);
 
 		deltaT_GPU = (int)((glfwGetTime() - newTime2)*1000000);
 	}
