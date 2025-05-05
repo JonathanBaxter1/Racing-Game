@@ -1,9 +1,6 @@
 #pragma once
-#include "types.h"
-//#include "utils.h"
 
-//using std::string;
-//using std::vector;
+#include "types.h"
 
 class Mesh
 {
@@ -13,7 +10,7 @@ public:
 	std::vector<Texture2> textures;
 
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture2> textures);
-	void Draw(Shader shader);
+	void Draw(Shader shader, mat4 modelMatrix);
 
 private:
 	unsigned int VAO, VBO, IBO, LBO;

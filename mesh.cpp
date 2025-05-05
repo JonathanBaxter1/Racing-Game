@@ -1,19 +1,4 @@
-#include <iostream>
-#include <stdlib.h>
-#include <vector>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <math.h>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include "stb_image.h"
-
-#include "mesh.h"
-
-#include "types.h"
-#include "utils.h"
-
+#include "include.h"
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture2> textures)
 {
@@ -24,8 +9,14 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 	setupMesh();
 }
 
-void Mesh::Draw(Shader shader)
+void Mesh::Draw(Shader shader, mat4 modelMatrix)
 {
+//	mat4 kekMat = {
+//		1.0, 0.0, 0.0, 0.0,
+//		0.0, 1.0, 0.0, 0.0,
+//		0.0, 0.0, 1.0, 0.0,
+//		0.0, 0.0, 1.0, 1.0,
+//	};
 	glUseProgram(shader);
 	int diffuseMapUniformLoc = glGetUniformLocation(shader, "diffuseMapTex");
 	glUniform1i(diffuseMapUniformLoc, 0);
@@ -38,6 +29,7 @@ void Mesh::Draw(Shader shader)
 	glBindTexture(GL_TEXTURE_2D, textures[0].id);
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, LBO);
+	glBufferData(GL_ARRAY_BUFFER, 16*sizeof(float), modelMatrix, GL_DYNAMIC_DRAW);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 

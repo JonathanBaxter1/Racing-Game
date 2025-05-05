@@ -1,23 +1,5 @@
-//#define _GNU_SOURCE
-#include <stdio.h>
-#include <iostream>
-#include <stdlib.h>
-#include <vector>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <math.h>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-#include "types.h"
-#include "utils.h"
-#include "mesh.h"
-#include "model.h"
-#include "models.h"
-#include "scene.h"
+#include "include.h"
 
 int main()
 {
@@ -40,8 +22,23 @@ int main()
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 
-	Model2 monkey("monkey/monkey.obj");
+	Model2 monkeyModel("monkey/monkey.obj");
 	Model2 brickSphere("sphere/sphere.obj");
+
+	float bouncyBallData[] = {0.0, 5.0, -3.0, 0.5};
+	Object2 bouncyBall(&brickSphere, bouncyBallData);
+
+	float monkeyData[] = {0.0, 0.0, -1.0, 0.5};
+	Object2 monkeyObj(&monkeyModel, monkeyData);
+
+	Scene2 buildScreen;
+	buildScreen.AddObject(&bouncyBall);
+	buildScreen.SetActive();
+
+	Scene2 raceScreen;
+	raceScreen.AddObject(&monkeyObj);
+
+	float bouncyBallVelocity = -1.0;
 
 	// Main Loop
 	while (!glfwWindowShouldClose(window)) {
@@ -60,13 +57,20 @@ int main()
 
 		setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);
 
+		if (activeScene == 0) {
+			bouncyBallVelocity -= dT*9.81;
+			if (bouncyBallData[1] < 0.0) {
+				bouncyBallVelocity = -bouncyBallVelocity;
+			}
+			bouncyBallData[1] += dT*bouncyBallVelocity;
+		}
+
 		updateUniforms();
 
 		float newTime2 = glfwGetTime();
 		deltaT_CPU = (int)((newTime2 - newTime)*1000000);
 
-		render(models);
-//		monkey.Draw(containerObj.shader);
+		render();
 
 		deltaT_GPU = (int)((glfwGetTime() - newTime2)*1000000);
 	}

@@ -1,31 +1,14 @@
-#include <iostream>
-#include <stdlib.h>
-#include <vector>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <math.h>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include "stb_image.h"
-#include <string>
-
-#include "model.h"
-
-#include "types.h"
-#include "utils.h"
-#include "mesh.h"
-
+#include "include.h"
 
 Model2::Model2(std::string path)
 {
 	loadModel("models/" + path);
 }
 
-void Model2::Draw(Shader shader)
+void Model2::Draw(Shader shader, mat4 modelMatrix)
 {
 	for (unsigned int i = 0; i < meshes.size(); i++) {
-		meshes[i].Draw(shader);
+		meshes[i].Draw(shader, modelMatrix);
 	}
 }
 

@@ -1,32 +1,8 @@
-#include <iostream>
-#include <stdlib.h>
-#include <vector>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <math.h>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include "stb_image.h"
-
-#include "utils.h"
-
-#include "models.h"
-#include "model.h"
-//#include "mesh.h"
-
-//#define VSYNC_ON 1
-//#define MAX_SHADERS 256
-//#define MAX_OBJECTS 256
-//#define NUM_POINT_LIGHTS 4
-//#define POINT_LIGHT_SIZE 5 // floats
-//#define MAX_SHADER_SIZE 8192 // bytes
-//#define MOUSE_SENSITIVITY 0.001
-//#define MOVEMENT_SPEED 5.0
-
+#include "include.h"
 
 // Global Variables
 std::vector<Model2*> models;
+std::vector<Scene2*> scenes;
 Shader shaderTexture;
 GLFWwindow* window;
 int screenWidth;
@@ -38,6 +14,7 @@ Object ground;
 
 unsigned int surfaceSize;
 unsigned int numObjects = 0;
+unsigned int activeScene = 0;
 float cameraPitch = 0.0;
 float cameraYaw = 0.0;
 float cameraX = 0.0;
@@ -188,6 +165,11 @@ void handleInput(GLFWwindow* window, float deltaT)
 	if (isKeyDown(GLFW_KEY_SPACE)) {
 		cameraZ -= MOVEMENT_SPEED*50.0*deltaT*cos(cameraYaw);
 		cameraX += MOVEMENT_SPEED*50.0*deltaT*sin(cameraYaw);
+	}
+	if (isKeyDown(GLFW_KEY_1)) {
+		activeScene = 0;
+	} else if (isKeyDown(GLFW_KEY_2)) {
+		activeScene = 1;
 	}
 }
 
@@ -451,7 +433,7 @@ void createSphere(Model* object, unsigned int num)
 	}
 }
 
-void render(std::vector<Model2*> model)
+void render()
 {
 	// Clear Background
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -461,9 +443,7 @@ void render(std::vector<Model2*> model)
 	for (unsigned int i = 0; i < numObjects; i++) {
 		drawObject(objects[i]);
 	}
-	for (unsigned int i = 0; i < model.size(); i++) {
-		models[i]->Draw(shaderTexture);
-	}
+	scenes[activeScene]->Draw(shaderTexture);
 
 	glfwSwapBuffers(window);
 }

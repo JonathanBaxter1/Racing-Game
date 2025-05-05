@@ -1,7 +1,8 @@
 #pragma once
+
 #include "models.h"
 #include "model.h"
-//#include "mesh.h"
+#include "scene.h"
 
 #define VSYNC_ON 1
 #define GAME_DEBUG false
@@ -25,7 +26,7 @@ extern void drawObject(Object* object);
 extern void createSurface(Object* surface, Shader shader, unsigned int size, Texture diffuseMap, Texture specularMap);
 extern void drawSurface(Surface* surface);
 extern void createSphere(Model* object, unsigned int num);
-extern void render(std::vector<Model2*> models);
+extern void render();
 extern unsigned int createTexture(std::string fileName);
 extern unsigned int createTexture(std::string fileName, std::string directory);
 extern unsigned int compileShader(unsigned int type, std::string source);
@@ -35,6 +36,7 @@ extern unsigned int isKeyDown(int key);
 
 // Global Variables
 extern std::vector<Model2*> models;
+extern std::vector<Scene2*> scenes;
 extern Shader shaderTexture;
 extern GLFWwindow* window;
 extern int screenWidth;
@@ -44,6 +46,7 @@ extern Object* objects[MAX_OBJECTS];
 extern PointLight* pointLights;
 extern Object ground;
 extern unsigned int surfaceSize;
+extern unsigned int activeScene;
 extern unsigned int numObjects;
 extern float cameraPitch;
 extern float cameraYaw;

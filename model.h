@@ -1,18 +1,13 @@
 #pragma once
-//#include "utils.h"
+
 #include "types.h"
 #include "mesh.h"
-
-//using std::string;
-//using std::vector;
-
-//static unsigned int createTexture(const char* fileName, string directory);
 
 class Model2
 {
 public:
 	Model2(std::string path);
-	void Draw(Shader shader);
+	void Draw(Shader shader, mat4 modelMatrix);
 
 private:
 	std::vector<Mesh> meshes;
