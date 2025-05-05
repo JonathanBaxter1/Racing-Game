@@ -7,7 +7,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-//#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <string>
 
@@ -17,12 +16,10 @@
 #include "utils.h"
 #include "mesh.h"
 
-//using std::vector;
-//using std::string;
 
-Model2::Model2(char *path)
+Model2::Model2(std::string path)
 {
-	loadModel(path);
+	loadModel("models/" + path);
 }
 
 void Model2::Draw(Shader shader)
@@ -44,15 +41,14 @@ void Model2::loadModel(std::string path)
 	}
 	directory = path.substr(0, path.find_last_of('/'));
 	processNode(scene->mRootNode, scene);
+	models.push_back(this);
 }
 
 void Model2::processNode(aiNode *node, const aiScene *scene)
 {
 	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 		aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-//		Mesh tempMesh = processMesh(mesh, scene);
 		meshes.push_back(processMesh(mesh, scene));
-//		meshes.push_back(tempMesh);
 	}
 	for (unsigned int i = 0; i < node->mNumChildren; i++) {
 		processNode(node->mChildren[i], scene);
@@ -67,7 +63,7 @@ Mesh Model2::processMesh(aiMesh *mesh, const aiScene *scene)
 	std::vector<Texture2> textures;
 
 	// Process Vertices
-	printf("kek69 %d ", mesh->mNumVertices);
+	vertices.reserve(mesh->mNumVertices);
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
 		Vertex vertex;
 
@@ -96,6 +92,7 @@ Mesh Model2::processMesh(aiMesh *mesh, const aiScene *scene)
 	}
 
 	// Process Indices
+	indices.reserve(mesh->mNumFaces*3);
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
 		aiFace face = mesh->mFaces[i];
 		for (unsigned int j = 0; j < face.mNumIndices; j++) {
@@ -131,11 +128,7 @@ std::vector<Texture2> Model2::loadMaterialTextures(aiMaterial *mat, aiTextureTyp
 		}
 		if (!skip) {
 			Texture2 texture;
-			printf("keklol\n");
-			printf(str.C_Str());
-//				texture.id = createTexture("stone.jpg", "models/monkey");
 			texture.id = createTexture(str.C_Str(), directory);
-//				texture.id = createTexture(str.C_Str());
 			texture.type = typeName;
 			texture.path = str.C_Str();
 			textures.push_back(texture);

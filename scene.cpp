@@ -63,10 +63,10 @@ void scene_loadScene1()
 
 	// Objects
 	createTextureObject(&containerObj, &cubeModel, shaderTexture, containerDiffuse, containerSpecular, containerLocs, sizeof(containerLocs)/sizeof(float)/16);
-	createSurface(&ground, shaderSurface, 3000, surfaceTexture, surfaceTexture);
+	createSurface(&ground, shaderSurface, 1000, surfaceTexture, surfaceTexture);
 
 	// Lighting
-	for (int i = 0; i < NUM_POINT_LIGHTS; i++) {
+	for (unsigned int i = 0; i < NUM_POINT_LIGHTS; i++) {
 		float x = scene1_pointLightPositions[i*3];
 		float y = scene1_pointLightPositions[i*3+1];
 		float z = scene1_pointLightPositions[i*3+2];
@@ -88,7 +88,7 @@ void scene_setLighting(PointLight* localPointLights, Color lightColor, Shader sh
 
 void scene_setPositions(float* locs, float* positions, float size, unsigned int num)
 {
-	for (int i = 0; i < num; i++) {
+	for (unsigned int i = 0; i < num; i++) {
 		locs[i*16] = size;
 		locs[i*16 + 5] = size;
 		locs[i*16 + 10] = size;

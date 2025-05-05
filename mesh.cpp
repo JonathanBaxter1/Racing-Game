@@ -7,7 +7,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-//#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 #include "mesh.h"
@@ -15,8 +14,6 @@
 #include "types.h"
 #include "utils.h"
 
-//using std::vector;
-//using std::string;
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture2> textures)
 {
@@ -42,28 +39,6 @@ void Mesh::Draw(Shader shader)
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, LBO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-
-
-/*
-	glUseProgram(shader);
-	printf("shader: %d\n", shader);
-	int diffuseMapLoc = glGetUniformLocation(shader, "diffuseMapTex");
-	glUniform1i(diffuseMapLoc, 0);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textures[0].id);
-
-	// Don't use specular map for now
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, textures[0].id);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindVertexArray(VAO);
-	printf("hi %d %d %d\n", VBO, IBO, VAO);
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-	printf("error?: %d, %d", glGetError(), glGetError());
-	*/
 }
 
 void Mesh::setupMesh()

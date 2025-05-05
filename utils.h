@@ -4,6 +4,7 @@
 //#include "mesh.h"
 
 #define VSYNC_ON 1
+#define GAME_DEBUG false
 #define MAX_SHADERS 256
 #define MAX_OBJECTS 256
 #define NUM_POINT_LIGHTS 4
@@ -24,16 +25,16 @@ extern void drawObject(Object* object);
 extern void createSurface(Object* surface, Shader shader, unsigned int size, Texture diffuseMap, Texture specularMap);
 extern void drawSurface(Surface* surface);
 extern void createSphere(Model* object, unsigned int num);
-extern void render(Model2 model);
-extern unsigned int createTexture(const char* fileName);
-extern unsigned int createTexture(const char* fileName, std::string directory);
-extern unsigned int compileShader(unsigned int type, const char* source);
-extern unsigned int createShaderProgram(const char* vertexShader, const char* fragmentShader);
-extern unsigned int createShader(char* vertexFileName, char* fragmentFileName);
+extern void render(std::vector<Model2*> models);
+extern unsigned int createTexture(std::string fileName);
+extern unsigned int createTexture(std::string fileName, std::string directory);
+extern unsigned int compileShader(unsigned int type, std::string source);
+extern unsigned int createShaderProgram(std::string vertexShader, std::string fragmentShader);
+extern unsigned int createShader(std::string vertexFileName, std::string fragmentFileName);
 extern unsigned int isKeyDown(int key);
 
 // Global Variables
-extern Model2 monkey;
+extern std::vector<Model2*> models;
 extern Shader shaderTexture;
 extern GLFWwindow* window;
 extern int screenWidth;

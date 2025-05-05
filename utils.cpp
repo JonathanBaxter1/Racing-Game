@@ -26,6 +26,7 @@
 
 
 // Global Variables
+std::vector<Model2*> models;
 Shader shaderTexture;
 GLFWwindow* window;
 int screenWidth;
@@ -157,7 +158,6 @@ void windowInit(GLFWwindow** window)
 	setPerspectiveMatrix(projectionMatrix, 45.0, aspectRatio, 0.1, 10000.0);
 
 	shaderTexture = createShader("vertexTexture.shader", "fragmentTexture.shader");
-//	monkey = Model2("models/monkey/monkey.obj");
 
 }
 
@@ -335,11 +335,6 @@ void updateUniforms()
 			glUniform1f(pointLightUniformLoc3, pointLights[j].quad);
 		}
 
-		// Object Colors
-		// make array of objects
-		int colorUniformLoc = glGetUniformLocation(shader, "color");
-//t
-//		glUniform3f(colorUniformLoc, pointLightObj.color.r, pointLightObj.color.g, pointLightObj.color.b);
 	}
 }
 
@@ -433,8 +428,8 @@ void createSurface(Object* surface, Shader shader, unsigned int size, Texture di
 
 void createSphere(Model* object, unsigned int num)
 {
-	for (int j = 0; j < num/2 + 1; j++) {
-		for (int i = 0; i < num+1; i++) {
+	for (unsigned int j = 0; j < num/2 + 1; j++) {
+		for (unsigned int i = 0; i < num+1; i++) {
 			float angle2 = (float)j/(float)num*2*M_PI - M_PI/2;
 			float angle = (float)(i-1)/(float)num*2*M_PI;
 			object->vertices[(j*(num+1)+i)*5] = sin(angle)*cos(angle2);
@@ -444,8 +439,8 @@ void createSphere(Model* object, unsigned int num)
 			object->vertices[(j*(num+1)+i)*5 + 4] = (float)j/(float)num*2.0;
 		}
 	}
-	for (int j = 0; j < num/2; j++) {
-		for (int i = 0; i < num; i++) {
+	for (unsigned int j = 0; j < num/2; j++) {
+		for (unsigned int i = 0; i < num; i++) {
 			object->indices[(j*num+i)*6] = j*(num+1)+i;
 			object->indices[(j*num+i)*6 + 1] = j*(num+1)+i+(num+1);
 			object->indices[(j*num+i)*6 + 2] = j*(num+1)+i+(num+2);
@@ -456,24 +451,30 @@ void createSphere(Model* object, unsigned int num)
 	}
 }
 
-void render(Model2 model)
+void render(std::vector<Model2*> model)
 {
 	// Clear Background
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 //	drawSurface(&ground);
-	for (int i = 0; i < numObjects; i++) {
+	for (unsigned int i = 0; i < numObjects; i++) {
 		drawObject(objects[i]);
 	}
-	model.Draw(shaderTexture);
+	for (unsigned int i = 0; i < model.size(); i++) {
+		models[i]->Draw(shaderTexture);
+	}
 
 	glfwSwapBuffers(window);
 }
 
-unsigned int createTexture(const char* fileName)
+unsigned int createTexture(std::string fileName)
 {
-	printf("Binding Buffers...\n");
+	return createTexture(fileName, "textures/");
+}
+
+unsigned int createTexture(std::string fileName, std::string directory)
+{
 	unsigned int texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -484,81 +485,39 @@ unsigned int createTexture(const char* fileName)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	printf("stbi_load...\n");
-	char* folderPath = "textures/";
-	char textureFilePath[128];
-	snprintf(textureFilePath, sizeof(textureFilePath), "%s%s", folderPath, fileName);
-
 	int tex1width, tex1height, tex1numChannels;
-	unsigned char* tex1data = stbi_load(textureFilePath, &tex1width, &tex1height, &tex1numChannels, 0);
+	std::string path = directory + "/" + fileName;
+	unsigned char* tex1data = stbi_load(path.c_str(), &tex1width, &tex1height, &tex1numChannels, 0);
 	if (!tex1data) {
-		printf("Failed to load texture\n");
+		std::cout << "Failed to load texture" << std::endl;
 		exit(-1);
 	}
 	GLenum tex1Format = GL_RGB;
 	if (tex1numChannels == 4) {
 		tex1Format = GL_RGBA;
 	}
-	printf("glTexImage2D...\n");
 	glTexImage2D(GL_TEXTURE_2D, 0, tex1Format, tex1width, tex1height, 0, tex1Format, GL_UNSIGNED_BYTE, tex1data);
 //	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(tex1data);
 	return texture;
 }
 
-unsigned int createTexture(const char* fileName, std::string directory)
-{
-	printf("Binding Buffers...\n");
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	printf("stbi_load...\n");
-	char slash = '/';
-	directory.push_back(slash);
-	char* folderPath = directory.data();
-	char textureFilePath[128];
-	snprintf(textureFilePath, sizeof(textureFilePath), "%s%s", folderPath, fileName);
-	printf(textureFilePath);
-
-	int tex1width, tex1height, tex1numChannels;
-	unsigned char* tex1data = stbi_load(textureFilePath, &tex1width, &tex1height, &tex1numChannels, 0);
-	if (!tex1data) {
-		printf("Failed to load texture\n");
-		exit(-1);
-	}
-	GLenum tex1Format = GL_RGB;
-	if (tex1numChannels == 4) {
-		tex1Format = GL_RGBA;
-	}
-	printf("glTexImage2D...\n");
-	glTexImage2D(GL_TEXTURE_2D, 0, tex1Format, tex1width, tex1height, 0, tex1Format, GL_UNSIGNED_BYTE, tex1data);
-//	glGenerateMipmap(GL_TEXTURE_2D);
-	stbi_image_free(tex1data);
-	return texture;
-}
-
-unsigned int compileShader(unsigned int type, const char* source)
+unsigned int compileShader(unsigned int type, std::string source)
 {
 	unsigned int shaderId = glCreateShader(type);
-	glShaderSource(shaderId, 1, &source, NULL);
+	const char* sourceChar = source.c_str();
+	glShaderSource(shaderId, 1, &sourceChar, NULL);
 	glCompileShader(shaderId);
 	int result;
 	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &result);
 	if (!result) {
-		printf("Failed to compile shader\n");
+		std::cout << "Failed to compile shader" << std::endl;
 		return 0;
 	}
 	return shaderId;
 }
 
-unsigned int createShaderProgram(const char* vertexShader, const char* fragmentShader)
+unsigned int createShaderProgram(std::string vertexShader, std::string fragmentShader)
 {
 	unsigned int program = glCreateProgram();
 	unsigned int vs = compileShader(GL_VERTEX_SHADER, vertexShader);
@@ -573,18 +532,16 @@ unsigned int createShaderProgram(const char* vertexShader, const char* fragmentS
 	return program;
 }
 
-unsigned int createShader(char* vertexFileName, char* fragmentFileName)
+unsigned int createShader(std::string vertexFileName, std::string fragmentFileName)
 {
 	static unsigned int numShaders = 0;
-	char* folderPath = "shaders/";
-	char vertexFilePath[128];
-	char fragmentFilePath[128];
-	snprintf(vertexFilePath, sizeof(vertexFilePath), "%s%s", folderPath, vertexFileName);
-	snprintf(fragmentFilePath, sizeof(fragmentFilePath), "%s%s", folderPath, fragmentFileName);
 
-	FILE *vertexFile = fopen(vertexFilePath, "r");
+	std::string vertexFilePath = "shaders/" + vertexFileName;
+	std::string fragmentFilePath = "shaders/" + fragmentFileName;
+
+	FILE *vertexFile = fopen(vertexFilePath.c_str(), "r");
 	if (vertexFile == NULL) {
-		printf("Could not read vertex shader file: %s\n", vertexFileName);
+		std::cout << "Could not read vertex shader file: " << vertexFileName << std::endl;
 		glfwTerminate();
 		exit(-1);
 	}
@@ -593,25 +550,16 @@ unsigned int createShader(char* vertexFileName, char* fragmentFileName)
 	vertexShader[0] = '\0';  // Start with an empty string
 	char line[1024];
 	while (fgets(line, sizeof(line), vertexFile) != NULL) {
-	    if (strlen(vertexShader) + strlen(line) >= MAX_SHADER_SIZE) {
-	        printf("Shader file too large.\n");
-	        exit(-1);
-	    }
-	    strcat(vertexShader, line);
+		if (strlen(vertexShader) + strlen(line) >= MAX_SHADER_SIZE) {
+			std::cout << "Shader file too large.\n" << std::endl;
+			exit(-1);
+		}
+		strcat(vertexShader, line);
 	}
-//	size_t vertexShaderLen;
-//	ssize_t vertexBytesRead = getdelim(&vertexShader, &vertexShaderLen, '\0', vertexFile);
-//	while (fgets(vertexShader, MAX_SHADER_SIZE, vertexFile) != NULL) {}
-//	if (vertexBytesRead == -1) {
-//	if (2 == 2) {
-//		printf("Error reading vertex shader file: %s\n", vertexFileName);
-//		glfwTerminate();
-//		exit(-1);
-//	}
 
-	FILE *fragmentFile = fopen(fragmentFilePath, "r");
+	FILE *fragmentFile = fopen(fragmentFilePath.c_str(), "r");
 	if (fragmentFile == NULL) {
-		printf("Could not read fragment shader file: %s\n", fragmentFileName);
+		std::cout << "Could not read fragment shader file: " << fragmentFileName << std::endl;
 		glfwTerminate();
 		exit(-1);
 	}
@@ -619,25 +567,14 @@ unsigned int createShader(char* vertexFileName, char* fragmentFileName)
 
 	fragmentShader[0] = '\0';  // Start with an empty string
 	while (fgets(line, sizeof(line), fragmentFile) != NULL) {
-	    if (strlen(fragmentShader) + strlen(line) >= MAX_SHADER_SIZE) {
-	        printf("Shader file too large.\n");
-	        exit(-1);
-	    }
-	    strcat(fragmentShader, line);
+		if (strlen(fragmentShader) + strlen(line) >= MAX_SHADER_SIZE) {
+			std::cout << "Shader file too large.\n" << std::endl;
+			exit(-1);
+		}
+		strcat(fragmentShader, line);
 	}
-//	size_t fragmentShaderLen;
-//	ssize_t fragmentBytesRead = getdelim(&fragmentShader, &fragmentShaderLen, '\0', fragmentFile);
-//	while (fgets(fragmentShader, MAX_SHADER_SIZE, fragmentFile) != NULL) {}
-//	if (fragmentBytesRead == -1) {
-//	if (2 == 1) {
-//		printf("Error reading fragment shader file: %s\n", fragmentFileName);
-//		glfwTerminate();
-//		exit(-1);
-//	}
 
 	unsigned int shader = createShaderProgram(vertexShader, fragmentShader);
-//	free(vertexShader);
-//	free(fragmentShader);
 
 	glUseProgram(shader);
 	int projectionMatrixLoc = glGetUniformLocation(shader, "projection");

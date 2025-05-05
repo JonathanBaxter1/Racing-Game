@@ -40,7 +40,8 @@ int main()
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 
-	Model2 monkey("models/monkey/monkey.obj");
+	Model2 monkey("monkey/monkey.obj");
+	Model2 brickSphere("sphere/sphere.obj");
 
 	// Main Loop
 	while (!glfwWindowShouldClose(window)) {
@@ -50,7 +51,7 @@ int main()
 		deltaT = (int)(dT*1000000);
 		curTime = newTime;
 		frameCount++;
-		if (!(frameCount&15u)) { // So the printf statement doesn't count as computation time
+		if (!(frameCount&15u) && GAME_DEBUG == true) { // So the printf statement doesn't count as computation time
 			printf("delta T: %dus; CPU: %dus; GPU: %dus\n", deltaT, deltaT_CPU, deltaT_GPU);
 		}
 
@@ -64,7 +65,7 @@ int main()
 		float newTime2 = glfwGetTime();
 		deltaT_CPU = (int)((newTime2 - newTime)*1000000);
 
-		render(monkey);
+		render(models);
 //		monkey.Draw(containerObj.shader);
 
 		deltaT_GPU = (int)((glfwGetTime() - newTime2)*1000000);
