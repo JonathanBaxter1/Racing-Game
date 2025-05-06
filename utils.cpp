@@ -125,16 +125,33 @@ void windowInit(GLFWwindow** window)
 	glfwMakeContextCurrent(*window);
 	glewInit();
 	glViewport(0, 0, screenWidth, screenHeight);
-	stbi_set_flip_vertically_on_load(1);
 
 	// Turn on/off vsync
 	glfwSwapInterval(VSYNC_ON);
 
-	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	// Cursor setup
+	int cursorWidth, cursorHeight, cursorNumChannels;
+	unsigned char* cursorImageData = stbi_load("textures/cursor.png", &cursorWidth, &cursorHeight, &cursorNumChannels, 0);
+
+	if (cursorNumChannels != 4) {
+		std::cout << "Error: cursor image data must have 4 channels (RGBA)" << std::endl;
+		exit(-1);
+	}
+	GLFWimage cursorImage;
+	cursorImage.width = cursorWidth;
+	cursorImage.height = cursorHeight;
+	cursorImage.pixels = cursorImageData;
+
+	GLFWcursor* cursor = glfwCreateCursor(&cursorImage, 0, 0);
+	stbi_image_free(cursorImageData);
+	glfwSetCursor(*window, cursor);
+//	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	glfwSetCursorPosCallback(*window, mouseCallback);
 	setPerspectiveMatrix(projectionMatrix, 45.0, aspectRatio, 0.1, 10000.0);
 
 	shaderTexture = createShader("vertexTexture.shader", "fragmentTexture.shader");
+	stbi_set_flip_vertically_on_load(1);
 
 }
 
