@@ -1,4 +1,3 @@
 #!/bin/sh
 
-g++ main.cpp scene.cpp object.cpp model.cpp mesh.cpp models.cpp utils.cpp sceneOld.cpp -o race -march=native -Wall -lGL -lGLU -lglut -lGLEW -lglfw -lXxf86vm -lXrandr -lXi -ldl -lXinerama -lXcursor -lassimp
-#g++ main.cpp utils.cpp -o race -Wall -lGL -lGLU -lglut -lGLEW -lglfw -lXxf86vm -lXrandr -lXi -ldl -lXinerama -lXcursor -lassimp
+g++ ./src/*.cpp -o ./bin/race -march=native -Wall -lGL -lGLU -lglut -lGLEW -lglfw -lXxf86vm -lXrandr -lXi -ldl -lXinerama -lXcursor -lassimp
