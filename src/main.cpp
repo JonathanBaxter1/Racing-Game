@@ -58,7 +58,7 @@ int main()
 		setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);
 
 		if (activeScene == 0) {
-			bouncyBallVelocity -= dT*9.81;
+			bouncyBallVelocity -= dT*2.0;
 			if (bouncyBallData[1] < 0.0) {
 				bouncyBallVelocity = -bouncyBallVelocity;
 			}
