@@ -20,7 +20,7 @@ void Model2::loadModel(std::string path)
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 		std::cout << "Assimp Error: " << import.GetErrorString() << std::endl;
-		return;
+		exit(-1);
 	}
 	directory = path.substr(0, path.find_last_of('/'));
 	processNode(scene->mRootNode, scene);
@@ -84,15 +84,38 @@ Mesh Model2::processMesh(aiMesh *mesh, const aiScene *scene)
 	}
 
 	// Process Material
+	Material mat;
 	if (mesh->mMaterialIndex >= 0) {
 		aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+		mat = loadMaterial(material);
 		std::vector<Texture2> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "diffuse");
 		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 		std::vector<Texture2> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "specular");
 		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	}
-	return Mesh(vertices, indices, textures);
+	return Mesh(vertices, indices, textures, mat);
+}
 
+Material Model2::loadMaterial(aiMaterial *mat)
+{
+	Material material;
+	if (AI_SUCCESS != mat->Get(AI_MATKEY_COLOR_DIFFUSE, material.diffuse)) {
+		std::cout << "Assimp Error: Material diffuse color not found" << std::endl;
+		exit(-1);
+	}
+	if (AI_SUCCESS != mat->Get(AI_MATKEY_COLOR_SPECULAR, material.specular)) {
+		std::cout << "Assimp Error: Material specular color not found" << std::endl;
+		exit(-1);
+	}
+	if (AI_SUCCESS != mat->Get(AI_MATKEY_COLOR_AMBIENT, material.ambient)) {
+		std::cout << "Assimp Error: Material ambient color not found" << std::endl;
+		exit(-1);
+	}
+	if (AI_SUCCESS != mat->Get(AI_MATKEY_SHININESS, material.shininess)) {
+		std::cout << "Assimp Error: Material shininess value not found" << std::endl;
+		exit(-1);
+	}
+	return material;
 }
 
 std::vector<Texture2> Model2::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)

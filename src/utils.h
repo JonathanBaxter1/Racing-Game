@@ -13,6 +13,7 @@
 #define MAX_SHADER_SIZE 8192 // bytes
 #define MOUSE_SENSITIVITY 0.001
 #define MOVEMENT_SPEED 5.0
+#define CAR_SPEED 26.0
 
 extern void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 extern void setModelMatrix(mat4 matrix, float scale, float angle, float angle2, float x, float y, float z);
@@ -38,6 +39,7 @@ extern unsigned int isKeyDown(int key);
 extern std::vector<Model2*> models;
 extern std::vector<Scene2*> scenes;
 extern Shader shaderTexture;
+extern Shader shaderColorPhong;
 extern GLFWwindow* window;
 extern int screenWidth;
 extern int screenHeight;
@@ -53,6 +55,8 @@ extern float cameraYaw;
 extern float cameraX;
 extern float cameraY;
 extern float cameraZ;
+
+extern float carX, carY, carZ, carYaw;
 
 extern Object containerObj;
 extern Object pointLightObj;

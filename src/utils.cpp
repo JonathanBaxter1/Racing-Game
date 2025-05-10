@@ -4,6 +4,7 @@
 std::vector<Model2*> models;
 std::vector<Scene2*> scenes;
 Shader shaderTexture;
+Shader shaderColorPhong;
 GLFWwindow* window;
 int screenWidth;
 int screenHeight;
@@ -20,6 +21,11 @@ float cameraYaw = 0.0;
 float cameraX = 0.0;
 float cameraY = 0.0;
 float cameraZ = 1.0;
+
+float carX = 50.0;
+float carY = 0.0;
+float carZ = 50.0;
+float carYaw = 0.0;
 
 Object containerObj;
 Object pointLightObj;
@@ -144,13 +150,14 @@ void windowInit(GLFWwindow** window)
 
 	GLFWcursor* cursor = glfwCreateCursor(&cursorImage, 0, 0);
 	stbi_image_free(cursorImageData);
-	glfwSetCursor(*window, cursor);
-//	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+//	glfwSetCursor(*window, cursor);
+	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+//	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	glfwSetCursorPosCallback(*window, mouseCallback);
 	setPerspectiveMatrix(projectionMatrix, 45.0, aspectRatio, 0.1, 10000.0);
 
 	shaderTexture = createShader("vertexTexture.shader", "fragmentTexture.shader");
+	shaderColorPhong = createShader("vertexTexture.shader", "fragmentColorPhong.shader");
 	stbi_set_flip_vertically_on_load(1);
 
 }
@@ -160,28 +167,44 @@ void handleInput(GLFWwindow* window, float deltaT)
 	if (isKeyDown(GLFW_KEY_ESCAPE)) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
-	if (isKeyDown(GLFW_KEY_S)) {
-		cameraZ += MOVEMENT_SPEED*deltaT*cos(cameraYaw);
-		cameraX -= MOVEMENT_SPEED*deltaT*sin(cameraYaw);
-	} else if (isKeyDown(GLFW_KEY_W)) {
-		cameraZ -= MOVEMENT_SPEED*deltaT*cos(cameraYaw);
-		cameraX += MOVEMENT_SPEED*deltaT*sin(cameraYaw);
-	}
-	if (isKeyDown(GLFW_KEY_D)) {
-		cameraZ += MOVEMENT_SPEED*deltaT*sin(cameraYaw);
-		cameraX += MOVEMENT_SPEED*deltaT*cos(cameraYaw);
-	} else if (isKeyDown(GLFW_KEY_A)) {
-		cameraZ -= MOVEMENT_SPEED*deltaT*sin(cameraYaw);
-		cameraX -= MOVEMENT_SPEED*deltaT*cos(cameraYaw);
-	}
-	if (isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-		cameraY += MOVEMENT_SPEED*deltaT;
-	} else if (isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-		cameraY -= MOVEMENT_SPEED*deltaT;
-	}
-	if (isKeyDown(GLFW_KEY_SPACE)) {
-		cameraZ -= MOVEMENT_SPEED*50.0*deltaT*cos(cameraYaw);
-		cameraX += MOVEMENT_SPEED*50.0*deltaT*sin(cameraYaw);
+	if (activeScene == 0) {
+		if (isKeyDown(GLFW_KEY_S)) {
+			cameraZ += MOVEMENT_SPEED*deltaT*cos(cameraYaw);
+			cameraX -= MOVEMENT_SPEED*deltaT*sin(cameraYaw);
+		} else if (isKeyDown(GLFW_KEY_W)) {
+			cameraZ -= MOVEMENT_SPEED*deltaT*cos(cameraYaw);
+			cameraX += MOVEMENT_SPEED*deltaT*sin(cameraYaw);
+		}
+		if (isKeyDown(GLFW_KEY_D)) {
+			cameraZ += MOVEMENT_SPEED*deltaT*sin(cameraYaw);
+			cameraX += MOVEMENT_SPEED*deltaT*cos(cameraYaw);
+		} else if (isKeyDown(GLFW_KEY_A)) {
+			cameraZ -= MOVEMENT_SPEED*deltaT*sin(cameraYaw);
+			cameraX -= MOVEMENT_SPEED*deltaT*cos(cameraYaw);
+		}
+		if (isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+			cameraY += MOVEMENT_SPEED*deltaT;
+		} else if (isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+			cameraY -= MOVEMENT_SPEED*deltaT;
+		}
+		if (isKeyDown(GLFW_KEY_SPACE)) {
+			cameraZ -= MOVEMENT_SPEED*50.0*deltaT*cos(cameraYaw);
+			cameraX += MOVEMENT_SPEED*50.0*deltaT*sin(cameraYaw);
+		}
+	} else if (activeScene == 1) {
+		if (isKeyDown(GLFW_KEY_W)) {
+			carZ -= CAR_SPEED*deltaT*cos(carYaw);
+			carX += CAR_SPEED*deltaT*sin(carYaw);
+		} else if (isKeyDown(GLFW_KEY_S)) {
+			carZ += CAR_SPEED*deltaT*cos(carYaw);
+			carX -= CAR_SPEED*deltaT*sin(carYaw);
+		}
+		if (isKeyDown(GLFW_KEY_RIGHT)) {
+			carYaw += 2.0*deltaT;
+		} else if (isKeyDown(GLFW_KEY_LEFT)) {
+			carYaw -= 2.0*deltaT;
+		}
+
 	}
 	if (isKeyDown(GLFW_KEY_1)) {
 		activeScene = 0;
@@ -318,6 +341,10 @@ void updateUniforms()
 		int viewPosUniformLoc = glGetUniformLocation(shader, "viewPos");
 		glUniform3f(viewPosUniformLoc, cameraX, cameraY, cameraZ);
 
+		// Shininess
+		int shininessUniformLoc = glGetUniformLocation(shader, "shininess");
+		glUniform1f(shininessUniformLoc, 32.0);
+
 		// Point Light Info
 		for (int j = 0; j < NUM_POINT_LIGHTS; j++) {
 			char pointLightUniformString1[32];
@@ -346,6 +373,9 @@ void drawObject(Object* object)
 		glBindTexture(GL_TEXTURE_2D, object->diffuseMap);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, object->specularMap);
+	} else {
+		int colorUniformLoc = glGetUniformLocation(object->shader, "color");
+		glUniform3f(colorUniformLoc, object->color.r, object->color.g, object->color.b);
 	}
 	glBindVertexArray(object->VAO);
 	if (object->numInstances == 1) {
@@ -477,16 +507,16 @@ unsigned int createTexture(std::string fileName, std::string directory)
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int tex1width, tex1height, tex1numChannels;
 	std::string path = directory + "/" + fileName;
 	unsigned char* tex1data = stbi_load(path.c_str(), &tex1width, &tex1height, &tex1numChannels, 0);
 	if (!tex1data) {
-		std::cout << "Failed to load texture" << std::endl;
+		std::cout << "Failed to load texture: " << path << std::endl;
 		exit(-1);
 	}
 	GLenum tex1Format = GL_RGB;
@@ -494,7 +524,7 @@ unsigned int createTexture(std::string fileName, std::string directory)
 		tex1Format = GL_RGBA;
 	}
 	glTexImage2D(GL_TEXTURE_2D, 0, tex1Format, tex1width, tex1height, 0, tex1Format, GL_UNSIGNED_BYTE, tex1data);
-//	glGenerateMipmap(GL_TEXTURE_2D);
+	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(tex1data);
 	return texture;
 }

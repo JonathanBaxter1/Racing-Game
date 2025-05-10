@@ -3,11 +3,15 @@ out vec4 FragColor;
 
 in vec3 fragPos;
 in vec3 normal;
-in vec2 texCoord;
+//in vec2 texCoord;
 
-uniform sampler2D diffuseMapTex;
-uniform sampler2D specularMapTex;
+//uniform sampler2D diffuseMapTex;
+//uniform sampler2D specularMapTex;
 uniform vec3 viewPos;
+
+uniform vec3 diffuseColor;
+uniform vec3 specularColor;
+uniform vec3 ambientColor;
 uniform float shininess;
 
 struct PointLight {
@@ -26,10 +30,10 @@ void main()
 {
 	vec3 viewDir = normalize(viewPos - fragPos);
 	vec3 norm = normalize(normal);
-	vec3 diffuseMap = vec3(texture(diffuseMapTex, texCoord));
+//	vec3 diffuseMap = vec3(texture(diffuseMapTex, texCoord));
 
 	float ambientScalar = 0.2;
-	vec3 colorOut = ambientScalar*diffuseMap;
+	vec3 colorOut = ambientScalar*ambientColor;
 
 	for (int i = 0; i < NUM_POINT_LIGHTS; i++) {
 		colorOut += calcPointLight(pointLights[i], norm, fragPos, viewDir);
@@ -40,8 +44,8 @@ void main()
 
 vec3 calcPointLight(PointLight pointLight, vec3 norm, vec3 fragPos, vec3 viewDir)
 {
-	vec3 diffuseMap = vec3(texture(diffuseMapTex, texCoord));
-	vec3 specularMap = vec3(texture(specularMapTex, texCoord));
+//	vec3 diffuseMap = vec3(texture(diffuseMapTex, texCoord));
+//	vec3 specularMap = vec3(texture(specularMapTex, texCoord));
 	vec3 lightDir = normalize(pointLight.pos - fragPos);
 
 	float distance = length(pointLight.pos - fragPos);
@@ -52,8 +56,8 @@ vec3 calcPointLight(PointLight pointLight, vec3 norm, vec3 fragPos, vec3 viewDir
 		specularScalar = 1.0*pow(max(dot(viewDir, reflectDir), 0.0), shininess);
 	}
 	float attenuation = 3.0/(1.0 + pointLight.linear*distance + pointLight.quad*(distance*distance));
-	vec3 diffuse = diffuseScalar*diffuseMap;
-	vec3 specular = specularScalar*specularMap;
+	vec3 diffuse = diffuseScalar*diffuseColor;
+	vec3 specular = specularScalar*specularColor;
 
 	return attenuation*(diffuse + specular);
 }

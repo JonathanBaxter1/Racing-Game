@@ -38,8 +38,9 @@ void scene_loadScene1()
 {
 	// Shaders
 	Shader shaderColor = createShader("vertexColor.shader", "fragmentColor.shader");
-//	Shader shaderTexture = createShader("vertexTexture.shader", "fragmentTexture.shader");
+	Shader shaderTexture = createShader("vertexTexture.shader", "fragmentTexture.shader");
 	Shader shaderSurface = createShader("vertexSurface.shader", "fragmentSurface.shader");
+//	Shader shaderColorPhong = createShader("vertexTexture.shader", "fragmentColorPhong.shader");
 
 	// Textures
 	Texture containerDiffuse = createTexture("container2.png");

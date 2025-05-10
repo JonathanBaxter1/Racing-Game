@@ -71,3 +71,9 @@ typedef struct {
 	std::string path;
 } Texture2;
 
+typedef struct {
+	aiColor3D diffuse;
+	aiColor3D specular;
+	aiColor3D ambient;
+	float shininess;
+} Material;
