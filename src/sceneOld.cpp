@@ -31,6 +31,13 @@ float scene1_pointLightPositions[3*NUM_POINT_LIGHTS] = {
 };
 float scene1_pointLightLocs[16*NUM_POINT_LIGHTS] = {0.0};
 
+float waterLoc[16] = {
+	1.0, 0.0, 0.0, 0.0,
+	0.0, 1.0, 0.0, 0.0,
+	0.0, 0.0, 1.0, 0.0,
+	0.0, 0.0, 0.0, 1.0,
+};
+
 PointLight scene1_pointLights[NUM_POINT_LIGHTS];
 
 
@@ -49,7 +56,9 @@ void scene_loadScene1()
 
 	// Objects
 	createTextureObject(&containerObj, &cubeModel, shaderTexture, containerDiffuse, containerSpecular, containerLocs, sizeof(containerLocs)/sizeof(float)/16);
-	createSurface(&ground, shaderSurface, 1000, surfaceTexture, surfaceTexture);
+	createSurface(&ground, shaderSurface, 512, surfaceTexture, containerSpecular);
+	Color waterColor = {.r = 0.06, .g = 0.5, .b = 0.6};
+	createColorObject(&waterObj, &planeModel, shaderColor, waterColor, waterLoc, 1);
 
 	// Lighting
 	for (unsigned int i = 0; i < NUM_POINT_LIGHTS; i++) {

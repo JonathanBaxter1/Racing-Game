@@ -13,6 +13,24 @@
 
 #include "types.h"
 
+/* Plane (infinite) */
+float planeVert[] = { // idk if this is right
+	-500.0, 0.0, -500.0,  0.0, 0.0, 1.0,  0.0, 0.0,
+	-500.0, 0.0,  500.0,  0.0, 0.0, 1.0,  0.0, 1.0,
+	 500.0, 0.0,  500.0,  0.0, 0.0, 1.0,  1.0, 1.0,
+	 500.0, 0.0, -500.0,  0.0, 0.0, 1.0,  1.0, 0.0,
+};
+unsigned int planeInd[] = {
+	0, 1, 2,
+	2, 3, 0,
+};
+Model planeModel = {
+	.vertices = planeVert,
+	.verticesSize = sizeof(planeVert),
+	.indices = planeInd,
+	.indicesSize = sizeof(planeInd),
+};
+
 /* Square */
 float squareVert[] = {
 	-1.0, -1.0, 0.25, 0.0, 0.0,

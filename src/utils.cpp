@@ -12,6 +12,7 @@ Shader shaders[MAX_SHADERS] = {0};
 Object* objects[MAX_OBJECTS] = {0};
 PointLight* pointLights;
 Object ground;
+Object waterObj;
 
 unsigned int surfaceSize;
 unsigned int numObjects = 0;
@@ -486,7 +487,6 @@ void render()
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//	drawSurface(&ground);
 	for (unsigned int i = 0; i < numObjects; i++) {
 		drawObject(objects[i]);
 	}

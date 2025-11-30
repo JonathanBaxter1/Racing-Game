@@ -47,6 +47,7 @@ extern Shader shaders[MAX_SHADERS];
 extern Object* objects[MAX_OBJECTS];
 extern PointLight* pointLights;
 extern Object ground;
+extern Object waterObj;
 extern unsigned int surfaceSize;
 extern unsigned int activeScene;
 extern unsigned int numObjects;

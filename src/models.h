@@ -1,6 +1,11 @@
 #pragma once
 #include "types.h"
 
+/* Plane (infinite) */
+extern float planeVert[];
+extern unsigned int planeInd[];
+extern Model planeModel;
+
 /* Square */
 extern float squareVert[];
 extern unsigned int squareInd[];

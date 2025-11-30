@@ -18,9 +18,9 @@ int main()
 	// OpenGL settings
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
-//	glEnable(GL_CULL_FACE);
-//	glFrontFace(GL_CCW);
-//	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
 
 	Model2 monkeyModel("monkey/monkey.obj");
 	Model2 brickSphere("sphere/sphere.obj");
