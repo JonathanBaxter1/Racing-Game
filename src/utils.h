@@ -12,7 +12,7 @@
 #define POINT_LIGHT_SIZE 5 // floats
 #define MAX_SHADER_SIZE 8192 // bytes
 #define MOUSE_SENSITIVITY 0.001
-#define MOVEMENT_SPEED 5.0
+#define MOVEMENT_SPEED 55.0 // M/s
 #define CAR_SPEED 26.0
 
 extern void mouseCallback(GLFWwindow* window, double xpos, double ypos);

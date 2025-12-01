@@ -17,6 +17,7 @@ Object waterObj;
 unsigned int surfaceSize;
 unsigned int numObjects = 0;
 unsigned int activeScene = 0;
+unsigned int drawType = GL_TRIANGLES;
 float cameraPitch = 0.0;
 float cameraYaw = 0.0;
 float cameraX = 0.0;
@@ -192,25 +193,11 @@ void handleInput(GLFWwindow* window, float deltaT)
 			cameraZ -= MOVEMENT_SPEED*50.0*deltaT*cos(cameraYaw);
 			cameraX += MOVEMENT_SPEED*50.0*deltaT*sin(cameraYaw);
 		}
-	} else if (activeScene == 1) {
-		if (isKeyDown(GLFW_KEY_W)) {
-			carZ -= CAR_SPEED*deltaT*cos(carYaw);
-			carX += CAR_SPEED*deltaT*sin(carYaw);
-		} else if (isKeyDown(GLFW_KEY_S)) {
-			carZ += CAR_SPEED*deltaT*cos(carYaw);
-			carX -= CAR_SPEED*deltaT*sin(carYaw);
-		}
-		if (isKeyDown(GLFW_KEY_RIGHT)) {
-			carYaw += 2.0*deltaT;
-		} else if (isKeyDown(GLFW_KEY_LEFT)) {
-			carYaw -= 2.0*deltaT;
-		}
-
 	}
 	if (isKeyDown(GLFW_KEY_1)) {
-		activeScene = 0;
+		drawType = GL_TRIANGLES;
 	} else if (isKeyDown(GLFW_KEY_2)) {
-		activeScene = 1;
+		drawType = GL_LINE_LOOP;
 	}
 }
 
@@ -380,12 +367,12 @@ void drawObject(Object* object)
 	}
 	glBindVertexArray(object->VAO);
 	if (object->numInstances == 1) {
-		glDrawElements(GL_TRIANGLES, object->indicesSize/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+		glDrawElements(drawType, object->indicesSize/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 	} else if (object->surfaceSize == 0) {
 		glBindBuffer(GL_ARRAY_BUFFER, object->LBO);
-		glDrawElementsInstanced(GL_TRIANGLES, object->indicesSize/sizeof(unsigned int), GL_UNSIGNED_INT, 0, object->numInstances);
+		glDrawElementsInstanced(drawType, object->indicesSize/sizeof(unsigned int), GL_UNSIGNED_INT, 0, object->numInstances);
 	} else {
-		glDrawElementsInstanced(GL_TRIANGLES, object->indicesSize/sizeof(unsigned int), GL_UNSIGNED_INT, 0, object->numInstances);
+		glDrawElementsInstanced(drawType, object->indicesSize/sizeof(unsigned int), GL_UNSIGNED_INT, 0, object->numInstances);
 	}
 }
 

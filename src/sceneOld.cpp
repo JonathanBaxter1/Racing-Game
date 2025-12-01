@@ -56,7 +56,7 @@ void scene_loadScene1()
 
 	// Objects
 	createTextureObject(&containerObj, &cubeModel, shaderTexture, containerDiffuse, containerSpecular, containerLocs, sizeof(containerLocs)/sizeof(float)/16);
-	createSurface(&ground, shaderSurface, 512, surfaceTexture, containerSpecular);
+	createSurface(&ground, shaderSurface, 4096, surfaceTexture, containerSpecular);
 	Color waterColor = {.r = 0.06, .g = 0.5, .b = 0.6};
 	createColorObject(&waterObj, &planeModel, shaderColor, waterColor, waterLoc, 1);
 
