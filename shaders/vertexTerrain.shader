@@ -19,8 +19,8 @@ vec3 perlin(float x, float y, float cellSize);
 
 void main()
 {
-	float centerXrounded = floor(centerX/64.0)*64.0;
-	float centerYrounded = floor(centerY/64.0)*64.0;
+	float centerXrounded = floor(centerX/256.0)*256.0;
+	float centerYrounded = floor(centerY/256.0)*256.0;
 
 	uint outerWidth2 = outerWidth/squareSize;
 	uint innerWidth2 = innerWidth/squareSize;

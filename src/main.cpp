@@ -48,7 +48,7 @@ int main()
 		unsigned int polygons = 0;
 		unsigned int lastSegmentOuterWidth = 0;
 		unsigned int curWidth = 2048;
-		unsigned int curSquareSize = 4;
+		unsigned int curSquareSize = 1u<<(5u-GRAPHICS_SETTING);
 		for (int i = 0; i < NUM_TERRAIN_SEGMENTS; i++) {
 			terrain.segments[i].centerX = cameraX;
 			terrain.segments[i].centerY = cameraZ;
