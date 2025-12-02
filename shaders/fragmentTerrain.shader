@@ -26,8 +26,12 @@ void main()
 //	vec3 diffuseMap = vec3(texture(diffuseMapTex, texCoord));
 
 	float ambientScalar = 0.3;
-	vec3 colorOut = ambientScalar*color + diffuseScalar*color;
-//	vec3 colorOut = ambientScalar*diffuseMap + diffuseScalar*diffuseMap;
+
+	float distance = distance(viewPos, fragPos);
+	float fogLevel = clamp((distance-12288.0)/4096.0, 0.0, 1.0);
+	vec3 surfaceColor = ambientScalar*color + diffuseScalar*color;
+	vec3 fogColor = vec3(0.5, 0.75, 0.95);
+	vec3 colorOut = mix(surfaceColor, fogColor, fogLevel);
 
 	FragColor = vec4(colorOut, 1.0);
 }

@@ -83,7 +83,7 @@ int main()
 		deltaT_CPU = (int)((newTime2 - newTime)*1000000);
 
 		// Render
-		glClearColor(0.5, 0.75, 0.95, 1.0); // Sky blue
+		glClearColor(0.5, 0.75, 0.95, 1.0); // Sky blue, also fog color
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		drawTerrain(terrain);
 		drawTerrain(water);
