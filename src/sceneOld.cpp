@@ -41,7 +41,7 @@ float waterLoc[16] = {
 PointLight scene1_pointLights[NUM_POINT_LIGHTS];
 
 
-void scene_loadScene1()
+/*void scene_loadScene1()
 {
 	// Shaders
 	Shader shaderColor = createShader("vertexColor.shader", "fragmentColor.shader");
@@ -56,7 +56,7 @@ void scene_loadScene1()
 
 	// Objects
 	createTextureObject(&containerObj, &cubeModel, shaderTexture, containerDiffuse, containerSpecular, containerLocs, sizeof(containerLocs)/sizeof(float)/16);
-	createSurface(&ground, shaderSurface, 4096, surfaceTexture, containerSpecular);
+	createTerrain(terrain);
 	Color waterColor = {.r = 0.06, .g = 0.5, .b = 0.6};
 	createColorObject(&waterObj, &planeModel, shaderColor, waterColor, waterLoc, 1);
 
@@ -73,7 +73,7 @@ void scene_loadScene1()
 	Color scene1_lightColor = {1.0, 1.0, 1.0};
 	scene_setPositions(scene1_pointLightLocs, scene1_pointLightPositions, lightSize, NUM_POINT_LIGHTS);
 	scene_setLighting(scene1_pointLights, scene1_lightColor, shaderColor);
-}
+}*/
 
 void scene_setLighting(PointLight* localPointLights, Color lightColor, Shader shader)
 {

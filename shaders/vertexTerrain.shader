@@ -1,15 +1,16 @@
 #version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aNormal;
-layout (location = 2) in vec2 aTexCoord;
-layout (location = 3) in mat4 model;
+layout (location = 0) in vec2 aPos;
 
 out vec3 fragPos;
 out vec3 normal;
 
 uniform mat4 view;
 uniform mat4 projection;
-uniform uint size;
+uniform uint innerWidth;
+uniform uint outerWidth;
+uniform uint squareSize;
+uniform float centerX;
+uniform float centerY;
 
 vec2 gradient(int x, int y);
 float fade(float t);
@@ -18,28 +19,56 @@ vec3 perlin(float x, float y, float cellSize);
 
 void main()
 {
-	float x = aPos.x + floor(gl_InstanceID/float(size));
-	float z = aPos.z + mod(gl_InstanceID, float(size));
+	float centerXrounded = floor(centerX/64.0)*64.0;
+	float centerYrounded = floor(centerY/64.0)*64.0;
+
+	uint outerWidth2 = outerWidth/squareSize;
+	uint innerWidth2 = innerWidth/squareSize;
+	uint thickness = (outerWidth2 - innerWidth2)/2u;
+	uint section1Offset = outerWidth2*thickness;
+	uint section2Offset = section1Offset + innerWidth2*thickness;
+	uint section3Offset = section2Offset + innerWidth2*thickness;
+
+	float x = centerXrounded + aPos.x*float(squareSize);
+	float z = centerYrounded + aPos.y*float(squareSize);
+	int xOffset = -int(outerWidth2)/2;
+	int zOffset = -int(outerWidth2)/2;
+
+	if (step(section3Offset, uint(gl_InstanceID)) == 1.0) {
+		uint newID = uint(gl_InstanceID) - uint(section3Offset);
+		xOffset += int(newID%outerWidth2);
+		zOffset += int(thickness + innerWidth2 + newID/outerWidth2);
+	} else if (step(section2Offset, uint(gl_InstanceID)) == 1.0) {
+		uint newID = uint(gl_InstanceID) - uint(section2Offset);
+		xOffset += int(thickness + innerWidth2 + newID%thickness);
+		zOffset += int(thickness + newID/thickness);
+	} else if (step(section1Offset, uint(gl_InstanceID)) == 1.0) {
+		uint newID = uint(gl_InstanceID) - uint(section1Offset);
+		xOffset += int(newID%thickness);
+		zOffset += int(thickness + newID/thickness);
+	} else {
+		xOffset += gl_InstanceID%int(outerWidth2);
+		zOffset += gl_InstanceID/int(outerWidth2);
+	}
+	x += float(xOffset*int(squareSize));
+	z += float(zOffset*int(squareSize));
 
 	float y = 0.0;
 	float cellSize = 1024.0;
 	float perlinDx = 0.0;
 	float perlinDy = 0.0;
 	for (int i = 0; i < 4; i++) {
-		vec3 perlinResult = perlin(x, z, cellSize);
+		vec3 perlinResult = perlin(x + 1000000.0, z + 1000000.0, cellSize);
 		y += perlinResult.x*cellSize;
 		perlinDx += perlinResult.y;
 		perlinDy += perlinResult.z;
 		cellSize *= 0.5;
 	}
-
 	vec4 worldPos = vec4(x, y, z, 1.0);
-//	gl_Position = projection*view*model*vec4(aPos, 1.0);
 	gl_Position = projection*view*worldPos;
 	fragPos = vec3(worldPos);
 
 	normal = normalize(vec3(-perlinDx, -perlinDy, 1.0));
-//	texCoord = aTexCoord;
 }
 
 vec2 gradient(int x, int y, int seed)

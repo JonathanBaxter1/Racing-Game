@@ -11,7 +11,6 @@ int screenHeight;
 Shader shaders[MAX_SHADERS] = {0};
 Object* objects[MAX_OBJECTS] = {0};
 PointLight* pointLights;
-Object ground;
 Object waterObj;
 
 unsigned int surfaceSize;
@@ -156,7 +155,7 @@ void windowInit(GLFWwindow** window)
 	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 //	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	glfwSetCursorPosCallback(*window, mouseCallback);
-	setPerspectiveMatrix(projectionMatrix, 45.0, aspectRatio, 0.1, 10000.0);
+	setPerspectiveMatrix(projectionMatrix, 45.0, aspectRatio, 1.0, 100000.0);
 
 	shaderTexture = createShader("vertexTexture.shader", "fragmentTexture.shader");
 	shaderColorPhong = createShader("vertexTexture.shader", "fragmentColorPhong.shader");
@@ -185,9 +184,9 @@ void handleInput(GLFWwindow* window, float deltaT)
 			cameraX -= MOVEMENT_SPEED*deltaT*cos(cameraYaw);
 		}
 		if (isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-			cameraY += MOVEMENT_SPEED*deltaT;
+			cameraY += MOVEMENT_SPEED*10*deltaT;
 		} else if (isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-			cameraY -= MOVEMENT_SPEED*deltaT;
+			cameraY -= MOVEMENT_SPEED*10*deltaT;
 		}
 		if (isKeyDown(GLFW_KEY_SPACE)) {
 			cameraZ -= MOVEMENT_SPEED*50.0*deltaT*cos(cameraYaw);
@@ -315,12 +314,6 @@ void updateUniforms()
 		if (shader == 0) break;
 		glUseProgram(shader);
 
-		// Surface Size
-		int surfaceSizeLoc = glGetUniformLocation(shader, "size");
-		if (surfaceSizeLoc != -1) {
-			glUniform1ui(surfaceSizeLoc, surfaceSize);
-		}
-
 		// View Matrix
 		int viewMatrixLoc = glGetUniformLocation(shader, "view");
 		glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, viewMatrix);
@@ -333,8 +326,8 @@ void updateUniforms()
 		int shininessUniformLoc = glGetUniformLocation(shader, "shininess");
 		glUniform1f(shininessUniformLoc, 32.0);
 
-		// Point Light Info
-		for (int j = 0; j < NUM_POINT_LIGHTS; j++) {
+		// Point Light Info (disable for now)
+/*		for (int j = 0; j < NUM_POINT_LIGHTS; j++) {
 			char pointLightUniformString1[32];
 			char pointLightUniformString2[32];
 			char pointLightUniformString3[32];
@@ -347,7 +340,7 @@ void updateUniforms()
 			glUniform3f(pointLightUniformLoc1, pointLights[j].pos.x, pointLights[j].pos.y, pointLights[j].pos.z);
 			glUniform1f(pointLightUniformLoc2, pointLights[j].linear);
 			glUniform1f(pointLightUniformLoc3, pointLights[j].quad);
-		}
+		}*/
 
 	}
 }
@@ -372,76 +365,63 @@ void drawObject(Object* object)
 		glBindBuffer(GL_ARRAY_BUFFER, object->LBO);
 		glDrawElementsInstanced(drawType, object->indicesSize/sizeof(unsigned int), GL_UNSIGNED_INT, 0, object->numInstances);
 	} else {
-		glDrawElementsInstanced(drawType, object->indicesSize/sizeof(unsigned int), GL_UNSIGNED_INT, 0, object->numInstances);
+		glDrawElementsInstanced(drawType, 6, GL_UNSIGNED_INT, 0, object->numInstances);
 	}
 }
 
-void createSurface(Object* surface, Shader shader, unsigned int size, Texture diffuseMap, Texture specularMap)
+Terrain createTerrain(Shader shader)
 {
+	Terrain terrain;
 	glUseProgram(shader);
-	int diffuseMapUniformLoc = glGetUniformLocation(shader, "diffuseMapTex");
-	glUniform1i(diffuseMapUniformLoc, 0);
-	int specularMapUniformLoc = glGetUniformLocation(shader, "specularMapTex");
-	glUniform1i(specularMapUniformLoc, 1);
 
-	glGenVertexArrays(1, &surface->VAO);
-	glBindVertexArray(surface->VAO);
+	glGenVertexArrays(1, &terrain.VAO);
+	glBindVertexArray(terrain.VAO);
 
 	float surfaceVertices[] = {
-		0.0, 0.0, 0.0,  0.0, 1.0, 0.0,  0.0, 0.0,
-		0.0, 0.0, 1.0,  0.0, 1.0, 0.0,  0.0, 1.0,
-		1.0, 0.0, 1.0,  0.0, 1.0, 0.0,  1.0, 1.0,
-		1.0, 0.0, 0.0,  0.0, 1.0, 0.0,  1.0, 0.0,
+		0.0, 0.0,
+		0.0, 1.0,
+		1.0, 1.0,
+		1.0, 0.0,
 	};
 	unsigned int surfaceIndices[] = {
 		0, 1, 2,
 		2, 3, 0,
 	};
 
-	glGenBuffers(1, &surface->VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, surface->VBO);
+	glGenBuffers(1, &terrain.VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, terrain.VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(surfaceVertices), surfaceVertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
 
-	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 16*sizeof(float), (void*)0);
-	glVertexAttribDivisor(3, 1);
-	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 16*sizeof(float), (void*)(4*sizeof(float)));
-	glVertexAttribDivisor(4, 1);
-	glEnableVertexAttribArray(4);
-	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 16*sizeof(float), (void*)(8*sizeof(float)));
-	glVertexAttribDivisor(5, 1);
-	glEnableVertexAttribArray(5);
-	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 16*sizeof(float), (void*)(12*sizeof(float)));
-	glVertexAttribDivisor(6, 1);
-	glEnableVertexAttribArray(6);
-
-	glGenBuffers(1, &surface->IBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, surface->IBO);
+	glGenBuffers(1, &terrain.IBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrain.IBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(surfaceIndices), surfaceIndices, GL_STATIC_DRAW);
 
-	surface->shader = shader;
-	surface->diffuseMap = diffuseMap;
-	surface->specularMap = specularMap;
-	surface->indicesSize = sizeof(surfaceIndices);
-	surface->surfaceSize = size;
-	surfaceSize = size;
-	surface->numInstances = size*size;
+	terrain.shader = shader;
 
-	objects[numObjects] = surface;
-	numObjects++;
+	return terrain;
 }
 
-//static void drawSurface(Surface* surface)
-//{
-//	glUseProgram(surface->shader);
-//}
+void drawTerrain(Terrain terrain)
+{
+	glUseProgram(terrain.shader);
+	glBindVertexArray(terrain.VAO);
+	for (int i = 0; i < NUM_TERRAIN_SEGMENTS; i++) {
+		int innerWidthLoc = glGetUniformLocation(terrain.shader, "innerWidth");
+		int outerWidthLoc = glGetUniformLocation(terrain.shader, "outerWidth");
+		int squareSizeLoc = glGetUniformLocation(terrain.shader, "squareSize");
+		int centerXLoc = glGetUniformLocation(terrain.shader, "centerX");
+		int centerYLoc = glGetUniformLocation(terrain.shader, "centerY");
+		glUniform1ui(innerWidthLoc, terrain.segments[i].innerWidth);
+		glUniform1ui(outerWidthLoc, terrain.segments[i].outerWidth);
+		glUniform1ui(squareSizeLoc, terrain.segments[i].squareSize);
+		glUniform1f(centerXLoc, terrain.segments[i].centerX);
+		glUniform1f(centerYLoc, terrain.segments[i].centerY);
+		glDrawElementsInstanced(drawType, 6, GL_UNSIGNED_INT, 0, terrain.segments[i].numSquares);
+	}
+}
 
 void createSphere(Model* object, unsigned int num)
 {
@@ -466,20 +446,6 @@ void createSphere(Model* object, unsigned int num)
 			object->indices[(j*num+i)*6 + 5] = j*(num+1)+i+1;
 		}
 	}
-}
-
-void render()
-{
-	// Clear Background
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	for (unsigned int i = 0; i < numObjects; i++) {
-		drawObject(objects[i]);
-	}
-	scenes[activeScene]->Draw(shaderTexture);
-
-	glfwSwapBuffers(window);
 }
 
 unsigned int createTexture(std::string fileName)

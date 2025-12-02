@@ -12,6 +12,7 @@
 #include <assimp/postprocess.h>
 #include "stb_image.h"
 
+#include "consts.h"
 #include "types.h"
 #include "utils.h"
 #include "models.h"

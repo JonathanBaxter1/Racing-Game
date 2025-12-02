@@ -1,4 +1,7 @@
 #pragma once
+
+#include "consts.h"
+
 typedef float mat4[16];
 typedef unsigned int Shader;
 typedef unsigned int Texture;
@@ -43,16 +46,20 @@ typedef struct {
 	unsigned int surfaceSize;
 } Object;
 typedef struct {
+	float centerX;
+	float centerY;
+	unsigned int innerWidth;
+	unsigned int outerWidth;
+	unsigned int squareSize;
+	unsigned int numSquares;
+} TerrainSegment;
+typedef struct {
 	unsigned int VAO;
 	unsigned int VBO;
 	unsigned int IBO;
 	Shader shader;
-	Texture diffuseMap;
-	Texture specularMap;
-	int indicesSize;
-	unsigned int size;
-	unsigned int numInstances;
-} Surface;
+	TerrainSegment segments[NUM_TERRAIN_SEGMENTS];
+} Terrain;
 typedef struct {
 	vec3 pos;
 	float linear;

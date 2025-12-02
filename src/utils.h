@@ -1,19 +1,9 @@
 #pragma once
 
+#include "consts.h"
 #include "models.h"
 #include "model.h"
 #include "scene.h"
-
-#define VSYNC_ON 1
-#define GAME_DEBUG false
-#define MAX_SHADERS 256
-#define MAX_OBJECTS 256
-#define NUM_POINT_LIGHTS 4
-#define POINT_LIGHT_SIZE 5 // floats
-#define MAX_SHADER_SIZE 8192 // bytes
-#define MOUSE_SENSITIVITY 0.001
-#define MOVEMENT_SPEED 55.0 // M/s
-#define CAR_SPEED 26.0
 
 extern void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 extern void setModelMatrix(mat4 matrix, float scale, float angle, float angle2, float x, float y, float z);
@@ -24,10 +14,9 @@ extern void updateUniforms();
 extern void createColorObject(Object* object, Model* model, Shader shader, Color color, float instancePositions[], unsigned int numInstances);
 extern void createTextureObject(Object* object, Model* model, Shader shader, Texture diffuseMap, Texture specularMap, float instancePositions[], unsigned int numInstances);
 extern void drawObject(Object* object);
-extern void createSurface(Object* surface, Shader shader, unsigned int size, Texture diffuseMap, Texture specularMap);
-extern void drawSurface(Surface* surface);
+extern Terrain createTerrain(Shader shader);
+extern void drawTerrain(Terrain terrain);
 extern void createSphere(Model* object, unsigned int num);
-extern void render();
 extern unsigned int createTexture(std::string fileName);
 extern unsigned int createTexture(std::string fileName, std::string directory);
 extern unsigned int compileShader(unsigned int type, std::string source);
