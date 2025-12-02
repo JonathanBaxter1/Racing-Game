@@ -123,7 +123,7 @@ void windowInit(GLFWwindow** window)
 	screenHeight = videoMode->height;
 	float aspectRatio = (float)screenWidth/(float)screenHeight;
 	printf("Screen Resolution: %dx%d\n", screenWidth, screenHeight);
-	(*window) = glfwCreateWindow(screenWidth, screenHeight, "Tutorial", monitor, NULL);
+	(*window) = glfwCreateWindow(screenWidth, screenHeight, "flight sim", monitor, NULL);
 	if (*window == NULL) {
 		printf("GLFW window creation failed\n");
 		glfwTerminate();
