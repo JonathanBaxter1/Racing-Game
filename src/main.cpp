@@ -61,7 +61,6 @@ int main()
 			curSquareSize *= 2;
 			polygons += terrain.segments[i].numSquares*2;
 		}
-		printf("Polygons: %d\n", polygons);
 
 		// Update water
 		lastSegmentOuterWidth = 0;
