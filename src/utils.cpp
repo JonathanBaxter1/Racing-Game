@@ -137,20 +137,20 @@ void windowInit(GLFWwindow** window)
 	glfwSwapInterval(VSYNC_ON);
 
 	// Cursor setup
-	int cursorWidth, cursorHeight, cursorNumChannels;
-	unsigned char* cursorImageData = stbi_load("textures/cursor.png", &cursorWidth, &cursorHeight, &cursorNumChannels, 0);
+//	int cursorWidth, cursorHeight, cursorNumChannels;
+//	unsigned char* cursorImageData = stbi_load("textures/cursor.png", &cursorWidth, &cursorHeight, &cursorNumChannels, 0);
 
-	if (cursorNumChannels != 4) {
-		std::cout << "Error: cursor image data must have 4 channels (RGBA)" << std::endl;
-		exit(-1);
-	}
-	GLFWimage cursorImage;
-	cursorImage.width = cursorWidth;
-	cursorImage.height = cursorHeight;
-	cursorImage.pixels = cursorImageData;
+//	if (cursorNumChannels != 4) {
+//		std::cout << "Error: cursor image data must have 4 channels (RGBA)" << std::endl;
+//		exit(-1);
+//	}
+//	GLFWimage cursorImage;
+//	cursorImage.width = cursorWidth;
+//	cursorImage.height = cursorHeight;
+//	cursorImage.pixels = cursorImageData;
 
-	GLFWcursor* cursor = glfwCreateCursor(&cursorImage, 0, 0);
-	stbi_image_free(cursorImageData);
+//	GLFWcursor* cursor = glfwCreateCursor(&cursorImage, 0, 0);
+//	stbi_image_free(cursorImageData);
 //	glfwSetCursor(*window, cursor);
 	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 //	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -387,6 +387,11 @@ Terrain createTerrain(Shader shader)
 		0, 1, 2,
 		2, 3, 0,
 	};
+
+	int snowDiffuseTexLoc = glGetUniformLocation(shader, "snowDiffuseTex");
+	int stoneDiffuseTexLoc = glGetUniformLocation(shader, "stoneDiffuseTex");
+	int grassDiffuseTexLoc = glGetUniformLocation(shader, "grassDiffuseTex");
+	int sandDiffuseTexLoc = glGetUniformLocation(shader, "sandDiffuseTex");
 
 	glGenBuffers(1, &terrain.VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, terrain.VBO);

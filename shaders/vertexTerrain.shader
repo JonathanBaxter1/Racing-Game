@@ -2,7 +2,6 @@
 layout (location = 0) in vec2 aPos;
 
 out vec3 fragPos;
-out vec3 normal;
 
 uniform mat4 view;
 uniform mat4 projection;
@@ -14,8 +13,7 @@ uniform float centerY;
 
 vec2 gradient(int x, int y);
 float fade(float t);
-float fadePrime(float t);
-vec3 perlin(float x, float y, float cellSize);
+float perlin(float x, float y, float cellSize);
 
 void main()
 {
@@ -55,20 +53,14 @@ void main()
 
 	float y = 0.0;
 	float cellSize = 1024.0;
-	float perlinDx = 0.0;
-	float perlinDy = 0.0;
-	for (int i = 0; i < 4; i++) {
-		vec3 perlinResult = perlin(x + 1000000.0, z + 1000000.0, cellSize);
-		y += perlinResult.x*cellSize;
-		perlinDx += perlinResult.y;
-		perlinDy += perlinResult.z;
+	for (int i = 0; i < 8; i++) {
+		float perlinResult = perlin(x + 1000000.0, z + 1000000.0, cellSize);
+		y += perlinResult*cellSize*0.5;
 		cellSize *= 0.5;
 	}
 	vec4 worldPos = vec4(x, y, z, 1.0);
 	gl_Position = projection*view*worldPos;
 	fragPos = vec3(worldPos);
-
-	normal = normalize(vec3(-perlinDx, -perlinDy, 1.0));
 }
 
 vec2 gradient(int x, int y, int seed)
@@ -92,12 +84,7 @@ float fade(float t)
 	return t*t*t*(t*(t*6 - 15) + 10);
 }
 
-float fadePrime(float t)
-{
-	return t*t*(t*(t*30 - 60) + 30);
-}
-
-vec3 perlin(float x, float y, float cellSize)
+float perlin(float x, float y, float cellSize)
 {
 	float x2 = x/cellSize;
 	float y2 = y/cellSize;
@@ -107,8 +94,6 @@ vec3 perlin(float x, float y, float cellSize)
 	int y1 = y0 + 1;
 	float u = fade(x2 - float(x0));
 	float v = fade(y2 - float(y0));
-	float du = fadePrime(x2 - float(x0));
-	float dv = fadePrime(y2 - float(y0));
 
 	vec2 g00 = gradient(x0, y0, 42);
 	vec2 g01 = gradient(x0, y1, 42);
@@ -124,25 +109,5 @@ vec3 perlin(float x, float y, float cellSize)
 	float nx1 = mix(n01, n11, u);
 	float n = mix(nx0, nx1, v);
 
-	float dn00_dx = g00.x;
-	float dn01_dx = g01.x;
-	float dn10_dx = g10.x;
-	float dn11_dx = g11.x;
-
-	float dnx0_dx = mix(dn00_dx, dn10_dx, u) + du * (n10 - n00);
-	float dnx1_dx = mix(dn01_dx, dn11_dx, u) + du * (n11 - n01);
-
-	float dn_dx = mix(dnx0_dx, dnx1_dx, v) + dv * (nx1 - nx0);
-
-	float dn00_dy = g00.y;
-	float dn01_dy = g01.y;
-	float dn10_dy = g10.y;
-	float dn11_dy = g11.y;
-
-	float dnx0_dy = mix(dn00_dy, dn10_dy, u) + du * (n10 - n00);
-	float dnx1_dy = mix(dn01_dy, dn11_dy, u) + du * (n11 - n01);
-
-	float dn_dy = mix(dnx0_dy, dnx1_dy, v) + dv * (nx1 - nx0);
-
-	return vec3(n, dn_dx, dn_dy);
+	return n;
 }
