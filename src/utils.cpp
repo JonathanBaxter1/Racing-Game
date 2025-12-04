@@ -369,8 +369,13 @@ void drawObject(Object* object)
 	}
 }
 
-Terrain createTerrain(Shader shader)
+Terrain createTerrain(Shader shader, Texture textures[], unsigned int numTextures)
 {
+	if (numTextures > TERRAIN_MAX_TEXTURES) {
+		printf("Too many textures in terrain. Max is %d\n", TERRAIN_MAX_TEXTURES);
+		exit(-1);
+	}
+
 	Terrain terrain;
 	glUseProgram(shader);
 
@@ -392,6 +397,10 @@ Terrain createTerrain(Shader shader)
 	int stoneDiffuseTexLoc = glGetUniformLocation(shader, "stoneDiffuseTex");
 	int grassDiffuseTexLoc = glGetUniformLocation(shader, "grassDiffuseTex");
 	int sandDiffuseTexLoc = glGetUniformLocation(shader, "sandDiffuseTex");
+	glUniform1i(snowDiffuseTexLoc, 0);
+	glUniform1i(stoneDiffuseTexLoc, 1);
+	glUniform1i(grassDiffuseTexLoc, 2);
+	glUniform1i(sandDiffuseTexLoc, 3);
 
 	glGenBuffers(1, &terrain.VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, terrain.VBO);
@@ -405,6 +414,10 @@ Terrain createTerrain(Shader shader)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(surfaceIndices), surfaceIndices, GL_STATIC_DRAW);
 
 	terrain.shader = shader;
+	for (unsigned int i = 0; i < numTextures; i++) {
+		terrain.textures[i] = textures[i];
+	}
+	terrain.numTextures = numTextures;
 
 	return terrain;
 }
@@ -413,6 +426,12 @@ void drawTerrain(Terrain terrain)
 {
 	glUseProgram(terrain.shader);
 	glBindVertexArray(terrain.VAO);
+
+	for (unsigned int i = 0; i < terrain.numTextures; i++) {
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, terrain.textures[i]);
+	}
+
 	for (int i = 0; i < NUM_TERRAIN_SEGMENTS; i++) {
 		int innerWidthLoc = glGetUniformLocation(terrain.shader, "innerWidth");
 		int outerWidthLoc = glGetUniformLocation(terrain.shader, "outerWidth");

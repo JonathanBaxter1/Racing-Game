@@ -37,16 +37,16 @@ void main()
 
 	vec3 norm = normalize(vec3(-perlinDx, 1.0, -perlinDy));
 
-	float isSnow = step(200.0-flatness*30.0, y);
-//	float isSnow = step(200.0, y);
-	float isGrass = 1.0-step(-350.0, y);
-	vec3 color = vec3(0.4+0.6*isSnow, 0.4+0.6*isSnow+0.6*isGrass, 0.4+0.6*isSnow);
+	float snowStoneMix = clamp((y - 200.0 + flatness*30.0)/30.0, 0.0, 1.0);
+	vec2 texCoord = vec2(fragPos.x, fragPos.z)/64.0;
+	vec4 snowColor = texture(snowDiffuseTex, texCoord);
+	vec4 stoneColor = texture(stoneDiffuseTex, texCoord);
+	vec3 color = vec3(mix(stoneColor, snowColor, snowStoneMix));
 
 	vec3 viewDir = normalize(viewPos - fragPos);
 	vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
 
 	float diffuseScalar = 0.7*max(dot(norm, lightDir), 0.0);
-//	vec3 diffuseMap = vec3(texture(diffuseMapTex, texCoord));
 
 	float ambientScalar = 0.3;
 

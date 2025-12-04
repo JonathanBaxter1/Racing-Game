@@ -58,6 +58,8 @@ typedef struct {
 	unsigned int VBO;
 	unsigned int IBO;
 	Shader shader;
+	Texture textures[TERRAIN_MAX_TEXTURES];
+	unsigned int numTextures;
 	TerrainSegment segments[NUM_TERRAIN_SEGMENTS];
 } Terrain;
 typedef struct {

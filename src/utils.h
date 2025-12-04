@@ -14,7 +14,7 @@ extern void updateUniforms();
 extern void createColorObject(Object* object, Model* model, Shader shader, Color color, float instancePositions[], unsigned int numInstances);
 extern void createTextureObject(Object* object, Model* model, Shader shader, Texture diffuseMap, Texture specularMap, float instancePositions[], unsigned int numInstances);
 extern void drawObject(Object* object);
-extern Terrain createTerrain(Shader shader);
+extern Terrain createTerrain(Shader shader, Texture textures[], unsigned int numTextures);
 extern void drawTerrain(Terrain terrain);
 extern void createSphere(Model* object, unsigned int num);
 extern unsigned int createTexture(std::string fileName);
