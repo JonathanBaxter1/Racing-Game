@@ -52,12 +52,29 @@ void main()
 	z += float(zOffset*int(squareSize));
 
 	float y = 0.0;
-	float cellSize = 1024.0;
+	float cellSize = 8192.0;
+	float multiplier = 1.0;
+	for (int i = 0; i < 4; i++) {
+		float perlinResult = perlin(x + 1000000.0, z + 1000000.0, cellSize);
+		y += perlinResult*multiplier;
+		cellSize *= 0.5;
+		multiplier *= 0.5;
+	}
+	float grassY = y;
 	for (int i = 0; i < 8; i++) {
 		float perlinResult = perlin(x + 1000000.0, z + 1000000.0, cellSize);
-		y += perlinResult*cellSize*0.5;
+		y += perlinResult*multiplier;
 		cellSize *= 0.5;
+		multiplier *= 0.5;
 	}
+	grassY = (grassY + 0.8)/1.6;
+	float newY = (y + 0.8)/1.6;
+	float isMountain = step(0.8, newY);
+	float isMountainFade = clamp((newY - 0.75)*10.0, 0.0, 1.0);
+	y = mix(grassY, newY, isMountainFade);
+	float yFlat = 0.1*y;
+	float yMountain = (y - 0.775)*(y - 0.775)*2 + 0.07875;
+	y = mix(yFlat, yMountain, isMountain)*8192.0;
 	vec4 worldPos = vec4(x, y, z, 1.0);
 	gl_Position = projection*view*worldPos;
 	fragPos = vec3(worldPos);
@@ -100,6 +117,10 @@ float perlin(float x, float y, float cellSize)
 	vec2 g10 = gradient(x1, y0, 42);
 	vec2 g11 = gradient(x1, y1, 42);
 
+//	float n00 = dot(g00, vec2(u, v));
+//	float n01 = dot(g01, vec2(u, v-1));
+//	float n10 = dot(g10, vec2(u-1, v));
+//	float n11 = dot(g11, vec2(u-1, v-1));
 	float n00 = dot(g00, vec2(x2 - float(x0), y2 - float(y0)));
 	float n01 = dot(g01, vec2(x2 - float(x0), y2 - float(y1)));
 	float n10 = dot(g10, vec2(x2 - float(x1), y2 - float(y0)));

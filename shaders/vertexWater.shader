@@ -48,7 +48,7 @@ void main()
 	x += float(xOffset*int(squareSize));
 	z += float(zOffset*int(squareSize));
 
-	float y = -80.0;
+	float y = 400.0;
 	vec4 worldPos = vec4(x, y, z, 1.0);
 	gl_Position = projection*view*worldPos;
 	fragPos = vec3(worldPos);

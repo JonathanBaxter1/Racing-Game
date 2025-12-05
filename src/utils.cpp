@@ -20,8 +20,8 @@ unsigned int drawType = GL_TRIANGLES;
 float cameraPitch = 0.0;
 float cameraYaw = 0.0;
 float cameraX = 0.0;
-float cameraY = 0.0;
-float cameraZ = 1.0;
+float cameraY = 1000.0;
+float cameraZ = 0.0;
 
 float carX = 50.0;
 float carY = 0.0;
