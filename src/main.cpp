@@ -20,14 +20,15 @@ int main()
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 
-	Shader terrainShader = createShader("vertexTerrain.shader", "fragmentTerrain.shader");
 	Texture snowTexture = createTexture("snowTex.png");
 	Texture stoneTexture = createTexture("stoneTex.jpg");
 	Texture grassTexture = createTexture("grassTex.jpg");
 	Texture terrainTextures[] = {snowTexture, stoneTexture, grassTexture};
+
+	Shader terrainShader = createShader("vertexTerrain.shader", "", "", "", "fragmentTerrain.shader");
 	Terrain terrain = createTerrain(terrainShader, terrainTextures, sizeof(terrainTextures)/sizeof(terrainTextures[0]));
 
-	Shader waterShader = createShader("vertexWater.shader", "fragmentWater.shader");
+	Shader waterShader = createShader("vertexWater.shader", "", "", "", "fragmentWater.shader");
 	Terrain water = createTerrain(waterShader, nullptr, 0);
 
 	// Main Loop

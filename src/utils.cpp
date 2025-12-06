@@ -110,7 +110,7 @@ void windowInit(GLFWwindow** window)
 		printf("GLFW initialization failed\n");
 		exit(-1);
 	}
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #ifdef __APPLE__
@@ -157,8 +157,8 @@ void windowInit(GLFWwindow** window)
 	glfwSetCursorPosCallback(*window, mouseCallback);
 	setPerspectiveMatrix(projectionMatrix, 45.0, aspectRatio, 1.0, 100000.0);
 
-	shaderTexture = createShader("vertexTexture.shader", "fragmentTexture.shader");
-	shaderColorPhong = createShader("vertexTexture.shader", "fragmentColorPhong.shader");
+//	shaderTexture = createShader("vertexTexture.shader", "fragmentTexture.shader");
+//	shaderColorPhong = createShader("vertexTexture.shader", "fragmentColorPhong.shader");
 	stbi_set_flip_vertically_on_load(1);
 
 }
@@ -506,11 +506,11 @@ unsigned int createTexture(std::string fileName, std::string directory)
 	return texture;
 }
 
-unsigned int compileShader(unsigned int type, std::string source)
+// temp
+unsigned int compileShader(unsigned int type, char* source)
 {
 	unsigned int shaderId = glCreateShader(type);
-	const char* sourceChar = source.c_str();
-	glShaderSource(shaderId, 1, &sourceChar, NULL);
+	glShaderSource(shaderId, 1, &source, NULL);
 	glCompileShader(shaderId);
 	int result;
 	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &result);
@@ -521,64 +521,78 @@ unsigned int compileShader(unsigned int type, std::string source)
 	return shaderId;
 }
 
-unsigned int createShaderProgram(std::string vertexShader, std::string fragmentShader)
+unsigned int createShaderProgram(char* vertexShader, char* tessControlShader, char* tessEvalShader, char* geometryShader, char* fragmentShader)
 {
 	unsigned int program = glCreateProgram();
-	unsigned int vs = compileShader(GL_VERTEX_SHADER, vertexShader);
-	unsigned int fs = compileShader(GL_FRAGMENT_SHADER, fragmentShader);
+	unsigned int vs, tcs, tes, gs, fs = 0;
+
+	vs = compileShader(GL_VERTEX_SHADER, vertexShader);
 	glAttachShader(program, vs);
+	if (tessControlShader[0] != '\0') {
+		tcs = compileShader(GL_TESS_CONTROL_SHADER, tessControlShader);
+		glAttachShader(program, tcs);
+	}
+	if (tessEvalShader[0] != '\0') {
+		tes = compileShader(GL_TESS_EVALUATION_SHADER, tessEvalShader);
+		glAttachShader(program, tes);
+	}
+	if (geometryShader[0] != '\0') {
+		gs = compileShader(GL_GEOMETRY_SHADER, geometryShader);
+		glAttachShader(program, gs);
+	}
+	fs = compileShader(GL_FRAGMENT_SHADER, fragmentShader);
 	glAttachShader(program, fs);
+
 	glLinkProgram(program);
 	glValidateProgram(program);
+
 	glDeleteShader(vs);
+	glDeleteShader(tcs);
+	glDeleteShader(tes);
+	glDeleteShader(gs);
 	glDeleteShader(fs);
 
 	return program;
 }
 
-unsigned int createShader(std::string vertexFileName, std::string fragmentFileName)
+//unsigned int createShader(std::string vertexFileName, std::string fragmentFileName)
+unsigned int createShader(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string geometryFileName, std::string fragmentFileName)
 {
 	static unsigned int numShaders = 0;
 
 	std::string vertexFilePath = "shaders/" + vertexFileName;
+	std::string tessControlFilePath = "shaders/" + tessControlFileName;
+	std::string tessEvalFilePath = "shaders/" + tessEvalFileName;
+	std::string geometryFilePath = "shaders/" + geometryFileName;
 	std::string fragmentFilePath = "shaders/" + fragmentFileName;
 
-	FILE *vertexFile = fopen(vertexFilePath.c_str(), "r");
-	if (vertexFile == NULL) {
-		std::cout << "Could not read vertex shader file: " << vertexFileName << std::endl;
-		glfwTerminate();
-		exit(-1);
-	}
-	char vertexShader[MAX_SHADER_SIZE];
+	std::string shaderFileNames[5] = {vertexFileName, tessControlFileName, tessEvalFileName, geometryFileName, fragmentFileName};
+	std::string shaderFilePaths[5] = {vertexFilePath, tessControlFilePath, tessEvalFilePath, geometryFilePath, fragmentFilePath};
+	char shaderFiles[5][MAX_SHADER_SIZE];
 
-	vertexShader[0] = '\0';  // Start with an empty string
-	char line[1024];
-	while (fgets(line, sizeof(line), vertexFile) != NULL) {
-		if (strlen(vertexShader) + strlen(line) >= MAX_SHADER_SIZE) {
-			std::cout << "Shader file too large.\n" << std::endl;
+
+	for (int i = 0; i < 5; i++) {
+		shaderFiles[i][0] = '\0';
+		if (shaderFileNames[i].empty()) continue;
+		FILE *shaderFile = fopen(shaderFilePaths[i].c_str(), "r");
+		if (shaderFile == NULL) {
+			std::cout << "Could not read shader file: " << shaderFileNames[i] << std::endl;
+			glfwTerminate();
 			exit(-1);
 		}
-		strcat(vertexShader, line);
-	}
 
-	FILE *fragmentFile = fopen(fragmentFilePath.c_str(), "r");
-	if (fragmentFile == NULL) {
-		std::cout << "Could not read fragment shader file: " << fragmentFileName << std::endl;
-		glfwTerminate();
-		exit(-1);
-	}
-	char fragmentShader[MAX_SHADER_SIZE];
-
-	fragmentShader[0] = '\0';  // Start with an empty string
-	while (fgets(line, sizeof(line), fragmentFile) != NULL) {
-		if (strlen(fragmentShader) + strlen(line) >= MAX_SHADER_SIZE) {
-			std::cout << "Shader file too large.\n" << std::endl;
-			exit(-1);
+		char line[1024];
+		while (fgets(line, sizeof(line), shaderFile) != NULL) {
+			if (strlen(shaderFiles[i]) + strlen(line) >= MAX_SHADER_SIZE) {
+				std::cout << "Shader file too large.\n" << std::endl;
+				exit(-1);
+			}
+			strcat(shaderFiles[i], line);
 		}
-		strcat(fragmentShader, line);
+		fclose(shaderFile);
 	}
 
-	unsigned int shader = createShaderProgram(vertexShader, fragmentShader);
+	unsigned int shader = createShaderProgram(shaderFiles[0], shaderFiles[1], shaderFiles[2], shaderFiles[3], shaderFiles[4]);
 
 	glUseProgram(shader);
 	int projectionMatrixLoc = glGetUniformLocation(shader, "projection");

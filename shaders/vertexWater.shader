@@ -1,4 +1,4 @@
-#version 330 core
+#version 430
 layout (location = 0) in vec2 aPos;
 
 out vec3 fragPos;

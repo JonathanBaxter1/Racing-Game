@@ -19,9 +19,9 @@ extern void drawTerrain(Terrain terrain);
 extern void createSphere(Model* object, unsigned int num);
 extern unsigned int createTexture(std::string fileName);
 extern unsigned int createTexture(std::string fileName, std::string directory);
-extern unsigned int compileShader(unsigned int type, std::string source);
-extern unsigned int createShaderProgram(std::string vertexShader, std::string fragmentShader);
-extern unsigned int createShader(std::string vertexFileName, std::string fragmentFileName);
+extern unsigned int compileShader(unsigned int type, char* source);
+extern unsigned int createShaderProgram(char* vertexShader, char* tessControlShader, char* tessEvalShader, char* geometryShader, char* fragmentShader);
+extern unsigned int createShader(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string geometryFileName, std::string fragmentFileName);
 extern unsigned int isKeyDown(int key);
 
 // Global Variables
