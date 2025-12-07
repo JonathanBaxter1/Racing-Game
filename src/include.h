@@ -21,3 +21,5 @@
 #include "sceneOld.h"
 #include "object.h"
 #include "scene.h"
+
+#include "Terrain.h"

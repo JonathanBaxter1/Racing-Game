@@ -26,10 +26,10 @@ int main()
 	Texture terrainTextures[] = {snowTexture, stoneTexture, grassTexture};
 
 	Shader terrainShader = createShader("vertexTerrain.shader", "", "", "", "fragmentTerrain.shader");
-	Terrain terrain = createTerrain(terrainShader, terrainTextures, sizeof(terrainTextures)/sizeof(terrainTextures[0]));
+	TerrainOld terrain = createTerrain(terrainShader, terrainTextures, sizeof(terrainTextures)/sizeof(terrainTextures[0]));
 
-	Shader waterShader = createShader("vertexWater.shader", "", "", "", "fragmentWater.shader");
-	Terrain water = createTerrain(waterShader, nullptr, 0);
+	Shader waterShader = createShader("vertexWater.shader", "tessControlWater.shader", "tessEvalWater.shader", "", "fragmentWater.shader");
+	Terrain water(waterShader);
 
 	// Main Loop
 	while (!glfwWindowShouldClose(window)) {
@@ -69,7 +69,7 @@ int main()
 		}
 
 		// Update water
-		lastSegmentOuterWidth = 0;
+/*		lastSegmentOuterWidth = 0;
 		curWidth = 2048;
 		curSquareSize = 32;
 		for (int i = 0; i < NUM_TERRAIN_SEGMENTS; i++) {
@@ -82,7 +82,7 @@ int main()
 			lastSegmentOuterWidth = curWidth;
 			curWidth *= 2;
 			curSquareSize *= 2;
-		}
+		}*/
 
 		float newTime2 = glfwGetTime();
 		deltaT_CPU = (int)((newTime2 - newTime)*1000000);
@@ -91,7 +91,7 @@ int main()
 		glClearColor(0.5, 0.75, 0.95, 1.0); // Sky blue, also fog color
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		drawTerrain(terrain);
-		drawTerrain(water);
+		water.render();
 		glfwSwapBuffers(window);
 
 		deltaT_GPU = (int)((glfwGetTime() - newTime2)*1000000);

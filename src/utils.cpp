@@ -369,14 +369,14 @@ void drawObject(Object* object)
 	}
 }
 
-Terrain createTerrain(Shader shader, Texture textures[], unsigned int numTextures)
+TerrainOld createTerrain(Shader shader, Texture textures[], unsigned int numTextures)
 {
 	if (numTextures > TERRAIN_MAX_TEXTURES) {
 		printf("Too many textures in terrain. Max is %d\n", TERRAIN_MAX_TEXTURES);
 		exit(-1);
 	}
 
-	Terrain terrain;
+	TerrainOld terrain;
 	glUseProgram(shader);
 
 	glGenVertexArrays(1, &terrain.VAO);
@@ -422,7 +422,7 @@ Terrain createTerrain(Shader shader, Texture textures[], unsigned int numTexture
 	return terrain;
 }
 
-void drawTerrain(Terrain terrain)
+void drawTerrain(TerrainOld terrain)
 {
 	glUseProgram(terrain.shader);
 	glBindVertexArray(terrain.VAO);
@@ -528,20 +528,24 @@ unsigned int createShaderProgram(char* vertexShader, char* tessControlShader, ch
 
 	vs = compileShader(GL_VERTEX_SHADER, vertexShader);
 	glAttachShader(program, vs);
+	std::cout << "vertex" << std::endl;
 	if (tessControlShader[0] != '\0') {
 		tcs = compileShader(GL_TESS_CONTROL_SHADER, tessControlShader);
 		glAttachShader(program, tcs);
 	}
+	std::cout << "tcs" << std::endl;
 	if (tessEvalShader[0] != '\0') {
 		tes = compileShader(GL_TESS_EVALUATION_SHADER, tessEvalShader);
 		glAttachShader(program, tes);
 	}
+	std::cout << "tes" << std::endl;
 	if (geometryShader[0] != '\0') {
 		gs = compileShader(GL_GEOMETRY_SHADER, geometryShader);
 		glAttachShader(program, gs);
 	}
 	fs = compileShader(GL_FRAGMENT_SHADER, fragmentShader);
 	glAttachShader(program, fs);
+	std::cout << "fragment" << std::endl;
 
 	glLinkProgram(program);
 	glValidateProgram(program);
