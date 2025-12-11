@@ -1,10 +1,14 @@
 #pragma once
 
+#include <string>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 #include "consts.h"
 
 typedef float mat4[16];
 typedef unsigned int Shader;
-typedef unsigned int Texture;
+typedef int Texture;
 typedef struct {
 	float x;
 	float y;
@@ -61,7 +65,7 @@ typedef struct {
 	Texture textures[TERRAIN_MAX_TEXTURES];
 	unsigned int numTextures;
 	TerrainSegment segments[NUM_TERRAIN_SEGMENTS];
-} Terrain;
+} TerrainOld;
 typedef struct {
 	vec3 pos;
 	float linear;

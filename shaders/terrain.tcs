@@ -1,0 +1,24 @@
+#version 430
+
+layout (vertices = 4) out;
+
+uniform vec3 viewPos;
+
+void main()
+{
+	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+
+	float cameraDistance = distance(viewPos, vec3(gl_in[0].gl_Position));
+	float minResolution = 1.0;
+	float maxResolution = 64.0;
+	float resolution = clamp(16384.0/cameraDistance, minResolution, maxResolution);
+	resolution = pow(2.0, ceil(log2(resolution)));
+
+	gl_TessLevelOuter[0] = resolution;
+	gl_TessLevelOuter[1] = resolution;
+	gl_TessLevelOuter[2] = resolution;
+	gl_TessLevelOuter[3] = resolution;
+
+	gl_TessLevelInner[0] = resolution;
+	gl_TessLevelInner[1] = resolution;
+}

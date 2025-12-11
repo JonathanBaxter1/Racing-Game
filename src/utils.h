@@ -1,9 +1,11 @@
 #pragma once
 
+#include "include.h"
 #include "consts.h"
 #include "models.h"
 #include "model.h"
 #include "scene.h"
+#include "Terrain.h"
 
 extern void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 extern void setModelMatrix(mat4 matrix, float scale, float angle, float angle2, float x, float y, float z);
@@ -14,8 +16,9 @@ extern void updateUniforms();
 extern void createColorObject(Object* object, Model* model, Shader shader, Color color, float instancePositions[], unsigned int numInstances);
 extern void createTextureObject(Object* object, Model* model, Shader shader, Texture diffuseMap, Texture specularMap, float instancePositions[], unsigned int numInstances);
 extern void drawObject(Object* object);
-extern Terrain createTerrain(Shader shader, Texture textures[], unsigned int numTextures);
-extern void drawTerrain(Terrain terrain);
+extern TerrainOld createTerrain(Shader shader, Texture textures[], unsigned int numTextures);
+extern void drawTerrain(TerrainOld terrain);
+//extern void drawTerrain(Terrain terrain);
 extern void createSphere(Model* object, unsigned int num);
 extern unsigned int createTexture(std::string fileName);
 extern unsigned int createTexture(std::string fileName, std::string directory);
