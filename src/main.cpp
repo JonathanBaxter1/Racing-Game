@@ -28,8 +28,10 @@ int main()
 	Shader terrainShader = createShader("vertexTerrain.shader", "", "", "", "fragmentTerrain.shader");
 	TerrainOld terrain = createTerrain(terrainShader, terrainTextures, sizeof(terrainTextures)/sizeof(terrainTextures[0]));
 
-	Shader waterShader = createShader("vertexWater.shader", "tessControlWater.shader", "tessEvalWater.shader", "", "fragmentWater.shader");
-	Terrain water(waterShader);
+	Shader waterShader = createShader("vertexWater.shader", "", "", "", "fragmentWater.shader");
+//	Shader waterShader = createShader("vertexWater.shader", "tessControlWater.shader", "tessEvalWater.shader", "", "fragmentWater.shader");
+	TerrainOld water = createTerrain(waterShader, nullptr, 0);
+//	Terrain water(waterShader, nullptr, 0);
 
 	// Main Loop
 	while (!glfwWindowShouldClose(window)) {
@@ -69,7 +71,7 @@ int main()
 		}
 
 		// Update water
-/*		lastSegmentOuterWidth = 0;
+		lastSegmentOuterWidth = 0;
 		curWidth = 2048;
 		curSquareSize = 32;
 		for (int i = 0; i < NUM_TERRAIN_SEGMENTS; i++) {
@@ -78,11 +80,11 @@ int main()
 			water.segments[i].innerWidth = lastSegmentOuterWidth;
 			water.segments[i].outerWidth = curWidth;
 			water.segments[i].squareSize = curSquareSize;
-			water.segments[i].numSquares = (curWidth*curWidth-lastSegmentOuterWidth*lastSegmentOuterWidth)/curSquareSize/curSquareSize;
+			water.segments[i].numSquares = 1;
 			lastSegmentOuterWidth = curWidth;
 			curWidth *= 2;
 			curSquareSize *= 2;
-		}*/
+		}
 
 		float newTime2 = glfwGetTime();
 		deltaT_CPU = (int)((newTime2 - newTime)*1000000);
@@ -91,7 +93,8 @@ int main()
 		glClearColor(0.5, 0.75, 0.95, 1.0); // Sky blue, also fog color
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		drawTerrain(terrain);
-		water.render();
+		drawTerrain(water);
+//		water.render();
 		glfwSwapBuffers(window);
 
 		deltaT_GPU = (int)((glfwGetTime() - newTime2)*1000000);

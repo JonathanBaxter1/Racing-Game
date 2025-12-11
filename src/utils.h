@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include.h"
 #include "consts.h"
 #include "models.h"
 #include "model.h"
@@ -40,6 +41,7 @@ extern Object waterObj;
 extern unsigned int surfaceSize;
 extern unsigned int activeScene;
 extern unsigned int numObjects;
+extern unsigned int drawType;
 extern float cameraPitch;
 extern float cameraYaw;
 extern float cameraX;
