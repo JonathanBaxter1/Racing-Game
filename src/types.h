@@ -8,7 +8,7 @@
 
 typedef float mat4[16];
 typedef unsigned int Shader;
-typedef unsigned int Texture;
+typedef int Texture;
 typedef struct {
 	float x;
 	float y;

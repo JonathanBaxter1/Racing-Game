@@ -20,18 +20,16 @@ int main()
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 
-	Texture snowTexture = createTexture("snowTex.png");
+	Texture islandHeightMap = createTexture("islandHeightMap.png");
+	Texture islandNormalMap = createTexture("islandNormalMap.png");
 	Texture stoneTexture = createTexture("stoneTex.jpg");
-	Texture grassTexture = createTexture("grassTex.jpg");
-	Texture terrainTextures[] = {snowTexture, stoneTexture, grassTexture};
+	Texture terrainTextures[] = {islandHeightMap, islandNormalMap, stoneTexture};
 
-	Shader terrainShader = createShader("vertexTerrain.shader", "", "", "", "fragmentTerrain.shader");
-	TerrainOld terrain = createTerrain(terrainShader, terrainTextures, sizeof(terrainTextures)/sizeof(terrainTextures[0]));
+	Shader terrainShader = createShader("terrain.vs", "terrain.tcs", "terrain.tes", "", "terrain.fs");
+	Terrain terrain(terrainShader, terrainTextures, 3);
 
-	Shader waterShader = createShader("vertexWater.shader", "", "", "", "fragmentWater.shader");
-//	Shader waterShader = createShader("vertexWater.shader", "tessControlWater.shader", "tessEvalWater.shader", "", "fragmentWater.shader");
-	TerrainOld water = createTerrain(waterShader, nullptr, 0);
-//	Terrain water(waterShader, nullptr, 0);
+	Shader waterShader = createShader("water.vs", "water.tcs", "water.tes", "", "water.fs");
+	Terrain water(waterShader, nullptr, 0);
 
 	// Main Loop
 	while (!glfwWindowShouldClose(window)) {
@@ -52,49 +50,14 @@ int main()
 		updateUniforms();
 		setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);
 
-		// Update terrain
-		unsigned int polygons = 0;
-		unsigned int lastSegmentOuterWidth = 0;
-		unsigned int curWidth = 2048;
-		unsigned int curSquareSize = 1u<<(5u-GRAPHICS_SETTING);
-		for (int i = 0; i < NUM_TERRAIN_SEGMENTS; i++) {
-			terrain.segments[i].centerX = cameraX;
-			terrain.segments[i].centerY = cameraZ;
-			terrain.segments[i].innerWidth = lastSegmentOuterWidth;
-			terrain.segments[i].outerWidth = curWidth;
-			terrain.segments[i].squareSize = curSquareSize;
-			terrain.segments[i].numSquares = (curWidth*curWidth-lastSegmentOuterWidth*lastSegmentOuterWidth)/curSquareSize/curSquareSize;
-			lastSegmentOuterWidth = curWidth;
-			curWidth *= 2;
-			curSquareSize *= 2;
-			polygons += terrain.segments[i].numSquares*2;
-		}
-
-		// Update water
-		lastSegmentOuterWidth = 0;
-		curWidth = 2048;
-		curSquareSize = 32;
-		for (int i = 0; i < NUM_TERRAIN_SEGMENTS; i++) {
-			water.segments[i].centerX = cameraX;
-			water.segments[i].centerY = cameraZ;
-			water.segments[i].innerWidth = lastSegmentOuterWidth;
-			water.segments[i].outerWidth = curWidth;
-			water.segments[i].squareSize = curSquareSize;
-			water.segments[i].numSquares = 1;
-			lastSegmentOuterWidth = curWidth;
-			curWidth *= 2;
-			curSquareSize *= 2;
-		}
-
 		float newTime2 = glfwGetTime();
 		deltaT_CPU = (int)((newTime2 - newTime)*1000000);
 
 		// Render
 		glClearColor(0.5, 0.75, 0.95, 1.0); // Sky blue, also fog color
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		drawTerrain(terrain);
-		drawTerrain(water);
-//		water.render();
+		terrain.render();
+		water.render();
 		glfwSwapBuffers(window);
 
 		deltaT_GPU = (int)((glfwGetTime() - newTime2)*1000000);

@@ -4,6 +4,7 @@
 class Terrain
 {
 private:
+//	unsigned int numPatches;
 	unsigned int vao;
 	unsigned int vbo;
 	unsigned int ibo;
@@ -12,6 +13,7 @@ private:
 	unsigned int numTextures;
 
 public:
+
 	Terrain(Shader shader, Texture textures[], unsigned int numTextures);
 	void render();
 };

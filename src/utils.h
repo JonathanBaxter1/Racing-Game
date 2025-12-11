@@ -5,6 +5,7 @@
 #include "models.h"
 #include "model.h"
 #include "scene.h"
+#include "Terrain.h"
 
 extern void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 extern void setModelMatrix(mat4 matrix, float scale, float angle, float angle2, float x, float y, float z);
@@ -17,6 +18,7 @@ extern void createTextureObject(Object* object, Model* model, Shader shader, Tex
 extern void drawObject(Object* object);
 extern TerrainOld createTerrain(Shader shader, Texture textures[], unsigned int numTextures);
 extern void drawTerrain(TerrainOld terrain);
+//extern void drawTerrain(Terrain terrain);
 extern void createSphere(Model* object, unsigned int num);
 extern unsigned int createTexture(std::string fileName);
 extern unsigned int createTexture(std::string fileName, std::string directory);
@@ -41,7 +43,6 @@ extern Object waterObj;
 extern unsigned int surfaceSize;
 extern unsigned int activeScene;
 extern unsigned int numObjects;
-extern unsigned int drawType;
 extern float cameraPitch;
 extern float cameraYaw;
 extern float cameraX;

@@ -16,7 +16,6 @@ Object waterObj;
 unsigned int surfaceSize;
 unsigned int numObjects = 0;
 unsigned int activeScene = 0;
-unsigned int drawType = GL_TRIANGLES;
 float cameraPitch = 0.0;
 float cameraYaw = 0.0;
 float cameraX = 0.0;
@@ -194,9 +193,9 @@ void handleInput(GLFWwindow* window, float deltaT)
 		}
 	}
 	if (isKeyDown(GLFW_KEY_1)) {
-		drawType = GL_TRIANGLES;
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	} else if (isKeyDown(GLFW_KEY_2)) {
-		drawType = GL_LINE_LOOP;
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 }
 
@@ -360,12 +359,12 @@ void drawObject(Object* object)
 	}
 	glBindVertexArray(object->VAO);
 	if (object->numInstances == 1) {
-		glDrawElements(drawType, object->indicesSize/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, object->indicesSize/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 	} else if (object->surfaceSize == 0) {
 		glBindBuffer(GL_ARRAY_BUFFER, object->LBO);
-		glDrawElementsInstanced(drawType, object->indicesSize/sizeof(unsigned int), GL_UNSIGNED_INT, 0, object->numInstances);
+		glDrawElementsInstanced(GL_TRIANGLES, object->indicesSize/sizeof(unsigned int), GL_UNSIGNED_INT, 0, object->numInstances);
 	} else {
-		glDrawElementsInstanced(drawType, 6, GL_UNSIGNED_INT, 0, object->numInstances);
+		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, object->numInstances);
 	}
 }
 
@@ -443,7 +442,7 @@ void drawTerrain(TerrainOld terrain)
 		glUniform1ui(squareSizeLoc, terrain.segments[i].squareSize);
 		glUniform1f(centerXLoc, terrain.segments[i].centerX);
 		glUniform1f(centerYLoc, terrain.segments[i].centerY);
-		glDrawElementsInstanced(drawType, 6, GL_UNSIGNED_INT, 0, terrain.segments[i].numSquares);
+		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, terrain.segments[i].numSquares);
 	}
 }
 
@@ -559,7 +558,6 @@ unsigned int createShaderProgram(char* vertexShader, char* tessControlShader, ch
 	return program;
 }
 
-//unsigned int createShader(std::string vertexFileName, std::string fragmentFileName)
 unsigned int createShader(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string geometryFileName, std::string fragmentFileName)
 {
 	static unsigned int numShaders = 0;
