@@ -1,0 +1,5 @@
+# To run program
+sudo apt install libglew-dev libglfw3-dev libassimp-dev
+
+# To compile program
+sudo apt install libxxf86vm-dev libxi-dev libxinerama-dev libxcursor-dev
