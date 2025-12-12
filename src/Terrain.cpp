@@ -1,9 +1,4 @@
-#include "Terrain.h"
-
-#include <iostream>
-#include <GL/glew.h>
 #include "include.h"
-#include "types.h"
 
 #define PATCH_RES 64
 #define MAP_SIZE 4096.0
@@ -16,16 +11,15 @@ Terrain::Terrain(Shader shader, Texture textures[], unsigned int numTextures)
 		exit(-1);
 	}
 
-	this->shader = shader;
+	this->shader = shader.ID;
 	glUseProgram(this->shader);
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(this->vao);
 	for (unsigned int i = 0; i < numTextures; i++) {
-		this->textures[i] = textures[i];
+		this->textures[i] = textures[i].ID;
 	}
 	this->numTextures = numTextures;
 
-//	this->numPatches = PATCH_RES*PATCH_RES;
 	float surfaceVertices[8*PATCH_RES*PATCH_RES];
 	for (unsigned int x = 0; x < PATCH_RES; x++) {
 		for (unsigned int y = 0; y < PATCH_RES; y++) {
@@ -40,15 +34,6 @@ Terrain::Terrain(Shader shader, Texture textures[], unsigned int numTextures)
 			surfaceVertices[offset+7] = y*PATCH_SIZE;
 		}
 	}
-
-//	int snowDiffuseTexLoc = glGetUniformLocation(shader, "snowDiffuseTex");
-//	int stoneDiffuseTexLoc = glGetUniformLocation(shader, "stoneDiffuseTex");
-//	int grassDiffuseTexLoc = glGetUniformLocation(shader, "grassDiffuseTex");
-//	int sandDiffuseTexLoc = glGetUniformLocation(shader, "sandDiffuseTex");
-//	glUniform1i(snowDiffuseTexLoc, 0);
-//	glUniform1i(stoneDiffuseTexLoc, 1);
-//	glUniform1i(grassDiffuseTexLoc, 2);
-//	glUniform1i(sandDiffuseTexLoc, 3);
 
 	int texturesUniformLoc = glGetUniformLocation(this->shader, "textures");
 	int units[8] = {0, 1, 2, 3, 4, 5, 6, 7};

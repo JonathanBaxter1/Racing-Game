@@ -12,24 +12,24 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 void Mesh::Draw(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix)
 {
 	if (textures.size() > 0) {
-		glUseProgram(shaderTexture);
-		int diffuseMapUniformLoc = glGetUniformLocation(shaderTexture, "diffuseMapTex");
+		glUseProgram(shaderTexture.ID);
+		int diffuseMapUniformLoc = glGetUniformLocation(shaderTexture.ID, "diffuseMapTex");
 		glUniform1i(diffuseMapUniformLoc, 0);
-		int specularMapUniformLoc = glGetUniformLocation(shaderTexture, "specularMapTex");
+		int specularMapUniformLoc = glGetUniformLocation(shaderTexture.ID, "specularMapTex");
 		glUniform1i(specularMapUniformLoc, 1);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, textures[0].id);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	} else {
-		glUseProgram(shaderColor);
-		int diffuseLoc = glGetUniformLocation(shaderColor, "diffuseColor");
+		glUseProgram(shaderColor.ID);
+		int diffuseLoc = glGetUniformLocation(shaderColor.ID, "diffuseColor");
 		glUniform3f(diffuseLoc, material.diffuse.r, material.diffuse.g, material.diffuse.b);
-		int specularLoc = glGetUniformLocation(shaderColor, "specularColor");
+		int specularLoc = glGetUniformLocation(shaderColor.ID, "specularColor");
 		glUniform3f(specularLoc, material.specular.r, material.specular.g, material.specular.b);
-		int ambientLoc = glGetUniformLocation(shaderColor, "ambientColor");
+		int ambientLoc = glGetUniformLocation(shaderColor.ID, "ambientColor");
 		glUniform3f(ambientLoc, material.ambient.r, material.ambient.g, material.ambient.b);
-		int shininessLoc = glGetUniformLocation(shaderColor, "shininess");
+		int shininessLoc = glGetUniformLocation(shaderColor.ID, "shininess");
 		glUniform1f(shininessLoc, material.shininess);
 	}
 	glBindVertexArray(VAO);

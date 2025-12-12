@@ -16,6 +16,9 @@
 #include "types.h"
 #include "utils.h"
 
+#include "Texture.h"
+#include "Shader.h"
+#include "Window.h"
 #include "Mesh.h"
 #include "Model.h"
 #include "Object.h"

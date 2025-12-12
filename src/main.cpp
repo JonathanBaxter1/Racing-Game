@@ -3,7 +3,7 @@
 
 int main()
 {
-	windowInit(&window);
+	Window window;
 
 	// For profiling
 	float curTime = glfwGetTime();
@@ -13,19 +13,19 @@ int main()
 	int deltaT_GPU = 0;
 	unsigned int frameCount = 0;
 
-	Texture islandHeightMap = createTexture("islandHeightMap.png");
-	Texture islandNormalMap = createTexture("islandNormalMap.png");
-	Texture stoneTexture = createTexture("stoneTex.jpg");
+	Texture islandHeightMap("islandHeightMap.png");
+	Texture islandNormalMap("islandNormalMap.png");
+	Texture stoneTexture("stoneTex.jpg");
 	Texture terrainTextures[] = {islandHeightMap, islandNormalMap, stoneTexture};
 
-	Shader terrainShader = createShader("terrain.vs", "terrain.tcs", "terrain.tes", "", "terrain.fs");
+	Shader terrainShader("terrain.vs", "terrain.tcs", "terrain.tes", "", "terrain.fs");
 	Terrain terrain(terrainShader, terrainTextures, 3);
 
-	Shader waterShader = createShader("water.vs", "water.tcs", "water.tes", "", "water.fs");
+	Shader waterShader("water.vs", "water.tcs", "water.tes", "", "water.fs");
 	Terrain water(waterShader, nullptr, 0);
 
 	// Main Loop
-	while (!glfwWindowShouldClose(window)) {
+	while (!glfwWindowShouldClose(window.windowPtr)) {
 
 		float newTime = glfwGetTime();
 		dT = newTime - curTime;
@@ -38,7 +38,7 @@ int main()
 
 		// Game logic
 		glfwPollEvents();
-		handleInput(window, dT);
+		window.handleInput(dT);
 
 		updateUniforms();
 		setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);
@@ -51,7 +51,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		terrain.render();
 		water.render();
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(window.windowPtr);
 
 		deltaT_GPU = (int)((glfwGetTime() - newTime2)*1000000);
 	}

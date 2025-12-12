@@ -4,8 +4,6 @@
 #include <assimp/scene.h>
 
 typedef float mat4[16];
-typedef unsigned int Shader;
-typedef int Texture;
 typedef struct {
 	unsigned int id;
 	std::string type;

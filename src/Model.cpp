@@ -134,7 +134,8 @@ std::vector<TextureFull> Model::loadMaterialTextures(aiMaterial *mat, aiTextureT
 		}
 		if (!skip) {
 			TextureFull texture;
-			texture.id = createTexture(str.C_Str(), directory);
+			Texture textureTemp(str.C_Str(), directory);
+			texture.id = textureTemp.ID;
 			texture.type = typeName;
 			texture.path = str.C_Str();
 			textures.push_back(texture);
