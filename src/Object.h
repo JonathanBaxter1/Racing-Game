@@ -6,14 +6,14 @@
 class Object
 {
 public:
+	float objectData[5];
+	// objectData: {x, y, z, size, angleRad}
 	Object(Model* model, float objectData[]);
-	void Draw(Shader shaderTexture, Shader shaderColor);
+	void render(Shader shaderTexture, Shader shaderColor, unsigned int frame);
 
 private:
 	Model* model;
-	float* objectData;
 	mat4 modelMatrix;
-
 	void Update();
 };
 

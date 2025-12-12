@@ -16,6 +16,8 @@ OBJS := $(SRCS:%=build/%.o)
 OBJS := $(OBJS:.cpp.o=.o)
 OBJS := $(subst /src/,/,$(OBJS))
 
+COMPILE_FLAGS := -Wall -O4
+
 .PHONY: all
 all: $(EXE)
 
@@ -23,7 +25,7 @@ $(EXE): $(OBJS)
 	$(CXX) -o $(EXE) $(OBJS) $(LINK_FLAGS)
 
 build/%.o: src/%.cpp
-	$(CXX) -c $^ -o $@ -Wall
+	$(CXX) -c $^ -o $@ $(COMPILE_FLAGS)
 
 .PHONY: clean
 clean:

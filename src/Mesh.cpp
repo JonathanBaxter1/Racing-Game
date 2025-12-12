@@ -9,16 +9,25 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 	setupMesh();
 }
 
-void Mesh::Draw(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix)
+void Mesh::render(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix, bool isPropeller, unsigned int frame)
 {
-	if (textures.size() > 0) {
+	mat4 finalMatrix;
+	memcpy(finalMatrix, modelMatrix, sizeof(mat4));
+	if (isPropeller) {
+		float angle = 2.0*M_PI/16.0*(float)frame;
+		finalMatrix[0] = modelMatrix[0]*cos(angle);
+		finalMatrix[1] = modelMatrix[5]*sin(angle);
+		finalMatrix[4] = modelMatrix[0]*-sin(angle);
+		finalMatrix[5] = modelMatrix[5]*cos(angle);
+	}
+	if (this->textures.size() > 0) {
 		glUseProgram(shaderTexture.ID);
 		int diffuseMapUniformLoc = glGetUniformLocation(shaderTexture.ID, "diffuseMapTex");
 		glUniform1i(diffuseMapUniformLoc, 0);
 		int specularMapUniformLoc = glGetUniformLocation(shaderTexture.ID, "specularMapTex");
 		glUniform1i(specularMapUniformLoc, 1);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, textures[0].id);
+		glBindTexture(GL_TEXTURE_2D, this->textures[0].id);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	} else {
@@ -34,7 +43,7 @@ void Mesh::Draw(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix)
 	}
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, LBO);
-	glBufferData(GL_ARRAY_BUFFER, 16*sizeof(float), modelMatrix, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 16*sizeof(float), finalMatrix, GL_DYNAMIC_DRAW);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 

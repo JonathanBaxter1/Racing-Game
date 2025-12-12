@@ -7,7 +7,7 @@ class Model
 {
 public:
 	Model(std::string path);
-	void Draw(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix);
+	void render(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix, unsigned int frame);
 
 private:
 	std::vector<Mesh> meshes;

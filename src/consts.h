@@ -6,6 +6,6 @@
 #define MAX_SHADER_SIZE 8192 // bytes
 #define CURSOR_ENABLED false
 #define MOUSE_SENSITIVITY 0.001
-#define MOVEMENT_SPEED 55.0 // M/s
+#define MOVEMENT_SPEED 90.0 // M/s
 #define TERRAIN_MAX_TEXTURES 8
 #define GRAPHICS_SETTING 1

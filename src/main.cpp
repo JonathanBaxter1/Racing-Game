@@ -24,6 +24,13 @@ int main()
 	Shader waterShader("water.vs", "water.tcs", "water.tes", "", "water.fs");
 	Terrain water(waterShader, nullptr, 0);
 
+	// Models
+	Shader textureShader("texture.vs", "", "", "", "texture.fs");
+	Shader colorShader("color.vs", "", "", "", "color.fs");
+	Model airplaneModel("airplane/airplane.obj");
+	float playerAirplaneStartData[] = {0.0, 55, 0.0, 1.0, 0.0};
+	Object playerAirplane(&airplaneModel, playerAirplaneStartData);
+
 	// Main Loop
 	while (!glfwWindowShouldClose(window.windowPtr)) {
 
@@ -51,6 +58,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		terrain.render();
 		water.render();
+		playerAirplane.render(textureShader, colorShader, frameCount);
 		glfwSwapBuffers(window.windowPtr);
 
 		deltaT_GPU = (int)((glfwGetTime() - newTime2)*1000000);

@@ -5,10 +5,12 @@ Model::Model(std::string path)
 	loadModel("models/" + path);
 }
 
-void Model::Draw(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix)
+void Model::render(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix, unsigned int frame)
 {
 	for (unsigned int i = 0; i < meshes.size(); i++) {
-		meshes[i].Draw(shaderTexture, shaderColor, modelMatrix);
+		bool isPlane = true;
+		bool isProp = (i == 3) && isPlane;
+		meshes[i].render(shaderTexture, shaderColor, modelMatrix, isProp, frame);
 	}
 }
 
@@ -36,7 +38,6 @@ void Model::processNode(aiNode *node, const aiScene *scene)
 	for (unsigned int i = 0; i < node->mNumChildren; i++) {
 		processNode(node->mChildren[i], scene);
 	}
-
 }
 
 Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
@@ -70,7 +71,6 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 			vector2.y = 0.0;
 		}
 		vertex.texCoords = vector2;
-
 		vertices.push_back(vertex);
 	}
 

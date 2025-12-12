@@ -3,14 +3,15 @@
 Object::Object(Model* model, float objectData[])
 {
 	this->model = model;
-	this->objectData = objectData;
+//	this->objectData = objectData;
+	memcpy(this->objectData, objectData, 5*sizeof(float));
 	this->Update();
 }
 
-void Object::Draw(Shader shaderTexture, Shader shaderColor)
+void Object::render(Shader shaderTexture, Shader shaderColor, unsigned int frame)
 {
 	this->Update();
-	model->Draw(shaderTexture, shaderColor, modelMatrix);
+	model->render(shaderTexture, shaderColor, modelMatrix, frame);
 }
 
 void Object::Update()

@@ -12,7 +12,7 @@ public:
 	Material material;
 
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<TextureFull> textures, Material material);
-	void Draw(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix);
+	void render(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix, bool isPropeller, unsigned int frame);
 
 private:
 	unsigned int VAO, VBO, IBO, LBO;

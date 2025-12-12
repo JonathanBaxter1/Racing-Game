@@ -17,7 +17,8 @@ unsigned int Shader::compileShader(unsigned int type, char* source)
 unsigned int Shader::createShaderProgram(char* vertexShader, char* tessControlShader, char* tessEvalShader, char* geometryShader, char* fragmentShader)
 {
 	unsigned int program = glCreateProgram();
-	unsigned int vs, tcs, tes, gs, fs = 0;
+	unsigned int vs, tcs, tes, gs, fs;
+	vs = tcs = tes = gs = fs = 0;
 
 	vs = compileShader(GL_VERTEX_SHADER, vertexShader);
 	glAttachShader(program, vs);
