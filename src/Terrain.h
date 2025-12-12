@@ -1,4 +1,6 @@
 #pragma once
+
+#include "consts.h"
 #include "types.h"
 
 class Terrain

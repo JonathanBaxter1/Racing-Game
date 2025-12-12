@@ -13,13 +13,6 @@ int main()
 	int deltaT_GPU = 0;
 	unsigned int frameCount = 0;
 
-	// OpenGL settings
-	glShadeModel(GL_SMOOTH);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
-
 	Texture islandHeightMap = createTexture("islandHeightMap.png");
 	Texture islandNormalMap = createTexture("islandNormalMap.png");
 	Texture stoneTexture = createTexture("stoneTex.jpg");
@@ -39,8 +32,8 @@ int main()
 		deltaT = (int)(dT*1000000);
 		curTime = newTime;
 		frameCount++;
-		if (!(frameCount&15u) && GAME_DEBUG == true) { // So the printf statement doesn't count as computation time
-			printf("delta T: %dus; CPU: %dus; GPU: %dus\n", deltaT, deltaT_CPU, deltaT_GPU);
+		if (!(frameCount&15u) && GAME_DEBUG == true) { // So the print statement doesn't count as computation time
+			std::cout << "delta T: " << deltaT << "us; CPU: " << deltaT_CPU << "us; GPU: " << deltaT_GPU << "us" << std::endl;
 		}
 
 		// Game logic

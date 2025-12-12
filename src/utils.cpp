@@ -1,35 +1,16 @@
 #include "include.h"
 
 // Global Variables
-std::vector<Model2*> models;
-std::vector<Scene2*> scenes;
-Shader shaderTexture;
-Shader shaderColorPhong;
+std::vector<Model*> models;
 GLFWwindow* window;
 int screenWidth;
 int screenHeight;
 Shader shaders[MAX_SHADERS] = {0};
-Object* objects[MAX_OBJECTS] = {0};
-PointLight* pointLights;
-Object waterObj;
-
-unsigned int surfaceSize;
-unsigned int numObjects = 0;
-unsigned int activeScene = 0;
 float cameraPitch = 0.0;
 float cameraYaw = 0.0;
 float cameraX = 0.0;
 float cameraY = 1000.0;
 float cameraZ = 0.0;
-
-float carX = 50.0;
-float carY = 0.0;
-float carZ = 50.0;
-float carYaw = 0.0;
-
-Object containerObj;
-Object pointLightObj;
-
 mat4 viewMatrix = {
 	0.0, 0.0, 0.0, 0.0,
 	0.0, 0.0, 0.0, 0.0,
@@ -106,25 +87,22 @@ void setPerspectiveMatrix(mat4 mat, float fovYdeg, float aspect, float near, flo
 void windowInit(GLFWwindow** window)
 {
 	if (!glfwInit()) {
-		printf("GLFW initialization failed\n");
+		std::cout << "GLFW initialization failed" << std::endl;
 		exit(-1);
 	}
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
 
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* videoMode = glfwGetVideoMode(monitor);
 	screenWidth = videoMode->width;
 	screenHeight = videoMode->height;
 	float aspectRatio = (float)screenWidth/(float)screenHeight;
-	printf("Screen Resolution: %dx%d\n", screenWidth, screenHeight);
+	std::cout << "Screen Resolution: " << screenWidth << "x" << screenHeight << std::endl;
 	(*window) = glfwCreateWindow(screenWidth, screenHeight, "flight sim", monitor, NULL);
 	if (*window == NULL) {
-		printf("GLFW window creation failed\n");
+		std::cout << "GLFW window creation failed" << std::endl;
 		glfwTerminate();
 		exit(-1);
 	}
@@ -136,30 +114,38 @@ void windowInit(GLFWwindow** window)
 	glfwSwapInterval(VSYNC_ON);
 
 	// Cursor setup
-//	int cursorWidth, cursorHeight, cursorNumChannels;
-//	unsigned char* cursorImageData = stbi_load("textures/cursor.png", &cursorWidth, &cursorHeight, &cursorNumChannels, 0);
+	int cursorWidth, cursorHeight, cursorNumChannels;
+	unsigned char* cursorImageData = stbi_load("textures/cursor.png", &cursorWidth, &cursorHeight, &cursorNumChannels, 0);
 
-//	if (cursorNumChannels != 4) {
-//		std::cout << "Error: cursor image data must have 4 channels (RGBA)" << std::endl;
-//		exit(-1);
-//	}
-//	GLFWimage cursorImage;
-//	cursorImage.width = cursorWidth;
-//	cursorImage.height = cursorHeight;
-//	cursorImage.pixels = cursorImageData;
+	if (cursorNumChannels != 4) {
+		std::cout << "Error: cursor image data must have 4 channels (RGBA)" << std::endl;
+		exit(-1);
+	}
+	GLFWimage cursorImage;
+	cursorImage.width = cursorWidth;
+	cursorImage.height = cursorHeight;
+	cursorImage.pixels = cursorImageData;
 
-//	GLFWcursor* cursor = glfwCreateCursor(&cursorImage, 0, 0);
-//	stbi_image_free(cursorImageData);
-//	glfwSetCursor(*window, cursor);
-	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-//	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	if (CURSOR_ENABLED) {
+		GLFWcursor* cursor = glfwCreateCursor(&cursorImage, 0, 0);
+		glfwSetCursor(*window, cursor);
+		glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	} else {
+		glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+	stbi_image_free(cursorImageData);
+
 	glfwSetCursorPosCallback(*window, mouseCallback);
 	setPerspectiveMatrix(projectionMatrix, 45.0, aspectRatio, 1.0, 100000.0);
 
-//	shaderTexture = createShader("vertexTexture.shader", "fragmentTexture.shader");
-//	shaderColorPhong = createShader("vertexTexture.shader", "fragmentColorPhong.shader");
 	stbi_set_flip_vertically_on_load(1);
 
+	// OpenGL settings
+	glShadeModel(GL_SMOOTH);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
 }
 
 void handleInput(GLFWwindow* window, float deltaT)
@@ -167,143 +153,35 @@ void handleInput(GLFWwindow* window, float deltaT)
 	if (isKeyDown(GLFW_KEY_ESCAPE)) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
-	if (activeScene == 0) {
-		if (isKeyDown(GLFW_KEY_S)) {
-			cameraZ += MOVEMENT_SPEED*deltaT*cos(cameraYaw);
-			cameraX -= MOVEMENT_SPEED*deltaT*sin(cameraYaw);
-		} else if (isKeyDown(GLFW_KEY_W)) {
-			cameraZ -= MOVEMENT_SPEED*deltaT*cos(cameraYaw);
-			cameraX += MOVEMENT_SPEED*deltaT*sin(cameraYaw);
-		}
-		if (isKeyDown(GLFW_KEY_D)) {
-			cameraZ += MOVEMENT_SPEED*deltaT*sin(cameraYaw);
-			cameraX += MOVEMENT_SPEED*deltaT*cos(cameraYaw);
-		} else if (isKeyDown(GLFW_KEY_A)) {
-			cameraZ -= MOVEMENT_SPEED*deltaT*sin(cameraYaw);
-			cameraX -= MOVEMENT_SPEED*deltaT*cos(cameraYaw);
-		}
-		if (isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-			cameraY += MOVEMENT_SPEED*10*deltaT;
-		} else if (isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-			cameraY -= MOVEMENT_SPEED*10*deltaT;
-		}
-		if (isKeyDown(GLFW_KEY_SPACE)) {
-			cameraZ -= MOVEMENT_SPEED*50.0*deltaT*cos(cameraYaw);
-			cameraX += MOVEMENT_SPEED*50.0*deltaT*sin(cameraYaw);
-		}
-	}
 	if (isKeyDown(GLFW_KEY_1)) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	} else if (isKeyDown(GLFW_KEY_2)) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
-}
 
-void createColorObject(Object* object, Model* model, Shader shader, Color color, float instancePositions[], unsigned int numInstances)
-{
-	glUseProgram(shader);
-
-	glGenVertexArrays(1, &object->VAO);
-	glBindVertexArray(object->VAO);
-
-	glGenBuffers(1, &object->VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, object->VBO);
-	glBufferData(GL_ARRAY_BUFFER, model->verticesSize, model->vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-
-	glGenBuffers(1, &object->LBO);
-	glBindBuffer(GL_ARRAY_BUFFER, object->LBO);
-	glBufferData(GL_ARRAY_BUFFER, numInstances*16*sizeof(float), instancePositions, GL_DYNAMIC_DRAW);
-
-	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 16*sizeof(float), (void*)0);
-	glVertexAttribDivisor(3, 1);
-	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 16*sizeof(float), (void*)(4*sizeof(float)));
-	glVertexAttribDivisor(4, 1);
-	glEnableVertexAttribArray(4);
-	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 16*sizeof(float), (void*)(8*sizeof(float)));
-	glVertexAttribDivisor(5, 1);
-	glEnableVertexAttribArray(5);
-	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 16*sizeof(float), (void*)(12*sizeof(float)));
-	glVertexAttribDivisor(6, 1);
-	glEnableVertexAttribArray(6);
-
-	glGenBuffers(1, &object->IBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->indicesSize, model->indices, GL_STATIC_DRAW);
-
-	object->shader = shader;
-	object->diffuseMap = 0;
-	object->specularMap = 0;
-	object->color = color;
-	object->indicesSize = model->indicesSize;
-	object->instancePositions = instancePositions;
-	object->surfaceSize = 0;
-	object->numInstances = numInstances;
-
-	objects[numObjects] = object;
-	numObjects++;
-}
-
-void createTextureObject(Object* object, Model* model, Shader shader, Texture diffuseMap, Texture specularMap, float instancePositions[], unsigned int numInstances)
-{
-	glUseProgram(shader);
-	int diffuseMapUniformLoc = glGetUniformLocation(shader, "diffuseMapTex");
-	glUniform1i(diffuseMapUniformLoc, 0);
-	int specularMapUniformLoc = glGetUniformLocation(shader, "specularMapTex");
-	glUniform1i(specularMapUniformLoc, 1);
-
-	glGenVertexArrays(1, &object->VAO);
-	glBindVertexArray(object->VAO);
-
-	glGenBuffers(1, &object->VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, object->VBO);
-	glBufferData(GL_ARRAY_BUFFER, model->verticesSize, model->vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-
-	glGenBuffers(1, &object->LBO);
-	glBindBuffer(GL_ARRAY_BUFFER, object->LBO);
-	glBufferData(GL_ARRAY_BUFFER, numInstances*16*sizeof(float), instancePositions, GL_DYNAMIC_DRAW);
-
-	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 16*sizeof(float), (void*)0);
-	glVertexAttribDivisor(3, 1);
-	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 16*sizeof(float), (void*)(4*sizeof(float)));
-	glVertexAttribDivisor(4, 1);
-	glEnableVertexAttribArray(4);
-	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 16*sizeof(float), (void*)(8*sizeof(float)));
-	glVertexAttribDivisor(5, 1);
-	glEnableVertexAttribArray(5);
-	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 16*sizeof(float), (void*)(12*sizeof(float)));
-	glVertexAttribDivisor(6, 1);
-	glEnableVertexAttribArray(6);
-
-	glGenBuffers(1, &object->IBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->indicesSize, model->indices, GL_STATIC_DRAW);
-
-	object->shader = shader;
-	object->diffuseMap = diffuseMap;
-	object->specularMap = specularMap;
-	object->indicesSize = model->indicesSize;
-	object->instancePositions = instancePositions;
-	object->surfaceSize = 0;
-	object->numInstances = numInstances;
-
-	objects[numObjects] = object;
-	numObjects++;
+	if (isKeyDown(GLFW_KEY_S)) {
+		cameraZ += MOVEMENT_SPEED*deltaT*cos(cameraYaw);
+		cameraX -= MOVEMENT_SPEED*deltaT*sin(cameraYaw);
+	} else if (isKeyDown(GLFW_KEY_W)) {
+		cameraZ -= MOVEMENT_SPEED*deltaT*cos(cameraYaw);
+		cameraX += MOVEMENT_SPEED*deltaT*sin(cameraYaw);
+	}
+	if (isKeyDown(GLFW_KEY_D)) {
+		cameraZ += MOVEMENT_SPEED*deltaT*sin(cameraYaw);
+		cameraX += MOVEMENT_SPEED*deltaT*cos(cameraYaw);
+	} else if (isKeyDown(GLFW_KEY_A)) {
+		cameraZ -= MOVEMENT_SPEED*deltaT*sin(cameraYaw);
+		cameraX -= MOVEMENT_SPEED*deltaT*cos(cameraYaw);
+	}
+	if (isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+		cameraY += MOVEMENT_SPEED*10*deltaT;
+	} else if (isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+		cameraY -= MOVEMENT_SPEED*10*deltaT;
+	}
+	if (isKeyDown(GLFW_KEY_SPACE)) {
+		cameraZ -= MOVEMENT_SPEED*50.0*deltaT*cos(cameraYaw);
+		cameraX += MOVEMENT_SPEED*50.0*deltaT*sin(cameraYaw);
+	}
 }
 
 void updateUniforms()
@@ -324,150 +202,6 @@ void updateUniforms()
 		// Shininess
 		int shininessUniformLoc = glGetUniformLocation(shader, "shininess");
 		glUniform1f(shininessUniformLoc, 32.0);
-
-		// Point Light Info (disable for now)
-/*		for (int j = 0; j < NUM_POINT_LIGHTS; j++) {
-			char pointLightUniformString1[32];
-			char pointLightUniformString2[32];
-			char pointLightUniformString3[32];
-			sprintf(pointLightUniformString1, "pointLights[%d].pos", j);
-			sprintf(pointLightUniformString2, "pointLights[%d].linear", j);
-			sprintf(pointLightUniformString3, "pointLights[%d].quad", j);
-			int pointLightUniformLoc1 = glGetUniformLocation(shader, pointLightUniformString1);
-			int pointLightUniformLoc2 = glGetUniformLocation(shader, pointLightUniformString2);
-			int pointLightUniformLoc3 = glGetUniformLocation(shader, pointLightUniformString3);
-			glUniform3f(pointLightUniformLoc1, pointLights[j].pos.x, pointLights[j].pos.y, pointLights[j].pos.z);
-			glUniform1f(pointLightUniformLoc2, pointLights[j].linear);
-			glUniform1f(pointLightUniformLoc3, pointLights[j].quad);
-		}*/
-
-	}
-}
-
-void drawObject(Object* object)
-{
-	glUseProgram(object->shader);
-
-	if (object->diffuseMap && object->specularMap) {
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, object->diffuseMap);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, object->specularMap);
-	} else {
-		int colorUniformLoc = glGetUniformLocation(object->shader, "color");
-		glUniform3f(colorUniformLoc, object->color.r, object->color.g, object->color.b);
-	}
-	glBindVertexArray(object->VAO);
-	if (object->numInstances == 1) {
-		glDrawElements(GL_TRIANGLES, object->indicesSize/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
-	} else if (object->surfaceSize == 0) {
-		glBindBuffer(GL_ARRAY_BUFFER, object->LBO);
-		glDrawElementsInstanced(GL_TRIANGLES, object->indicesSize/sizeof(unsigned int), GL_UNSIGNED_INT, 0, object->numInstances);
-	} else {
-		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, object->numInstances);
-	}
-}
-
-TerrainOld createTerrain(Shader shader, Texture textures[], unsigned int numTextures)
-{
-	if (numTextures > TERRAIN_MAX_TEXTURES) {
-		printf("Too many textures in terrain. Max is %d\n", TERRAIN_MAX_TEXTURES);
-		exit(-1);
-	}
-
-	TerrainOld terrain;
-	glUseProgram(shader);
-
-	glGenVertexArrays(1, &terrain.VAO);
-	glBindVertexArray(terrain.VAO);
-
-	float surfaceVertices[] = {
-		0.0, 0.0,
-		0.0, 1.0,
-		1.0, 1.0,
-		1.0, 0.0,
-	};
-	unsigned int surfaceIndices[] = {
-		0, 1, 2,
-		2, 3, 0,
-	};
-
-	int snowDiffuseTexLoc = glGetUniformLocation(shader, "snowDiffuseTex");
-	int stoneDiffuseTexLoc = glGetUniformLocation(shader, "stoneDiffuseTex");
-	int grassDiffuseTexLoc = glGetUniformLocation(shader, "grassDiffuseTex");
-	int sandDiffuseTexLoc = glGetUniformLocation(shader, "sandDiffuseTex");
-	glUniform1i(snowDiffuseTexLoc, 0);
-	glUniform1i(stoneDiffuseTexLoc, 1);
-	glUniform1i(grassDiffuseTexLoc, 2);
-	glUniform1i(sandDiffuseTexLoc, 3);
-
-	glGenBuffers(1, &terrain.VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, terrain.VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(surfaceVertices), surfaceVertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	glGenBuffers(1, &terrain.IBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrain.IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(surfaceIndices), surfaceIndices, GL_STATIC_DRAW);
-
-	terrain.shader = shader;
-	for (unsigned int i = 0; i < numTextures; i++) {
-		terrain.textures[i] = textures[i];
-	}
-	terrain.numTextures = numTextures;
-
-	return terrain;
-}
-
-void drawTerrain(TerrainOld terrain)
-{
-	glUseProgram(terrain.shader);
-	glBindVertexArray(terrain.VAO);
-
-	for (unsigned int i = 0; i < terrain.numTextures; i++) {
-		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, terrain.textures[i]);
-	}
-
-	for (int i = 0; i < NUM_TERRAIN_SEGMENTS; i++) {
-		int innerWidthLoc = glGetUniformLocation(terrain.shader, "innerWidth");
-		int outerWidthLoc = glGetUniformLocation(terrain.shader, "outerWidth");
-		int squareSizeLoc = glGetUniformLocation(terrain.shader, "squareSize");
-		int centerXLoc = glGetUniformLocation(terrain.shader, "centerX");
-		int centerYLoc = glGetUniformLocation(terrain.shader, "centerY");
-		glUniform1ui(innerWidthLoc, terrain.segments[i].innerWidth);
-		glUniform1ui(outerWidthLoc, terrain.segments[i].outerWidth);
-		glUniform1ui(squareSizeLoc, terrain.segments[i].squareSize);
-		glUniform1f(centerXLoc, terrain.segments[i].centerX);
-		glUniform1f(centerYLoc, terrain.segments[i].centerY);
-		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, terrain.segments[i].numSquares);
-	}
-}
-
-void createSphere(Model* object, unsigned int num)
-{
-	for (unsigned int j = 0; j < num/2 + 1; j++) {
-		for (unsigned int i = 0; i < num+1; i++) {
-			float angle2 = (float)j/(float)num*2*M_PI - M_PI/2;
-			float angle = (float)(i-1)/(float)num*2*M_PI;
-			object->vertices[(j*(num+1)+i)*5] = sin(angle)*cos(angle2);
-			object->vertices[(j*(num+1)+i)*5 + 1] = cos(angle)*cos(angle2);
-			object->vertices[(j*(num+1)+i)*5 + 2] = sin(angle2);
-			object->vertices[(j*(num+1)+i)*5 + 3] = M_PI*2 - (float)i/(float)num;
-			object->vertices[(j*(num+1)+i)*5 + 4] = (float)j/(float)num*2.0;
-		}
-	}
-	for (unsigned int j = 0; j < num/2; j++) {
-		for (unsigned int i = 0; i < num; i++) {
-			object->indices[(j*num+i)*6] = j*(num+1)+i;
-			object->indices[(j*num+i)*6 + 1] = j*(num+1)+i+(num+1);
-			object->indices[(j*num+i)*6 + 2] = j*(num+1)+i+(num+2);
-			object->indices[(j*num+i)*6 + 3] = j*(num+1)+i;
-			object->indices[(j*num+i)*6 + 4] = j*(num+1)+i+(num+2);
-			object->indices[(j*num+i)*6 + 5] = j*(num+1)+i+1;
-		}
 	}
 }
 
@@ -485,8 +219,6 @@ unsigned int createTexture(std::string fileName, std::string directory)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int tex1width, tex1height, tex1numChannels;
 	std::string path = directory + "/" + fileName;

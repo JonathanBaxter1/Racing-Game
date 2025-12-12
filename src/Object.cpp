@@ -1,19 +1,19 @@
 #include "include.h"
 
-Object2::Object2(Model2* model, float objectData[])
+Object::Object(Model* model, float objectData[])
 {
 	this->model = model;
 	this->objectData = objectData;
 	this->Update();
 }
 
-void Object2::Draw(Shader shader)
+void Object::Draw(Shader shaderTexture, Shader shaderColor)
 {
 	this->Update();
-	model->Draw(shader, modelMatrix);
+	model->Draw(shaderTexture, shaderColor, modelMatrix);
 }
 
-void Object2::Update()
+void Object::Update()
 {
 	float x = objectData[0];
 	float y = objectData[1];

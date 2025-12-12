@@ -1,23 +1,23 @@
 #pragma once
 
 #include "types.h"
-#include "mesh.h"
+#include "Mesh.h"
 
-class Model2
+class Model
 {
 public:
-	Model2(std::string path);
-	void Draw(Shader shader, mat4 modelMatrix);
+	Model(std::string path);
+	void Draw(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix);
 
 private:
 	std::vector<Mesh> meshes;
-	std::vector<Texture2> textures_loaded;
+	std::vector<TextureFull> textures_loaded;
 	std::string directory;
 
 	void loadModel(std::string path);
 	void processNode(aiNode *node, const aiScene *scene);
 	Mesh processMesh(aiMesh *mesh, const aiScene *scene);
 	Material loadMaterial(aiMaterial *mat);
-	std::vector<Texture2> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
+	std::vector<TextureFull> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
 };
 

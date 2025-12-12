@@ -1,6 +1,6 @@
 #include "include.h"
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture2> textures, Material material)
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<TextureFull> textures, Material material)
 {
 	this->vertices = vertices;
 	this->indices = indices;
@@ -9,29 +9,27 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 	setupMesh();
 }
 
-void Mesh::Draw(Shader shader, mat4 modelMatrix)
+void Mesh::Draw(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix)
 {
-//	glUseProgram(shader);
-
 	if (textures.size() > 0) {
 		glUseProgram(shaderTexture);
-		int diffuseMapUniformLoc = glGetUniformLocation(shader, "diffuseMapTex");
+		int diffuseMapUniformLoc = glGetUniformLocation(shaderTexture, "diffuseMapTex");
 		glUniform1i(diffuseMapUniformLoc, 0);
-		int specularMapUniformLoc = glGetUniformLocation(shader, "specularMapTex");
+		int specularMapUniformLoc = glGetUniformLocation(shaderTexture, "specularMapTex");
 		glUniform1i(specularMapUniformLoc, 1);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, textures[0].id);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	} else {
-		glUseProgram(shaderColorPhong);
-		int diffuseLoc = glGetUniformLocation(shaderColorPhong, "diffuseColor");
+		glUseProgram(shaderColor);
+		int diffuseLoc = glGetUniformLocation(shaderColor, "diffuseColor");
 		glUniform3f(diffuseLoc, material.diffuse.r, material.diffuse.g, material.diffuse.b);
-		int specularLoc = glGetUniformLocation(shaderColorPhong, "specularColor");
+		int specularLoc = glGetUniformLocation(shaderColor, "specularColor");
 		glUniform3f(specularLoc, material.specular.r, material.specular.g, material.specular.b);
-		int ambientLoc = glGetUniformLocation(shaderColorPhong, "ambientColor");
+		int ambientLoc = glGetUniformLocation(shaderColor, "ambientColor");
 		glUniform3f(ambientLoc, material.ambient.r, material.ambient.g, material.ambient.b);
-		int shininessLoc = glGetUniformLocation(shaderColorPhong, "shininess");
+		int shininessLoc = glGetUniformLocation(shaderColor, "shininess");
 		glUniform1f(shininessLoc, material.shininess);
 	}
 	glBindVertexArray(VAO);
