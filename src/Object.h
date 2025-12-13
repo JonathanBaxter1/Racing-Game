@@ -6,14 +6,13 @@
 class Object
 {
 public:
-	float objectData[5];
-	// objectData: {x, y, z, size, angleRad}
-	Object(Model* model, float objectData[]);
+	float x, y, z, size, yaw, pitch, roll; // Euler angles
+	Object(Model* model, float x, float y, float z, float size, float yaw, float pitch, float roll);
 	void render(Shader shaderTexture, Shader shaderColor, unsigned int frame);
+	void update();
 
 private:
 	Model* model;
 	mat4 modelMatrix;
-	void Update();
 };
 

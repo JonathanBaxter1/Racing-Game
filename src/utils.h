@@ -3,6 +3,8 @@
 #include "types.h"
 #include "Model.h"
 
+extern float clamp(float number, float min, float max);
+extern void mat4Multiply(mat4 output, mat4 input1, mat4 input2);
 extern void setViewMatrix(mat4 matrix, float angle, float angle2, float x, float y, float z);
 extern void setPerspectiveMatrix(mat4 mat, float fovYdeg, float aspect, float near, float far);
 extern void updateUniforms();

@@ -68,28 +68,36 @@ void Window::mouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
 	static double lastX;
 	static double lastY;
-	static int isFirstFrame = 1;
+	static bool isFirstFrame = true;
 	if (isFirstFrame) {
-		isFirstFrame = 0;
+		isFirstFrame = false;
 	} else {
 		double deltaX = (xpos - lastX)*MOUSE_SENSITIVITY;
 		double deltaY = (ypos - lastY)*MOUSE_SENSITIVITY;
-		float newCameraPitch = cameraPitch - deltaY;
-		float newCameraYaw = cameraYaw + deltaX;
-		if (newCameraPitch > M_PI/2.0) {
-			cameraPitch = M_PI/2.0;
-		} else if (newCameraPitch < -M_PI/2.0) {
-			cameraPitch = -M_PI/2.0;
+
+		if (isSpectate) {
+			float newCameraPitch = cameraPitch - deltaY;
+			float newCameraYaw = cameraYaw + deltaX;
+			if (newCameraPitch > M_PI/2.0) {
+				cameraPitch = M_PI/2.0;
+			} else if (newCameraPitch < -M_PI/2.0) {
+				cameraPitch = -M_PI/2.0;
+			} else {
+				cameraPitch = newCameraPitch;
+			}
+			cameraYaw = fmod(newCameraYaw, 2*M_PI);
 		} else {
-			cameraPitch = newCameraPitch;
+			float newAileronAngle = aileronAngle + deltaX*1.0;
+			float newElevatorAngle = elevatorAngle + deltaY*0.7;
+			aileronAngle = clamp(newAileronAngle, -0.5, 0.5);
+			elevatorAngle = clamp(newElevatorAngle, -0.5, 0.5);
 		}
-		cameraYaw = fmod(newCameraYaw, 2*M_PI);
 	}
 	lastX = xpos;
 	lastY = ypos;
 }
 
-void Window::handleInput(float deltaT)
+void Window::handleInput(float deltaT, Object* airplane)
 {
 	if (isKeyDown(GLFW_KEY_ESCAPE)) {
 		glfwSetWindowShouldClose(this->windowPtr, GLFW_TRUE);
@@ -98,30 +106,73 @@ void Window::handleInput(float deltaT)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	} else if (isKeyDown(GLFW_KEY_2)) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	} else if (isKeyDown(GLFW_KEY_3)) {
+		isSpectate = false;
+	} else if (isKeyDown(GLFW_KEY_4)) {
+		isSpectate = true;
 	}
 
-	if (isKeyDown(GLFW_KEY_S)) {
-		cameraZ += MOVEMENT_SPEED*deltaT*cos(cameraYaw);
-		cameraX -= MOVEMENT_SPEED*deltaT*sin(cameraYaw);
-	} else if (isKeyDown(GLFW_KEY_W)) {
-		cameraZ -= MOVEMENT_SPEED*deltaT*cos(cameraYaw);
-		cameraX += MOVEMENT_SPEED*deltaT*sin(cameraYaw);
-	}
-	if (isKeyDown(GLFW_KEY_D)) {
-		cameraZ += MOVEMENT_SPEED*deltaT*sin(cameraYaw);
-		cameraX += MOVEMENT_SPEED*deltaT*cos(cameraYaw);
-	} else if (isKeyDown(GLFW_KEY_A)) {
-		cameraZ -= MOVEMENT_SPEED*deltaT*sin(cameraYaw);
-		cameraX -= MOVEMENT_SPEED*deltaT*cos(cameraYaw);
-	}
-	if (isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-		cameraY += MOVEMENT_SPEED*10*deltaT;
-	} else if (isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-		cameraY -= MOVEMENT_SPEED*10*deltaT;
-	}
-	if (isKeyDown(GLFW_KEY_SPACE)) {
-		cameraZ -= MOVEMENT_SPEED*50.0*deltaT*cos(cameraYaw);
-		cameraX += MOVEMENT_SPEED*50.0*deltaT*sin(cameraYaw);
+	if (isSpectate) {
+		if (isKeyDown(GLFW_KEY_S)) {
+			cameraZ += MOVEMENT_SPEED*deltaT*cos(cameraYaw);
+			cameraX -= MOVEMENT_SPEED*deltaT*sin(cameraYaw);
+		} else if (isKeyDown(GLFW_KEY_W)) {
+			cameraZ -= MOVEMENT_SPEED*deltaT*cos(cameraYaw);
+			cameraX += MOVEMENT_SPEED*deltaT*sin(cameraYaw);
+		}
+		if (isKeyDown(GLFW_KEY_D)) {
+			cameraZ += MOVEMENT_SPEED*deltaT*sin(cameraYaw);
+			cameraX += MOVEMENT_SPEED*deltaT*cos(cameraYaw);
+		} else if (isKeyDown(GLFW_KEY_A)) {
+			cameraZ -= MOVEMENT_SPEED*deltaT*sin(cameraYaw);
+			cameraX -= MOVEMENT_SPEED*deltaT*cos(cameraYaw);
+		}
+		if (isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+			cameraY += MOVEMENT_SPEED*10*deltaT;
+		} else if (isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+			cameraY -= MOVEMENT_SPEED*10*deltaT;
+		}
+		if (isKeyDown(GLFW_KEY_SPACE)) {
+			cameraZ -= MOVEMENT_SPEED*50.0*deltaT*cos(cameraYaw);
+			cameraX += MOVEMENT_SPEED*50.0*deltaT*sin(cameraYaw);
+		}
+	} else {
+		if (isKeyDown(GLFW_KEY_A)) {
+			rudderAngle -= deltaT*0.4;
+		} else if (isKeyDown(GLFW_KEY_D)) {
+			rudderAngle += deltaT*0.4;
+		}
+		rudderAngle = clamp(rudderAngle, -0.5, 0.5);
+
+		if (isKeyDown(GLFW_KEY_W)) {
+			speed += 1.0;
+		} else if (isKeyDown(GLFW_KEY_S)) {
+			speed -= 1.0;
+		}
+		speed = clamp(speed, 20.0, 90.0);
+
+		aileronAngle *= 1.0 - deltaT*1.0;
+		elevatorAngle *= 1.0 - deltaT*0.1;
+		rudderAngle *= 1.0 - deltaT*2.0;
+		float q = speed*0.001;
+		float rollRate = q*aileronAngle;
+		float pitchRate = q*-elevatorAngle;
+		float yawRate = q*-rudderAngle;
+
+		// T matrix lol
+		airplane->roll += rollRate + sin(airplane->roll)*tan(airplane->pitch)*pitchRate + cos(airplane->roll)*tan(airplane->pitch)*yawRate;
+		airplane->pitch += cos(airplane->roll)*pitchRate - sin(airplane->roll)*yawRate;
+		airplane->yaw -= sin(airplane->roll)/cos(airplane->pitch)*pitchRate + cos(airplane->roll)/cos(airplane->pitch)*yawRate;
+
+		airplane->z += speed*deltaT*cos(airplane->yaw);
+		airplane->x -= speed*deltaT*sin(airplane->yaw);
+		airplane->y -= speed*deltaT*sin(airplane->pitch);
+
+		cameraYaw = M_PI + airplane->yaw;
+		cameraPitch = 0.0;
+		cameraX = airplane->x + 50.0*sin(airplane->yaw);
+		cameraY = airplane->y + 0.0;
+		cameraZ = airplane->z - 50.0*cos(airplane->yaw);
 	}
 }
 

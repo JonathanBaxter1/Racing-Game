@@ -15,7 +15,7 @@ int main()
 
 	Texture islandHeightMap("islandHeightMap.png");
 	Texture islandNormalMap("islandNormalMap.png");
-	Texture stoneTexture("stoneTex.jpg");
+	Texture stoneTexture("stone.jpg");
 	Texture terrainTextures[] = {islandHeightMap, islandNormalMap, stoneTexture};
 
 	Shader terrainShader("terrain.vs", "terrain.tcs", "terrain.tes", "", "terrain.fs");
@@ -28,8 +28,7 @@ int main()
 	Shader textureShader("texture.vs", "", "", "", "texture.fs");
 	Shader colorShader("color.vs", "", "", "", "color.fs");
 	Model airplaneModel("airplane/airplane.obj");
-	float playerAirplaneStartData[] = {0.0, 55, 0.0, 1.0, 0.0};
-	Object playerAirplane(&airplaneModel, playerAirplaneStartData);
+	Object playerAirplane(&airplaneModel, 1300.0, 70.0, 800.0, 1.0, -1.5, 0.0, 0.0);
 
 	// Main Loop
 	while (!glfwWindowShouldClose(window.windowPtr)) {
@@ -45,7 +44,10 @@ int main()
 
 		// Game logic
 		glfwPollEvents();
-		window.handleInput(dT);
+		window.handleInput(dT, &playerAirplane);
+
+		// Update Airplane Position
+		playerAirplane.update();
 
 		updateUniforms();
 		setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);

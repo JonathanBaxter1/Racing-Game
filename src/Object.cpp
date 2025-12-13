@@ -1,39 +1,61 @@
 #include "include.h"
 
-Object::Object(Model* model, float objectData[])
+Object::Object(Model* model, float x, float y, float z, float size, float yaw, float pitch, float roll)
 {
+	this->x = x;
+	this->y = y;
+	this->z = z;
+	this->size = size;
+	this->yaw = yaw;
+	this->pitch = pitch;
+	this->roll = roll;
+
 	this->model = model;
-//	this->objectData = objectData;
-	memcpy(this->objectData, objectData, 5*sizeof(float));
-	this->Update();
+	this->update();
 }
 
 void Object::render(Shader shaderTexture, Shader shaderColor, unsigned int frame)
 {
-	this->Update();
+	this->update();
 	model->render(shaderTexture, shaderColor, modelMatrix, frame);
 }
 
-void Object::Update()
+void Object::update()
 {
-	float x = objectData[0];
-	float y = objectData[1];
-	float z = objectData[2];
-	float size = objectData[3];
-	float c = cos(objectData[4]);
-	float s = sin(objectData[4]);
-	modelMatrix[0] = size*c;
-	modelMatrix[1] = 0.0;
-	modelMatrix[2] = s;
-	modelMatrix[3] = 0.0;
-	modelMatrix[4] = 0.0;
-	modelMatrix[5] = size;
-	modelMatrix[6] = 0.0;
-	modelMatrix[7] = 0.0;
-	modelMatrix[8] = -s;
-	modelMatrix[9] = 0.0;
-	modelMatrix[10] = size*c;
-	modelMatrix[11] = 0.0;
+	mat4 scaleMatrix = {0.0};
+	mat4 yawMatrix = {0.0};
+	mat4 pitchMatrix = {0.0};
+	mat4 rollMatrix = {0.0};
+	mat4 tempMatrix;
+	mat4 tempMatrix2;
+
+	scaleMatrix[0] = size;
+	scaleMatrix[5] = size;
+	scaleMatrix[10] = size;
+	scaleMatrix[15] = 1.0;
+
+	yawMatrix[5] = 1.0;
+	yawMatrix[0] = cos(yaw);
+	yawMatrix[2] = sin(yaw);
+	yawMatrix[8] = -sin(yaw);
+	yawMatrix[10] = cos(yaw);
+
+	pitchMatrix[0] = 1.0;
+	pitchMatrix[5] = cos(pitch);
+	pitchMatrix[6] = sin(pitch);
+	pitchMatrix[9] = -sin(pitch);
+	pitchMatrix[10] = cos(pitch);
+
+	rollMatrix[10] = 1.0;
+	rollMatrix[0] = cos(roll);
+	rollMatrix[1] = sin(roll);
+	rollMatrix[4] = -sin(roll);
+	rollMatrix[5] = cos(roll);
+
+	mat4Multiply(tempMatrix, yawMatrix, scaleMatrix);
+	mat4Multiply(tempMatrix2, pitchMatrix, tempMatrix);
+	mat4Multiply(modelMatrix, rollMatrix, tempMatrix2);
+
 	modelMatrix[12] = x;
 	modelMatrix[13] = y;
 	modelMatrix[14] = z;

@@ -11,15 +11,22 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 
 void Mesh::render(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix, bool isPropeller, unsigned int frame)
 {
-	mat4 finalMatrix;
-	memcpy(finalMatrix, modelMatrix, sizeof(mat4));
+	mat4 propMatrix = {0.0};
+	propMatrix[10] = 1.0;
+	propMatrix[15] = 1.0;
 	if (isPropeller) {
 		float angle = 2.0*M_PI/16.0*(float)frame;
-		finalMatrix[0] = modelMatrix[0]*cos(angle);
-		finalMatrix[1] = modelMatrix[5]*sin(angle);
-		finalMatrix[4] = modelMatrix[0]*-sin(angle);
-		finalMatrix[5] = modelMatrix[5]*cos(angle);
+		propMatrix[0] = cos(angle);
+		propMatrix[1] = sin(angle);
+		propMatrix[4] = -sin(angle);
+		propMatrix[5] = cos(angle);
+	} else {
+		propMatrix[0] = 1.0;
+		propMatrix[5] = 1.0;
 	}
+	mat4 finalMatrix;
+	mat4Multiply(finalMatrix, propMatrix, modelMatrix);
+
 	if (this->textures.size() > 0) {
 		glUseProgram(shaderTexture.ID);
 		int diffuseMapUniformLoc = glGetUniformLocation(shaderTexture.ID, "diffuseMapTex");

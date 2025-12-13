@@ -3,6 +3,11 @@
 // Global Variables
 unsigned int Shader::numShaders = 0;
 unsigned int Shader::shaders[MAX_SHADERS] = {0};
+bool Window::isSpectate = false;
+float Window::aileronAngle = 0.0;
+float Window::elevatorAngle = 0.0;
+float Window::rudderAngle = 0.0;
+float Window::speed = 50.0;
 
 std::vector<Model*> models;
 int screenWidth;
@@ -24,6 +29,23 @@ mat4 projectionMatrix = {
 	0.0, 0.0, 0.0, 0.0,
 	0.0, 0.0, 0.0, 0.0,
 };
+
+float clamp(float number, float min, float max) {
+	float temp = number > max ? max : number;
+	return temp < min ? min : temp;
+}
+
+void mat4Multiply(mat4 output, mat4 input1, mat4 input2)
+{ // Benchmark: i5-8350U single core, 20.2 million/sec, ~178 cc (gcc -O4)
+	for (unsigned int i = 0; i < 16; i++) {
+		unsigned int rowStart = i&~3u;
+		unsigned int column = i&3u;
+		output[i] = input1[rowStart + 0]*input2[column + 0];
+		output[i] += input1[rowStart + 1]*input2[column + 4];
+		output[i] += input1[rowStart + 2]*input2[column + 8];
+		output[i] += input1[rowStart + 3]*input2[column + 12];
+	}
+}
 
 void setViewMatrix(mat4 matrix, float angle, float angle2, float x, float y, float z)
 {

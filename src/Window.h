@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+#include "Object.h"
 
 class Window
 {
@@ -9,7 +10,12 @@ public:
 
 	Window();
 	static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
-	void handleInput(float deltaT);
+	void handleInput(float deltaT, Object* airplane);
 	unsigned int isKeyDown(int key);
 private:
+	static bool isSpectate;
+	static float aileronAngle;
+	static float elevatorAngle;
+	static float rudderAngle;
+	static float speed;
 };
