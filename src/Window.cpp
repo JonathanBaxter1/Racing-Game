@@ -154,7 +154,7 @@ void Window::handleInput(float deltaT, Object* airplane)
 		aileronAngle *= 1.0 - deltaT*1.0;
 		elevatorAngle *= 1.0 - deltaT*0.1;
 		rudderAngle *= 1.0 - deltaT*2.0;
-		float q = speed*0.001;
+		float q = sqrt(speed)*0.01;
 		float rollRate = q*aileronAngle;
 		float pitchRate = q*-elevatorAngle;
 		float yawRate = q*-rudderAngle;
