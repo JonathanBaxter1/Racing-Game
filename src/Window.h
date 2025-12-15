@@ -14,8 +14,10 @@ public:
 	unsigned int isKeyDown(int key);
 private:
 	static bool isSpectate;
-	static float aileronAngle;
-	static float elevatorAngle;
-	static float rudderAngle;
+//	static float aileronAngle;
+//	static float elevatorAngle;
+//	static float rudderAngle;
+	static float desiredPitch;
+	static float desiredTurnAngle;
 	static float speed;
 };

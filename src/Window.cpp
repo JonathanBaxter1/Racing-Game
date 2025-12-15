@@ -87,10 +87,14 @@ void Window::mouseCallback(GLFWwindow* window, double xpos, double ypos)
 			}
 			cameraYaw = fmod(newCameraYaw, 2*M_PI);
 		} else {
-			float newAileronAngle = aileronAngle + deltaX*1.0;
-			float newElevatorAngle = elevatorAngle + deltaY*0.7;
-			aileronAngle = clamp(newAileronAngle, -0.5, 0.5);
-			elevatorAngle = clamp(newElevatorAngle, -0.5, 0.5);
+			float newDesiredPitch = desiredPitch - deltaY*1.0;
+			desiredPitch = clamp(newDesiredPitch, -M_PI/2.0, M_PI/2.0);
+			float newDesiredTurnAngle = desiredTurnAngle + deltaX*1.0;
+			desiredTurnAngle = clamp(newDesiredTurnAngle, -M_PI/2.0, M_PI/2.0);
+//			float newAileronAngle = aileronAngle + deltaX*1.0;
+//			float newElevatorAngle = elevatorAngle + deltaY*0.7;
+//			aileronAngle = clamp(newAileronAngle, -0.5, 0.5);
+//			elevatorAngle = clamp(newElevatorAngle, -0.5, 0.5);
 		}
 	}
 	lastX = xpos;
@@ -137,32 +141,19 @@ void Window::handleInput(float deltaT, Object* airplane)
 			cameraX += MOVEMENT_SPEED*50.0*deltaT*sin(cameraYaw);
 		}
 	} else {
-		if (isKeyDown(GLFW_KEY_A)) {
-			rudderAngle -= deltaT*0.4;
-		} else if (isKeyDown(GLFW_KEY_D)) {
-			rudderAngle += deltaT*0.4;
-		}
-		rudderAngle = clamp(rudderAngle, -0.5, 0.5);
-
 		if (isKeyDown(GLFW_KEY_W)) {
 			speed += 1.0;
 		} else if (isKeyDown(GLFW_KEY_S)) {
 			speed -= 1.0;
 		}
-		speed = clamp(speed, 20.0, 90.0);
+		speed = clamp(speed, 20.0, 150.0);
 
-		aileronAngle *= 1.0 - deltaT*1.0;
-		elevatorAngle *= 1.0 - deltaT*0.1;
-		rudderAngle *= 1.0 - deltaT*2.0;
+		desiredTurnAngle *= 1.0 - deltaT*1.0;
 		float q = sqrt(speed)*0.01;
-		float rollRate = q*aileronAngle;
-		float pitchRate = q*-elevatorAngle;
-		float yawRate = q*-rudderAngle;
 
-		// T matrix lol
-		airplane->roll += rollRate + sin(airplane->roll)*tan(airplane->pitch)*pitchRate + cos(airplane->roll)*tan(airplane->pitch)*yawRate;
-		airplane->pitch += cos(airplane->roll)*pitchRate - sin(airplane->roll)*yawRate;
-		airplane->yaw -= sin(airplane->roll)/cos(airplane->pitch)*pitchRate + cos(airplane->roll)/cos(airplane->pitch)*yawRate;
+		airplane->roll = desiredTurnAngle;
+		airplane->pitch = desiredPitch;
+		airplane->yaw += desiredTurnAngle*deltaT;
 
 		airplane->z += speed*deltaT*cos(airplane->yaw);
 		airplane->x -= speed*deltaT*sin(airplane->yaw);
