@@ -87,10 +87,8 @@ void Window::mouseCallback(GLFWwindow* window, double xpos, double ypos)
 			}
 			cameraYaw = fmod(newCameraYaw, 2*M_PI);
 		} else {
-			float newDesiredPitch = desiredPitch - deltaY*1.0;
-			desiredPitch = clamp(newDesiredPitch, -M_PI/2.0, M_PI/2.0);
-			float newDesiredTurnAngle = desiredTurnAngle + deltaX*1.0;
-			desiredTurnAngle = clamp(newDesiredTurnAngle, -M_PI/2.0, M_PI/2.0);
+			desiredPitch = desiredPitch - deltaY*1.0;
+			desiredTurnAngle = desiredTurnAngle + deltaX*1.0;
 //			float newAileronAngle = aileronAngle + deltaX*1.0;
 //			float newElevatorAngle = elevatorAngle + deltaY*0.7;
 //			aileronAngle = clamp(newAileronAngle, -0.5, 0.5);
@@ -148,8 +146,10 @@ void Window::handleInput(float deltaT, Object* airplane)
 		}
 		speed = clamp(speed, 20.0, 150.0);
 
-		desiredTurnAngle *= 1.0 - deltaT*1.0;
-		float q = sqrt(speed)*0.01;
+		float q = sqrt(speed)*0.06;
+		desiredPitch = clamp(desiredPitch, -M_PI/2.0, M_PI/2.0);
+		desiredTurnAngle = clamp(desiredTurnAngle, -M_PI/2.0*q, M_PI/2.0*q);
+//		desiredTurnAngle *= 1.0 - deltaT*1.0;
 
 		airplane->roll = desiredTurnAngle;
 		airplane->pitch = desiredPitch;
