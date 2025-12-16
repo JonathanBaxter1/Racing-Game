@@ -58,11 +58,15 @@ void setViewMatrix(mat4 matrix, float angle, float angle2, float x, float y, flo
 	matrix[0] = c2;
 	matrix[1] = -s2*s;
 	matrix[2] = s2*-c;
+	matrix[3] = 0.0;
+	matrix[4] = 0.0;
 	matrix[5] = c;
 	matrix[6] = -s;
+	matrix[7] = 0.0;
 	matrix[8] = s2;
 	matrix[9] = c2*s;
 	matrix[10] = c2*c;
+	matrix[11] = 0.0;
 	matrix[12] = -c2*x - s2*z;
 	matrix[13] = x*s2*s - z*c2*s - y*c;
 	matrix[14] = x*s2*c - z*c2*c + y*s;

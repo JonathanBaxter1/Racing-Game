@@ -38,7 +38,7 @@ int main()
 		deltaT = (int)(dT*1000000);
 		curTime = newTime;
 		frameCount++;
-		if (!(frameCount&15u) && GAME_DEBUG == true) { // So the print statement doesn't count as computation time
+		if (!(frameCount&1u) && GAME_DEBUG == true) { // So the print statement doesn't count as computation time
 			std::cout << "delta T: " << deltaT << "us; CPU: " << deltaT_CPU << "us; GPU: " << deltaT_GPU << "us" << std::endl;
 		}
 
@@ -46,11 +46,9 @@ int main()
 		glfwPollEvents();
 		window.handleInput(dT, &playerAirplane);
 
-		// Update Airplane Position
 		playerAirplane.update();
-
-		updateUniforms();
 		setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);
+		updateUniforms();
 
 		float newTime2 = glfwGetTime();
 		deltaT_CPU = (int)((newTime2 - newTime)*1000000);
@@ -61,6 +59,7 @@ int main()
 		terrain.render();
 		water.render();
 		playerAirplane.render(textureShader, colorShader, frameCount);
+
 		glfwSwapBuffers(window.windowPtr);
 
 		deltaT_GPU = (int)((glfwGetTime() - newTime2)*1000000);
