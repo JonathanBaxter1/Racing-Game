@@ -12,4 +12,3 @@
 - add checkpoints
 - add a timer (lap times and total time). Save fastest map time & fastest lap time (and replays?)
 - race start (with countdown)
-- fix airplane jittering
