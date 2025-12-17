@@ -42,6 +42,7 @@ int main()
 			std::cout << "delta T: " << deltaT << "us; CPU: " << deltaT_CPU << "us; GPU: " << deltaT_GPU << "us" << std::endl;
 		}
 
+
 		// Game logic
 		glfwPollEvents();
 		window.handleInput(dT, &playerAirplane);

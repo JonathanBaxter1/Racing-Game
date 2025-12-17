@@ -10,7 +10,7 @@ uniform mat4 view;
 
 uniform sampler2D textures[8];
 
-out vec2 texCoord;
+out vec3 coord;
 out vec3 normal;
 
 void main()
@@ -29,10 +29,11 @@ void main()
 
 
 	vec2 mapCoord = vec2(worldPos.x/4096.0, worldPos.z/4096.0);
-	texCoord = vec2(worldPos.x/30.0, worldPos.z/30.0);
 	float height = texture(heightMap, mapCoord).x*239.0;
-	normal = vec3(texture(normalMap, mapCoord));
 	worldPos.y = height;
 
+	normal = vec3(texture(normalMap, mapCoord));
+	normal = normalize(vec3(normal.x, normal.z, normal.y) - 0.5);
+	coord = worldPos.xyz;
 	gl_Position = projection*view*worldPos;
 }
