@@ -38,7 +38,7 @@ float clamp(float number, float min, float max) {
 }
 
 void mat4Multiply(mat4 output, mat4 input1, mat4 input2)
-{ // Benchmark: i5-8350U single core, 20.2 million/sec, ~178 cc (gcc -O4)
+{ // Benchmark: i5-8350U single core, 20.2 million/sec, ~178 cc (g++)
 	for (unsigned int i = 0; i < 16; i++) {
 		unsigned int rowStart = i&~3u;
 		unsigned int column = i&3u;

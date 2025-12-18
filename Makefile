@@ -1,5 +1,5 @@
 PLATFORM ?= linux
-COMPILE_FLAGS := -Wall -O4
+COMPILE_FLAGS := -Wall -O3
 
 ifeq ($(PLATFORM), linux)
 	LINK_FLAGS := -lGL -lGLU -lGLEW -lglfw -lXxf86vm -lXrandr -lXi -ldl -lXinerama -lXcursor -lassimp

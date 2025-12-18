@@ -136,9 +136,9 @@ void Window::handleInput(float deltaT, Object* airplane)
 		}
 	} else {
 		if (isKeyDown(GLFW_KEY_W)) {
-			speed += 1.0;
+			speed += 100.0*deltaT;
 		} else if (isKeyDown(GLFW_KEY_S)) {
-			speed -= 1.0;
+			speed -= 100.0*deltaT;
 		}
 		speed = clamp(speed, 30.0, 150.0);
 
