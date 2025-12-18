@@ -140,19 +140,21 @@ void Window::handleInput(float deltaT, Object* airplane)
 		} else if (isKeyDown(GLFW_KEY_S)) {
 			speed -= 1.0;
 		}
-		speed = clamp(speed, 20.0, 150.0);
+		speed = clamp(speed, 30.0, 150.0);
 
 		float q = sqrt(speed)*0.06;
 		desiredPitch = clamp(desiredPitch, -M_PI/2.0, M_PI/2.0);
 		desiredTurnAngle = clamp(desiredTurnAngle, -M_PI/2.0*q, M_PI/2.0*q);
+		float gravity = desiredPitch/M_PI*2.0 + 1.0;
+		float lift = clamp((speed-30.0)/20.0, 0.0, 1.0);
 
 		airplane->roll = desiredTurnAngle;
 		airplane->pitch = desiredPitch;
 		airplane->yaw += desiredTurnAngle*deltaT;
 
-		airplane->z += speed*deltaT*cos(airplane->yaw);
-		airplane->x -= speed*deltaT*sin(airplane->yaw);
-		airplane->y -= speed*deltaT*sin(airplane->pitch);
+		airplane->z += deltaT*speed*cos(airplane->yaw);
+		airplane->x -= deltaT*speed*sin(airplane->yaw);
+		airplane->y -= deltaT*((gravity - lift)*20.0 + speed*sin(airplane->pitch));
 
 		cameraYaw = M_PI + airplane->yaw;
 		cameraPitch = 0.0;
