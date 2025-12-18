@@ -1,11 +1,9 @@
 #include "include.h"
 
-#define PATCH_RES 64
-#define MAP_SIZE 4096.0
-#define PATCH_SIZE MAP_SIZE/PATCH_RES
-
-Terrain::Terrain(Shader shader, Texture textures[], unsigned int numTextures)
+Terrain::Terrain(Shader shader, Texture textures[], unsigned int numTextures, float mapSize, unsigned int patchRes)
 {
+	this->patchRes = patchRes;
+	float patchSize = mapSize/(float)patchRes;
 	if (numTextures > TERRAIN_MAX_TEXTURES) {
 		std::cout << "Too many textures in terrain. Max is " << TERRAIN_MAX_TEXTURES << std::endl;
 		exit(-1);
@@ -20,18 +18,18 @@ Terrain::Terrain(Shader shader, Texture textures[], unsigned int numTextures)
 	}
 	this->numTextures = numTextures;
 
-	float surfaceVertices[8*PATCH_RES*PATCH_RES];
-	for (unsigned int x = 0; x < PATCH_RES; x++) {
-		for (unsigned int y = 0; y < PATCH_RES; y++) {
-			unsigned int offset = (y*PATCH_RES+x)*8;
-			surfaceVertices[offset+0] = x*PATCH_SIZE;
-			surfaceVertices[offset+1] = y*PATCH_SIZE;
-			surfaceVertices[offset+2] = x*PATCH_SIZE;
-			surfaceVertices[offset+3] = (y+1)*PATCH_SIZE;
-			surfaceVertices[offset+4] = (x+1)*PATCH_SIZE;
-			surfaceVertices[offset+5] = (y+1)*PATCH_SIZE;
-			surfaceVertices[offset+6] = (x+1)*PATCH_SIZE;
-			surfaceVertices[offset+7] = y*PATCH_SIZE;
+	float* surfaceVertices = (float*)malloc(8*patchRes*patchRes*sizeof(float));
+	for (unsigned int x = 0; x < patchRes; x++) {
+		for (unsigned int y = 0; y < patchRes; y++) {
+			unsigned int offset = (y*patchRes+x)*8;
+			surfaceVertices[offset+0] = x*patchSize;
+			surfaceVertices[offset+1] = y*patchSize;
+			surfaceVertices[offset+2] = x*patchSize;
+			surfaceVertices[offset+3] = (y+1)*patchSize;
+			surfaceVertices[offset+4] = (x+1)*patchSize;
+			surfaceVertices[offset+5] = (y+1)*patchSize;
+			surfaceVertices[offset+6] = (x+1)*patchSize;
+			surfaceVertices[offset+7] = y*patchSize;
 		}
 	}
 
@@ -41,13 +39,14 @@ Terrain::Terrain(Shader shader, Texture textures[], unsigned int numTextures)
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(surfaceVertices), surfaceVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 8*patchRes*patchRes*sizeof(float), surfaceVertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 	glBindVertexArray(0);
+	free(surfaceVertices);
 }
 
 void Terrain::render()
@@ -60,6 +59,6 @@ void Terrain::render()
 		glBindTexture(GL_TEXTURE_2D, this->textures[i]);
 	}
 
-	glDrawArrays(GL_PATCHES, 0, 4*PATCH_RES*PATCH_RES);
+	glDrawArrays(GL_PATCHES, 0, 4*patchRes*patchRes);
 
 }

@@ -23,3 +23,4 @@
 #include "Model.h"
 #include "Object.h"
 #include "Terrain.h"
+#include "Skybox.h"

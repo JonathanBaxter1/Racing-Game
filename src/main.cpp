@@ -13,16 +13,27 @@ int main()
 	int deltaT_GPU = 0;
 	unsigned int frameCount = 0;
 
-	Texture islandHeightMap("islandHeightMap.png");
-	Texture islandNormalMap("islandNormalMap.png");
-	Texture stoneTexture("stone.jpg");
+	// https://opengameart.org/content/clouds-skybox-1
+	Texture skyboxUp("skyboxUp.bmp", 8, GL_CLAMP_TO_EDGE);
+	Texture skyboxDown("skyboxDown.bmp", 8, GL_CLAMP_TO_EDGE);
+	Texture skyboxNorth("skyboxNorth.bmp", 8, GL_CLAMP_TO_EDGE);
+	Texture skyboxEast("skyboxEast.bmp", 8, GL_CLAMP_TO_EDGE);
+	Texture skyboxSouth("skyboxSouth.bmp", 8, GL_CLAMP_TO_EDGE);
+	Texture skyboxWest("skyboxWest.bmp", 8, GL_CLAMP_TO_EDGE);
+	Shader skyboxShader("skybox.vs", "", "", "", "skybox.fs");
+	Texture skyboxTextures[6] = {skyboxUp, skyboxDown, skyboxNorth, skyboxEast, skyboxSouth, skyboxWest};
+	Skybox skybox(skyboxShader, skyboxTextures);
+
+	Texture islandHeightMap("islandHeightMap.png", 16, GL_CLAMP_TO_EDGE);
+	Texture islandNormalMap("islandNormalMap.png", 8, GL_CLAMP_TO_EDGE);
+	Texture stoneTexture("stone.jpg", 8, GL_REPEAT);
 	Texture terrainTextures[] = {islandHeightMap, islandNormalMap, stoneTexture};
 
 	Shader terrainShader("terrain.vs", "terrain.tcs", "terrain.tes", "", "terrain.fs");
-	Terrain terrain(terrainShader, terrainTextures, 3);
+	Terrain terrain(terrainShader, terrainTextures, 3, 4096.0, 64);
 
 	Shader waterShader("water.vs", "water.tcs", "water.tes", "", "water.fs");
-	Terrain water(waterShader, nullptr, 0);
+	Terrain water(waterShader, nullptr, 0, 100000.0, 32);
 
 	// Models
 	Shader textureShader("texture.vs", "", "", "", "texture.fs");
@@ -55,11 +66,12 @@ int main()
 		deltaT_CPU = (int)((newTime2 - newTime)*1000000);
 
 		// Render
-		glClearColor(0.5, 0.75, 0.95, 1.0); // Sky blue, also fog color
+		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		terrain.render();
 		water.render();
 		playerAirplane.render(textureShader, colorShader, frameCount);
+		skybox.render();
 
 		glfwSwapBuffers(window.windowPtr);
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include "consts.h"
 #include "types.h"
 
@@ -12,9 +13,10 @@ private:
 	unsigned int shader;
 	unsigned int textures[TERRAIN_MAX_TEXTURES];
 	unsigned int numTextures;
+	unsigned int patchRes;
 
 public:
 
-	Terrain(Shader shader, Texture textures[], unsigned int numTextures);
+	Terrain(Shader shader, Texture textures[], unsigned int numTextures, float mapSize, unsigned int patchRes);
 	void render();
 };
