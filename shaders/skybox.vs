@@ -18,6 +18,9 @@ void main()
 	viewStationary[3][2] = 0.0;
 	gl_Position = projection*viewStationary*vec4(aPos, 1.0);
 
+	float waterHeight = 50.0;
+	gl_ClipDistance[0] = aPos.y - waterHeight;
+
 	texCoord = aTexCoord;
 	texIndex = aTexIndex;
 }

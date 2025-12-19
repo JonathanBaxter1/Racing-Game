@@ -58,6 +58,7 @@ Window::Window()
 
 	// OpenGL settings
 	glShadeModel(GL_SMOOTH);
+	glEnable(GL_CLIP_DISTANCE0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);

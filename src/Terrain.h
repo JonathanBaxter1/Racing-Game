@@ -17,6 +17,6 @@ private:
 
 public:
 
-	Terrain(Shader shader, Texture textures[], unsigned int numTextures, float mapSize, unsigned int patchRes);
+	Terrain(Shader shader, unsigned int textures[], unsigned int numTextures, float mapSize, unsigned int patchRes);
 	void render();
 };

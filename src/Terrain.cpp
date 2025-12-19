@@ -1,6 +1,6 @@
 #include "include.h"
 
-Terrain::Terrain(Shader shader, Texture textures[], unsigned int numTextures, float mapSize, unsigned int patchRes)
+Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTextures, float mapSize, unsigned int patchRes)
 {
 	this->patchRes = patchRes;
 	float patchSize = mapSize/(float)patchRes;
@@ -14,7 +14,7 @@ Terrain::Terrain(Shader shader, Texture textures[], unsigned int numTextures, fl
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(this->vao);
 	for (unsigned int i = 0; i < numTextures; i++) {
-		this->textures[i] = textures[i].ID;
+		this->textures[i] = textures[i];
 	}
 	this->numTextures = numTextures;
 
