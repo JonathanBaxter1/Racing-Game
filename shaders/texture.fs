@@ -8,11 +8,11 @@ in vec2 texCoord;
 uniform sampler2D diffuseMapTex;
 uniform sampler2D specularMapTex;
 uniform vec3 viewPos;
+uniform vec3 lightDir;
 uniform float shininess;
 
 void main()
 {
-	vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
 	vec3 viewDir = normalize(viewPos - fragPos);
 	vec3 norm = normalize(normal);
 	vec3 diffuseMap = vec3(texture(diffuseMapTex, texCoord));

@@ -13,13 +13,10 @@ uniform mat4 projection;
 void main()
 {
 	mat4 viewStationary = view;
-	viewStationary[3][0] = 0.0;
-	viewStationary[3][1] = 0.0;
-	viewStationary[3][2] = 0.0;
+//	viewStationary[3][0] = 0.0;
+//	viewStationary[3][1] = 0.0;
+//	viewStationary[3][2] = 0.0;
 	gl_Position = projection*viewStationary*vec4(aPos, 1.0);
-
-	float waterHeight = 50.0;
-	gl_ClipDistance[0] = aPos.y - waterHeight;
 
 	texCoord = aTexCoord;
 	texIndex = aTexIndex;

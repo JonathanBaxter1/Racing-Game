@@ -30,7 +30,7 @@ int main()
 	unsigned int terrainTextureIDs[] = {islandHeightMap.ID, islandNormalMap.ID, stoneTexture.ID};
 
 	Shader terrainShader("terrain.vs", "terrain.tcs", "terrain.tes", "", "terrain.fs");
-	Terrain terrain(terrainShader, terrainTextureIDs, 3, 4096.0, 64);
+	Terrain terrain(terrainShader, terrainTextureIDs, sizeof(terrainTextureIDs)/sizeof(unsigned int), 4096.0, 64);
 
 	// Models
 	Shader textureShader("texture.vs", "", "", "", "texture.fs");
@@ -64,9 +64,10 @@ int main()
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	unsigned int waterTextureIDs[] = {reflectionTexture};
+	Texture waterDuDvTexture("waterDuDv.png", 8, GL_REPEAT);
+	unsigned int waterTextureIDs[] = {reflectionTexture, waterDuDvTexture.ID, islandHeightMap.ID};
 	Shader waterShader("water.vs", "water.tcs", "water.tes", "", "water.fs");
-	Terrain water(waterShader, waterTextureIDs, 1, 100000.0, 32);
+	Terrain water(waterShader, waterTextureIDs, sizeof(waterTextureIDs)/sizeof(unsigned int), 100000.0, 32);
 
 	// Main Loop
 	while (!glfwWindowShouldClose(window.windowPtr)) {

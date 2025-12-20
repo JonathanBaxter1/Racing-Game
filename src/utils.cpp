@@ -93,16 +93,30 @@ void updateUniforms()
 		if (shaderID == 0) break;
 		glUseProgram(shaderID);
 
-		// View Matrix
 		int viewMatrixLoc = glGetUniformLocation(shaderID, "view");
 		glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, viewMatrix);
 
-		// View Position
 		int viewPosUniformLoc = glGetUniformLocation(shaderID, "viewPos");
 		glUniform3f(viewPosUniformLoc, cameraX, cameraY, cameraZ);
 
-		// Shininess
 		int shininessUniformLoc = glGetUniformLocation(shaderID, "shininess");
 		glUniform1f(shininessUniformLoc, 32.0);
+
+		int timeUniformLoc = glGetUniformLocation(shaderID, "time");
+		glUniform1f(timeUniformLoc, glfwGetTime());
+
+		int lightDirUniformLoc = glGetUniformLocation(shaderID, "lightDir");
+		vec3 lightDir = {1.0, 0.7, 0.5};
+		lightDir = normalize(lightDir);
+		glUniform3f(lightDirUniformLoc, lightDir.x, lightDir.y, lightDir.z);
 	}
+}
+
+vec3 normalize(vec3 vec) {
+	vec3 output;
+	float magnitude = sqrt(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z);
+	output.x = vec.x/magnitude;
+	output.y = vec.y/magnitude;
+	output.z = vec.z/magnitude;
+	return output;
 }

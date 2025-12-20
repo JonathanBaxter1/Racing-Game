@@ -9,6 +9,7 @@ extern void setViewMatrix(mat4 matrix, float angle, float angle2, float x, float
 extern void setPerspectiveMatrix(mat4 mat, float fovYdeg, float aspect, float near, float far);
 extern void updateUniforms();
 extern unsigned int isKeyDown(int key);
+extern vec3 normalize(vec3 vec);
 
 // Global Variables
 extern std::vector<Model*> models;
