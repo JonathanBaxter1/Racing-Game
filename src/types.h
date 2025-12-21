@@ -3,6 +3,7 @@
 #include <string>
 #include <assimp/scene.h>
 
+typedef float mat3[9];
 typedef float mat4[16];
 typedef struct {
 	unsigned int id;

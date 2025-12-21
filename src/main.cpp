@@ -35,8 +35,26 @@ int main()
 	// Models
 	Shader textureShader("texture.vs", "", "", "", "texture.fs");
 	Shader colorShader("color.vs", "", "", "", "color.fs");
+
 	Model airplaneModel("airplane/airplane.obj");
 	Object playerAirplane(&airplaneModel, 1300.0, 70.0, 800.0, 1.0, -1.5, 0.0, 0.0);
+
+	Model checkpointModel("checkpoint/checkpoint.obj");
+	unsigned int numCheckpoints = 5;
+	float checkpointData[numCheckpoints*4] = {
+		1600.0, 70.0, 820.0, -1.5,
+		2670.0, 70.0, 832.0, -1.5,
+		2660.0, 70.0, 4096.0-2932.0, 0.0,
+		2658.0, 70.0, 4096.0-2586.0, -1.5,
+		1316.0, 70.0, 4096.0-2791.0, -1.5,
+	};
+	Object checkpoints[numCheckpoints];
+	mat3 checkpointNormals[numCheckpoints];
+	for (unsigned int i = 0; i < numCheckpoints; i++) {
+		unsigned int offset = i*4;
+		checkpoints[i] = Object(&checkpointModel, checkpointData[offset], checkpointData[offset + 1], checkpointData[offset + 2], 5.0, checkpointData[offset + 3], 0.0, 0.0);
+		checkpointNormals[i][0] = 0.0;
+	}
 
 	unsigned int reflectionTexture;
 	glGenTextures(1, &reflectionTexture);
@@ -98,13 +116,14 @@ int main()
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		terrain.render();
-//		water.render();
 		playerAirplane.render(textureShader, colorShader, frameCount);
+		for (unsigned int i = 0; i < numCheckpoints; i++) {
+			checkpoints[i].render(textureShader, colorShader, frameCount);
+		}
 		skybox.render();
 
 		float waterHeight = 50.0;
 		float reflectionCameraY = cameraY - 2.0*(cameraY - waterHeight);
-//		float reflectionCameraY =  - cameraY;
 		float reflectionCameraPitch = -cameraPitch;
 		setViewMatrix(viewMatrix, reflectionCameraPitch, cameraYaw, cameraX, reflectionCameraY, cameraZ);
 		updateUniforms();
@@ -115,8 +134,10 @@ int main()
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		terrain.render();
-//		water.render();
 		playerAirplane.render(textureShader, colorShader, frameCount);
+		for (unsigned int i = 0; i < numCheckpoints; i++) {
+			checkpoints[i].render(textureShader, colorShader, frameCount);
+		}
 		skybox.render();
 
 		setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);
@@ -124,7 +145,6 @@ int main()
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, screenWidth, screenHeight);
-//		water.render(reflectionTexture);
 		water.render();
 
 		glFinish(); // So we get consistent FPS

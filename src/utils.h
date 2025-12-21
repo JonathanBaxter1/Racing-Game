@@ -4,12 +4,15 @@
 #include "Model.h"
 
 extern float clamp(float number, float min, float max);
+extern void mat3Multiply(mat3 output, mat3 input1, mat3 input2);
 extern void mat4Multiply(mat4 output, mat4 input1, mat4 input2);
 extern void setViewMatrix(mat4 matrix, float angle, float angle2, float x, float y, float z);
 extern void setPerspectiveMatrix(mat4 mat, float fovYdeg, float aspect, float near, float far);
 extern void updateUniforms();
 extern unsigned int isKeyDown(int key);
 extern vec3 normalize(vec3 vec);
+extern void eulerRotationMatrix3(mat3 matrix, float size, float yaw, float pitch, float roll);
+extern void eulerRotationMatrix4(mat4 matrix, float size, float yaw, float pitch, float roll, float x, float y, float z);
 
 // Global Variables
 extern std::vector<Model*> models;

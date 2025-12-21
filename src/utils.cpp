@@ -37,8 +37,19 @@ float clamp(float number, float min, float max) {
 	return temp < min ? min : temp;
 }
 
+void mat3Multiply(mat3 output, mat3 input1, mat3 input2)
+{
+	for (unsigned int i = 0; i < 9; i++) {
+		unsigned int rowStart = i/3*3;
+		unsigned int column = i%3;
+		output[i] = input1[rowStart + 0]*input2[column + 0];
+		output[i] += input1[rowStart + 1]*input2[column + 3];
+		output[i] += input1[rowStart + 2]*input2[column + 6];
+	}
+}
+
 void mat4Multiply(mat4 output, mat4 input1, mat4 input2)
-{ // Benchmark: i5-8350U single core, 20.2 million/sec, ~178 cc (g++)
+{
 	for (unsigned int i = 0; i < 16; i++) {
 		unsigned int rowStart = i&~3u;
 		unsigned int column = i&3u;
@@ -119,4 +130,80 @@ vec3 normalize(vec3 vec) {
 	output.y = vec.y/magnitude;
 	output.z = vec.z/magnitude;
 	return output;
+}
+
+void eulerRotationMatrix3(mat3 matrix, float size, float yaw, float pitch, float roll) {
+	mat3 scaleMatrix = {0.0};
+	mat3 yawMatrix = {0.0};
+	mat3 pitchMatrix = {0.0};
+	mat3 rollMatrix = {0.0};
+	mat3 tempMatrix;
+	mat3 tempMatrix2;
+
+	scaleMatrix[0] = size;
+	scaleMatrix[4] = size;
+	scaleMatrix[8] = size;
+
+	yawMatrix[4] = 1.0;
+	yawMatrix[0] = cos(yaw);
+	yawMatrix[2] = sin(yaw);
+	yawMatrix[6] = -sin(yaw);
+	yawMatrix[8] = cos(yaw);
+
+	pitchMatrix[0] = 1.0;
+	pitchMatrix[4] = cos(pitch);
+	pitchMatrix[5] = sin(pitch);
+	pitchMatrix[7] = -sin(pitch);
+	pitchMatrix[8] = cos(pitch);
+
+	rollMatrix[8] = 1.0;
+	rollMatrix[0] = cos(roll);
+	rollMatrix[1] = sin(roll);
+	rollMatrix[3] = -sin(roll);
+	rollMatrix[4] = cos(roll);
+
+	mat3Multiply(tempMatrix, yawMatrix, scaleMatrix);
+	mat3Multiply(tempMatrix2, pitchMatrix, tempMatrix);
+	mat3Multiply(matrix, rollMatrix, tempMatrix2);
+}
+
+void eulerRotationMatrix4(mat4 matrix, float size, float yaw, float pitch, float roll, float x, float y, float z) {
+	mat4 scaleMatrix = {0.0};
+	mat4 yawMatrix = {0.0};
+	mat4 pitchMatrix = {0.0};
+	mat4 rollMatrix = {0.0};
+	mat4 tempMatrix;
+	mat4 tempMatrix2;
+
+	scaleMatrix[0] = size;
+	scaleMatrix[5] = size;
+	scaleMatrix[10] = size;
+	scaleMatrix[15] = 1.0;
+
+	yawMatrix[5] = 1.0;
+	yawMatrix[0] = cos(yaw);
+	yawMatrix[2] = sin(yaw);
+	yawMatrix[8] = -sin(yaw);
+	yawMatrix[10] = cos(yaw);
+
+	pitchMatrix[0] = 1.0;
+	pitchMatrix[5] = cos(pitch);
+	pitchMatrix[6] = sin(pitch);
+	pitchMatrix[9] = -sin(pitch);
+	pitchMatrix[10] = cos(pitch);
+
+	rollMatrix[10] = 1.0;
+	rollMatrix[0] = cos(roll);
+	rollMatrix[1] = sin(roll);
+	rollMatrix[4] = -sin(roll);
+	rollMatrix[5] = cos(roll);
+
+	mat4Multiply(tempMatrix, yawMatrix, scaleMatrix);
+	mat4Multiply(tempMatrix2, pitchMatrix, tempMatrix);
+	mat4Multiply(matrix, rollMatrix, tempMatrix2);
+
+	matrix[12] = x;
+	matrix[13] = y;
+	matrix[14] = z;
+	matrix[15] = 1.0;
 }
