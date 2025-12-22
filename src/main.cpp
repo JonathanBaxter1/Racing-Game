@@ -41,19 +41,37 @@ int main()
 
 	Model checkpointModel("checkpoint/checkpoint.obj");
 	unsigned int numCheckpoints = 5;
-	float checkpointData[numCheckpoints*4] = {
-		1600.0, 70.0, 820.0, -1.5,
-		2670.0, 70.0, 832.0, -1.5,
-		2660.0, 70.0, 4096.0-2932.0, 0.0,
-		2658.0, 70.0, 4096.0-2586.0, -1.5,
-		1316.0, 70.0, 4096.0-2791.0, -1.5,
+	float checkpointData[numCheckpoints*5] = { // x, y, z, yaw, pitch
+		1600.0, 70.0, 820.0, -1.5, 0.0,
+		2670.0, 70.0, 832.0, -1.5, 0.0,
+		2660.0, 70.0, 4096.0-2932.0, 0.0, 0.0,
+		2658.0, 70.0, 4096.0-2586.0, -1.5, 0.0,
+		1316.0, 70.0, 4096.0-2791.0, -1.5, 0.0,
 	};
 	Object checkpoints[numCheckpoints];
-	mat3 checkpointNormals[numCheckpoints];
+	vec4 checkpointPlaneEqs[numCheckpoints];
+	bool checkpointSides[numCheckpoints];
+	unsigned int checkpointsPassed = 0;
 	for (unsigned int i = 0; i < numCheckpoints; i++) {
-		unsigned int offset = i*4;
-		checkpoints[i] = Object(&checkpointModel, checkpointData[offset], checkpointData[offset + 1], checkpointData[offset + 2], 5.0, checkpointData[offset + 3], 0.0, 0.0);
-		checkpointNormals[i][0] = 0.0;
+		unsigned int offset = i*5;
+		float x = checkpointData[offset];
+		float y = checkpointData[offset + 1];
+		float z = checkpointData[offset + 2];
+		float yaw = checkpointData[offset + 3];
+		float pitch = checkpointData[offset + 4];
+		checkpoints[i] = Object(&checkpointModel, x, y, z, CHECKPOINT_RADIUS/2.0, yaw, pitch, 0.0);
+		checkpointPlaneEqs[i].x = cos(pitch)*sin(yaw);;
+		checkpointPlaneEqs[i].y = sin(pitch);
+		checkpointPlaneEqs[i].z = cos(pitch)*cos(yaw);
+		checkpointPlaneEqs[i].w = checkpointPlaneEqs[i].x*x;
+		checkpointPlaneEqs[i].w += checkpointPlaneEqs[i].y*y;
+		checkpointPlaneEqs[i].w += checkpointPlaneEqs[i].z*z;
+
+		float checkpointRHS = checkpointPlaneEqs[i].x*playerAirplane.x;
+		checkpointRHS += checkpointPlaneEqs[i].y*playerAirplane.y;
+		checkpointRHS += checkpointPlaneEqs[i].z*playerAirplane.z;
+		bool side = checkpointRHS > checkpointPlaneEqs[i].w;
+		checkpointSides[i] = side;
 	}
 
 	unsigned int reflectionTexture;
@@ -87,6 +105,9 @@ int main()
 	Shader waterShader("water.vs", "water.tcs", "water.tes", "", "water.fs");
 	Terrain water(waterShader, waterTextureIDs, sizeof(waterTextureIDs)/sizeof(unsigned int), 100000.0, 32, "");
 
+	float lapStartTime = 0.0;
+	float lapTime = 0.0;
+
 	// Main Loop
 	while (!glfwWindowShouldClose(window.windowPtr)) {
 
@@ -95,7 +116,7 @@ int main()
 		deltaT = (int)(dT*1000000);
 		curTime = newTime;
 		frameCount++;
-		if (!(frameCount&1u) && GAME_DEBUG == true) { // So the print statement doesn't count as computation time
+		if (!(frameCount&7u) && GAME_DEBUG == true) { // So the print statement doesn't count as computation time
 			std::cout << "delta T: " << deltaT << "us; CPU: " << deltaT_CPU << "us; GPU: " << deltaT_GPU << "us" << std::endl;
 		}
 
@@ -103,6 +124,24 @@ int main()
 		// Game logic
 		glfwPollEvents();
 		window.handleInput(dT, &playerAirplane);
+
+		float checkpointRHS = checkpointPlaneEqs[checkpointsPassed].x*playerAirplane.x;
+		checkpointRHS += checkpointPlaneEqs[checkpointsPassed].y*playerAirplane.y;
+		checkpointRHS += checkpointPlaneEqs[checkpointsPassed].z*playerAirplane.z;
+		bool side = checkpointRHS > checkpointPlaneEqs[checkpointsPassed].w;
+		float dx = playerAirplane.x - checkpoints[checkpointsPassed].x;
+		float dy = playerAirplane.y - checkpoints[checkpointsPassed].y;
+		float dz = playerAirplane.z - checkpoints[checkpointsPassed].z;
+		float distanceFromCheckpoint = sqrt(dx*dx + dy*dy + dz*dz);
+		if (side != checkpointSides[checkpointsPassed] && distanceFromCheckpoint <= CHECKPOINT_RADIUS) {
+			checkpointsPassed++;
+			if (checkpointsPassed == 1) {
+				lapStartTime = glfwGetTime();
+			} else if (checkpointsPassed == numCheckpoints) {
+				lapTime = glfwGetTime() - lapStartTime;
+				std::cout << "Lap Time: " << lapTime << "s" << std::endl;
+			}
+		}
 
 		playerAirplane.update();
 
@@ -118,7 +157,15 @@ int main()
 		terrain.render();
 		playerAirplane.render(textureShader, colorShader, frameCount);
 		for (unsigned int i = 0; i < numCheckpoints; i++) {
-			checkpoints[i].render(textureShader, colorShader, frameCount);
+			Color checkpointColor;
+			if (checkpointsPassed > i) {
+				checkpointColor = {0.0, 1.0, 0.0};
+			} else if (checkpointsPassed == i) {
+				checkpointColor = {1.0, 0.6, 0.0};
+			} else {
+				checkpointColor = {1.0, 0.0, 0.0};
+			}
+			checkpoints[i].render(textureShader, colorShader, frameCount, checkpointColor);
 		}
 		skybox.render();
 
@@ -136,7 +183,15 @@ int main()
 		terrain.render();
 		playerAirplane.render(textureShader, colorShader, frameCount);
 		for (unsigned int i = 0; i < numCheckpoints; i++) {
-			checkpoints[i].render(textureShader, colorShader, frameCount);
+			Color checkpointColor;
+			if (checkpointsPassed > i) {
+				checkpointColor = {0.0, 1.0, 0.0};
+			} else if (checkpointsPassed == i) {
+				checkpointColor = {1.0, 0.6, 0.0};
+			} else {
+				checkpointColor = {1.0, 0.0, 0.0};
+			}
+			checkpoints[i].render(textureShader, colorShader, frameCount, checkpointColor);
 		}
 		skybox.render();
 

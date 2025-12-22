@@ -5,12 +5,12 @@ Model::Model(std::string path)
 	loadModel("models/" + path);
 }
 
-void Model::render(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix, unsigned int frame)
+void Model::render(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix, unsigned int frame, Color color)
 {
 	for (unsigned int i = 0; i < meshes.size(); i++) {
 		bool isPlane = true;
 		bool isProp = (i == 3) && isPlane;
-		meshes[i].render(shaderTexture, shaderColor, modelMatrix, isProp, frame);
+		meshes[i].render(shaderTexture, shaderColor, modelMatrix, isProp, frame, color);
 	}
 }
 

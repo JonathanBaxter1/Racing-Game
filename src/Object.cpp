@@ -18,8 +18,14 @@ Object::Object(Model* model, float x, float y, float z, float size, float yaw, f
 
 void Object::render(Shader shaderTexture, Shader shaderColor, unsigned int frame)
 {
+	Color white = {1.0, 1.0, 1.0};
+	this->render(shaderTexture, shaderColor, frame, white);
+}
+
+void Object::render(Shader shaderTexture, Shader shaderColor, unsigned int frame, Color color)
+{
 	this->update();
-	model->render(shaderTexture, shaderColor, modelMatrix, frame);
+	model->render(shaderTexture, shaderColor, modelMatrix, frame, color);
 }
 
 void Object::update()
