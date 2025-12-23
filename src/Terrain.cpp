@@ -29,7 +29,9 @@ Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTexture
 		int heightMapNumChannels;
 
 		std::string heightMapPath = "textures/" + heightMapFileName;
+		stbi_set_flip_vertically_on_load(false);
 		unsigned short* heightMap = stbi_load_16(heightMapPath.c_str(), &heightMapWidth, &heightMapHeight, &heightMapNumChannels, 1);
+		stbi_set_flip_vertically_on_load(true);
 		if (!heightMap) {
 			std::cout << "stb_image import error: " << heightMapPath << std::endl;
 		}
@@ -47,7 +49,7 @@ Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTexture
 				unsigned int y = yStart*patchRes + dy;
 				x = x < (unsigned int)heightMapWidth - 1 ? x : (unsigned int)heightMapWidth - 1;
 				y = y < (unsigned int)heightMapHeight - 1 ? y : (unsigned int)heightMapHeight - 1;
-				float height = ((float)heightMap[y*heightMapWidth + x])/65536.0*239.0;
+				float height = ((float)heightMap[y*heightMapWidth + x])/65536.0*274.0;
 				if (height >= waterHeight) {
 					patchAboveWater = true;
 					break;
@@ -56,6 +58,7 @@ Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTexture
 			activePatches[curPatch] = patchAboveWater;
 			numPatches += (unsigned int)patchAboveWater;
 		}
+		stbi_image_free(heightMap);
 	} else {
 		for (unsigned int i = 0; i < patchRes*patchRes; i++) {
 			activePatches[i] = true;

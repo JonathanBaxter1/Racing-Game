@@ -13,8 +13,12 @@ uniform mat4 projection;
 
 void main()
 {
-	gl_Position = projection*view*model*vec4(aPos, 1.0);
-	fragPos = vec3(model*vec4(aPos, 1.0));
+	vec4 worldPos = model*vec4(aPos, 1.0);
+	float waterHeight = 50.0;
+	gl_ClipDistance[0] = worldPos.y - waterHeight;
+
+	gl_Position = projection*view*worldPos;
+	fragPos = worldPos.xyz;
 
 	// need to put this on the CPU?
 	normal = mat3(transpose(inverse(model)))*aNormal;

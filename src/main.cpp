@@ -3,6 +3,7 @@
 
 int main()
 {
+	float waterHeight = 50.0;
 	Window window;
 
 	// For profiling
@@ -24,10 +25,21 @@ int main()
 	Texture skyboxTextures[6] = {skyboxUp, skyboxDown, skyboxNorth, skyboxEast, skyboxSouth, skyboxWest};
 	Skybox skybox(skyboxShader, skyboxTextures);
 
+	stbi_set_flip_vertically_on_load(false);
+	int heightMapWidth, heightMapHeight, heightMapNumChannels;
+	unsigned short* heightMap = stbi_load_16("textures/islandHeightMap.png", &heightMapWidth, &heightMapHeight, &heightMapNumChannels, 1);
+	if (!heightMap) {
+		std::cout << "stb_image import error" << std::endl;
+	}
+
 	Texture islandHeightMap("islandHeightMap.png", 16, GL_CLAMP_TO_EDGE);
 	Texture islandNormalMap("islandNormalMap.png", 8, GL_CLAMP_TO_EDGE);
+	Texture islandColorMap("islandColorMap.png", 8, GL_CLAMP_TO_EDGE);
+	stbi_set_flip_vertically_on_load(true);
 	Texture stoneTexture("stone.jpg", 8, GL_REPEAT);
-	unsigned int terrainTextureIDs[] = {islandHeightMap.ID, islandNormalMap.ID, stoneTexture.ID};
+	Texture grassTexture("grassTex.jpg", 8, GL_REPEAT);
+	Texture snowTexture("snowTex.png", 8, GL_REPEAT);
+	unsigned int terrainTextureIDs[] = {islandHeightMap.ID, islandNormalMap.ID, islandColorMap.ID, stoneTexture.ID, grassTexture.ID, snowTexture.ID};
 
 	Shader terrainShader("terrain.vs", "terrain.tcs", "terrain.tes", "", "terrain.fs");
 	Terrain terrain(terrainShader, terrainTextureIDs, sizeof(terrainTextureIDs)/sizeof(unsigned int), 4096.0, 64, "islandHeightMap.png");
@@ -37,21 +49,51 @@ int main()
 	Shader colorShader("color.vs", "", "", "", "color.fs");
 
 	Model airplaneModel("airplane/airplane.obj");
-	Object playerAirplane(&airplaneModel, 1300.0, 70.0, 800.0, 1.0, -1.5, 0.0, 0.0);
+	Object playerAirplane(&airplaneModel, 2188.0, 70.0, 3351.0, 1.0, M_PI/2.0, 0.0, 0.0);
+
+	Model startFinishLineModel("startFinishLine/startFinishLine.obj");
+	float linePitch = 0.0;
+	float lineYaw = M_PI/2.0;
+	float lineX = 1865.0;
+	float lineY = 90.0;
+	float lineZ = 3349.0;
+	Object startFinishLine(&startFinishLineModel, lineX, lineY, lineZ, START_LINE_SIZE, lineYaw, linePitch, 0.0);
+	vec4 startFinishLineEq;
+	startFinishLineEq.x = cos(linePitch)*sin(lineYaw);;
+	startFinishLineEq.y = sin(linePitch);
+	startFinishLineEq.z = cos(linePitch)*cos(lineYaw);
+	startFinishLineEq.w = startFinishLineEq.x*lineX;
+	startFinishLineEq.w += startFinishLineEq.y*lineY;
+	startFinishLineEq.w += startFinishLineEq.z*lineZ;
+	bool inRace = false;
 
 	Model checkpointModel("checkpoint/checkpoint.obj");
-	unsigned int numCheckpoints = 5;
-	float checkpointData[numCheckpoints*5] = { // x, y, z, yaw, pitch
-		1600.0, 70.0, 820.0, -1.5, 0.0,
-		2670.0, 70.0, 832.0, -1.5, 0.0,
-		2660.0, 70.0, 4096.0-2932.0, 0.0, 0.0,
-		2658.0, 70.0, 4096.0-2586.0, -1.5, 0.0,
-		1316.0, 70.0, 4096.0-2791.0, -1.5, 0.0,
+	float checkpointData[] = { // x, y, z, yaw, pitch
+		1142.0, 70.0, 3244.0, -M_PI/4.0, 0.0,
+		956.0, 70.0, 2733.0, 0.0, 0.0,
+		1035.0, 70.0, 2505.0, M_PI/4.0, 0.0,
+		1314.0, 70.0, 2291.0, M_PI/4.0, 0.0,
+		1400.0, 70.0, 2064.0, M_PI/4.0, 0.0,
+		1541.0, 70.0, 715.0, M_PI/4.0, 0.0,
+		1807.0, 70.0, 606.0, M_PI/2.0, 0.0,
+		2360.0, 70.0, 678.0, M_PI*0.6, 0.0,
+		2830.0, 70.0, 930.0, M_PI*0.75, 0.0,
+		2892.0, 70.0, 1332.0, M_PI*1.2, 0.0,
+		2436.0, 70.0, 1462.0, M_PI*1.6, 0.0,
+		1956.0, 70.0, 1403.0, M_PI*0.3, 0.0,
+		1761.0, 70.0, 1572.0, M_PI*0.1, 0.0,
+		1815.0, 70.0, 1970.0, -M_PI*0.25, 0.0,
+		1890.0, 70.0, 2184.0, 0.0, 0.0,
+		1299.0, 70.0, 2757.0, 0.0, 0.0,
+		1552.0, 70.0, 3034.0, M_PI*0.5, 0.0,
+		2514.0, 70.0, 2829.0, M_PI*0.5, 0.0,
+		2862.0, 70.0, 2986.0, 0.0, 0.0,
+		2552.0, 70.0, 3352.0, M_PI*0.5, 0.0,
 	};
+	unsigned int numCheckpoints = sizeof(checkpointData)/sizeof(float)/5;
 	Object checkpoints[numCheckpoints];
-	vec4 checkpointPlaneEqs[numCheckpoints];
-	bool checkpointSides[numCheckpoints];
 	unsigned int checkpointsPassed = 0;
+	Color checkpointColors[numCheckpoints];
 	for (unsigned int i = 0; i < numCheckpoints; i++) {
 		unsigned int offset = i*5;
 		float x = checkpointData[offset];
@@ -60,18 +102,6 @@ int main()
 		float yaw = checkpointData[offset + 3];
 		float pitch = checkpointData[offset + 4];
 		checkpoints[i] = Object(&checkpointModel, x, y, z, CHECKPOINT_RADIUS/2.0, yaw, pitch, 0.0);
-		checkpointPlaneEqs[i].x = cos(pitch)*sin(yaw);;
-		checkpointPlaneEqs[i].y = sin(pitch);
-		checkpointPlaneEqs[i].z = cos(pitch)*cos(yaw);
-		checkpointPlaneEqs[i].w = checkpointPlaneEqs[i].x*x;
-		checkpointPlaneEqs[i].w += checkpointPlaneEqs[i].y*y;
-		checkpointPlaneEqs[i].w += checkpointPlaneEqs[i].z*z;
-
-		float checkpointRHS = checkpointPlaneEqs[i].x*playerAirplane.x;
-		checkpointRHS += checkpointPlaneEqs[i].y*playerAirplane.y;
-		checkpointRHS += checkpointPlaneEqs[i].z*playerAirplane.z;
-		bool side = checkpointRHS > checkpointPlaneEqs[i].w;
-		checkpointSides[i] = side;
 	}
 
 	unsigned int reflectionTexture;
@@ -124,22 +154,44 @@ int main()
 		// Game logic
 		glfwPollEvents();
 		window.handleInput(dT, &playerAirplane);
+		unsigned int roundedPlayerX = clamp((unsigned int)playerAirplane.x, 0, heightMapWidth);
+		unsigned int roundedPlayerZ = clamp((unsigned int)playerAirplane.z, 0, heightMapHeight);
+		float terrainHeight = heightMap[roundedPlayerX + roundedPlayerZ*heightMapWidth]/65536.0*274.0;
+		if (playerAirplane.y < waterHeight || playerAirplane.y < terrainHeight) {
+			std::cout << "You crashed your plane" << std::endl;
+			exit(0);
+		}
 
-		float checkpointRHS = checkpointPlaneEqs[checkpointsPassed].x*playerAirplane.x;
-		checkpointRHS += checkpointPlaneEqs[checkpointsPassed].y*playerAirplane.y;
-		checkpointRHS += checkpointPlaneEqs[checkpointsPassed].z*playerAirplane.z;
-		bool side = checkpointRHS > checkpointPlaneEqs[checkpointsPassed].w;
+		if (playerAirplane.x <= lineX && playerAirplane.z >= lineZ - START_LINE_SIZE*20.0 && playerAirplane.z <= lineZ + START_LINE_SIZE*20.0) {
+			if (checkpointsPassed == 0 && inRace == false) {
+				inRace  = true;
+				lapStartTime = glfwGetTime();
+			} else if (checkpointsPassed == numCheckpoints) {
+				inRace = false;
+				lapTime = glfwGetTime() - lapStartTime;
+				std::cout << lapTime << "s" << std::endl;
+				exit(0);
+			}
+		}
 		float dx = playerAirplane.x - checkpoints[checkpointsPassed].x;
 		float dy = playerAirplane.y - checkpoints[checkpointsPassed].y;
 		float dz = playerAirplane.z - checkpoints[checkpointsPassed].z;
 		float distanceFromCheckpoint = sqrt(dx*dx + dy*dy + dz*dz);
-		if (side != checkpointSides[checkpointsPassed] && distanceFromCheckpoint <= CHECKPOINT_RADIUS) {
+		if (distanceFromCheckpoint <= CHECKPOINT_RADIUS) {
 			checkpointsPassed++;
 			if (checkpointsPassed == 1) {
 				lapStartTime = glfwGetTime();
 			} else if (checkpointsPassed == numCheckpoints) {
 				lapTime = glfwGetTime() - lapStartTime;
-				std::cout << "Lap Time: " << lapTime << "s" << std::endl;
+			}
+		}
+		for (unsigned int i = 0; i < numCheckpoints; i++) {
+			if (checkpointsPassed == i && inRace) {
+				checkpointColors[i] = {1.0, 0.6, 0.0};
+			} else if (checkpointsPassed > i && inRace) {
+				checkpointColors[i] = {0.0, 1.0, 0.0};
+			} else {
+				checkpointColors[i] = {1.0, 0.0, 0.0};
 			}
 		}
 
@@ -157,19 +209,11 @@ int main()
 		terrain.render();
 		playerAirplane.render(textureShader, colorShader, frameCount);
 		for (unsigned int i = 0; i < numCheckpoints; i++) {
-			Color checkpointColor;
-			if (checkpointsPassed > i) {
-				checkpointColor = {0.0, 1.0, 0.0};
-			} else if (checkpointsPassed == i) {
-				checkpointColor = {1.0, 0.6, 0.0};
-			} else {
-				checkpointColor = {1.0, 0.0, 0.0};
-			}
-			checkpoints[i].render(textureShader, colorShader, frameCount, checkpointColor);
+			checkpoints[i].render(textureShader, colorShader, frameCount, checkpointColors[i]);
 		}
+		startFinishLine.render(textureShader, colorShader, frameCount);
 		skybox.render();
 
-		float waterHeight = 50.0;
 		float reflectionCameraY = cameraY - 2.0*(cameraY - waterHeight);
 		float reflectionCameraPitch = -cameraPitch;
 		setViewMatrix(viewMatrix, reflectionCameraPitch, cameraYaw, cameraX, reflectionCameraY, cameraZ);
@@ -183,16 +227,9 @@ int main()
 		terrain.render();
 		playerAirplane.render(textureShader, colorShader, frameCount);
 		for (unsigned int i = 0; i < numCheckpoints; i++) {
-			Color checkpointColor;
-			if (checkpointsPassed > i) {
-				checkpointColor = {0.0, 1.0, 0.0};
-			} else if (checkpointsPassed == i) {
-				checkpointColor = {1.0, 0.6, 0.0};
-			} else {
-				checkpointColor = {1.0, 0.0, 0.0};
-			}
-			checkpoints[i].render(textureShader, colorShader, frameCount, checkpointColor);
+			checkpoints[i].render(textureShader, colorShader, frameCount, checkpointColors[i]);
 		}
+		startFinishLine.render(textureShader, colorShader, frameCount);
 		skybox.render();
 
 		setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);
@@ -210,6 +247,7 @@ int main()
 
 	// cleanup framebuffers
 
+	stbi_image_free(heightMap);
 	glfwTerminate();
 	return 0;
 }

@@ -1,12 +1,15 @@
 #version 430
 
-#define stoneTex textures[2]
+#define stoneTex textures[3]
+#define grassTex textures[4]
+#define snowTex textures[5]
 
 uniform sampler2D textures[8];
 uniform vec3 lightDir;
 
 in vec3 coord;
 in vec3 normal;
+in vec3 color;
 
 out vec4 FragColor;
 
@@ -30,9 +33,9 @@ void main()
 	texAxis.z *= clamp((nz - ny*0.9)*5.0, 0.0, 1.0);
 
 	texAxis = texAxis/(texAxis.x + texAxis.y + texAxis.z);
-	vec3 texColorX = vec3(texture(stoneTex, texCoordX));
-	vec3 texColorY = vec3(texture(stoneTex, texCoordY));
-	vec3 texColorZ = vec3(texture(stoneTex, texCoordZ));
+	vec3 texColorX = vec3(texture(snowTex, texCoordX)*color.r + texture(grassTex, texCoordX)*color.g+ texture(stoneTex, texCoordX)*color.b);
+	vec3 texColorY = vec3(texture(snowTex, texCoordY)*color.r + texture(grassTex, texCoordY)*color.g+ texture(stoneTex, texCoordY)*color.b);
+	vec3 texColorZ = vec3(texture(snowTex, texCoordZ)*color.r + texture(grassTex, texCoordZ)*color.g+ texture(stoneTex, texCoordZ)*color.b);
 	vec3 texColor = texColorX*texAxis.x + texColorY*texAxis.y + texColorZ*texAxis.z;
 
 	float diffuseScalar = 1.0*max(dot(normal, lightDir), 0.0);
