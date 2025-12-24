@@ -67,6 +67,12 @@ int main()
 	startFinishLineEq.w += startFinishLineEq.z*lineZ;
 	bool inRace = false;
 
+	Model boostModel("boost/boost.obj");
+	float boostData[] = { // x, y, z, yaw, pitch
+		1542.0, 70.0, 3350.0, M_PI*0.5, 0.0,
+	};
+//	Object boost1(&boostModel, 1542.0, 70.0, 3350.0, 10.0, -M_PI*0.5, 0.0, 0.0);
+
 	Model checkpointModel("checkpoint/checkpoint.obj");
 	float checkpointData[] = { // x, y, z, yaw, pitch
 		1142.0, 70.0, 3244.0, -M_PI/4.0, 0.0,
@@ -208,6 +214,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		terrain.render(1.0);
 		playerAirplane.render(textureShader, colorShader, frameCount);
+//		boost1.render(textureShader, colorShader, frameCount);
 		for (unsigned int i = 0; i < numCheckpoints; i++) {
 			checkpoints[i].render(textureShader, colorShader, frameCount, checkpointColors[i]);
 		}
@@ -226,6 +233,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		terrain.render(2.0);
 		playerAirplane.render(textureShader, colorShader, frameCount);
+//		boost1.render(textureShader, colorShader, frameCount);
 		for (unsigned int i = 0; i < numCheckpoints; i++) {
 			checkpoints[i].render(textureShader, colorShader, frameCount, checkpointColors[i]);
 		}
