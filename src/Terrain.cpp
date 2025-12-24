@@ -99,10 +99,12 @@ Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTexture
 	free(surfaceVertices);
 }
 
-void Terrain::render()
+void Terrain::render(float resolutionDivisor)
 {
 	glUseProgram(this->shader);
 	glBindVertexArray(this->vao);
+	int resolutionDivisorLoc = glGetUniformLocation(this->shader, "resolutionDivisor");
+	glUniform1f(resolutionDivisorLoc, resolutionDivisor);
 
 	for (unsigned int i = 0; i < numTextures; i++) {
 		glActiveTexture(GL_TEXTURE0 + i);

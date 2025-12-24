@@ -107,7 +107,7 @@ int main()
 	unsigned int reflectionTexture;
 	glGenTextures(1, &reflectionTexture);
 	glBindTexture(GL_TEXTURE_2D, reflectionTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth/1, screenHeight/1, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth/2, screenHeight/2, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -119,7 +119,7 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenWidth/1, screenWidth/1, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenWidth/2, screenWidth/2, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	unsigned int reflectionBuffer;
@@ -206,7 +206,7 @@ int main()
 
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		terrain.render();
+		terrain.render(1.0);
 		playerAirplane.render(textureShader, colorShader, frameCount);
 		for (unsigned int i = 0; i < numCheckpoints; i++) {
 			checkpoints[i].render(textureShader, colorShader, frameCount, checkpointColors[i]);
@@ -221,10 +221,10 @@ int main()
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, reflectionBuffer);
-		glViewport(0, 0, screenWidth/1, screenHeight/1);
+		glViewport(0, 0, screenWidth/2, screenHeight/2);
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		terrain.render();
+		terrain.render(2.0);
 		playerAirplane.render(textureShader, colorShader, frameCount);
 		for (unsigned int i = 0; i < numCheckpoints; i++) {
 			checkpoints[i].render(textureShader, colorShader, frameCount, checkpointColors[i]);
@@ -237,9 +237,9 @@ int main()
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, screenWidth, screenHeight);
-		water.render();
+		water.render(1.0);
 
-		glFinish(); // So we get consistent FPS
+		if (VSYNC_ON) glFinish(); // So we get consistent FPS
 		glfwSwapBuffers(window.windowPtr);
 
 		deltaT_GPU = (int)((glfwGetTime() - newTime2)*1000000);

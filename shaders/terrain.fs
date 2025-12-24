@@ -33,9 +33,26 @@ void main()
 	texAxis.z *= clamp((nz - ny*0.9)*5.0, 0.0, 1.0);
 
 	texAxis = texAxis/(texAxis.x + texAxis.y + texAxis.z);
-	vec3 texColorX = vec3(texture(snowTex, texCoordX)*color.r + texture(grassTex, texCoordX)*color.g+ texture(stoneTex, texCoordX)*color.b);
-	vec3 texColorY = vec3(texture(snowTex, texCoordY)*color.r + texture(grassTex, texCoordY)*color.g+ texture(stoneTex, texCoordY)*color.b);
-	vec3 texColorZ = vec3(texture(snowTex, texCoordZ)*color.r + texture(grassTex, texCoordZ)*color.g+ texture(stoneTex, texCoordZ)*color.b);
+	vec3 texColorX;
+	vec3 texColorY;
+	vec3 texColorZ;
+	if (color == vec3(1.0, 0.0, 0.0)) {
+		texColorX = vec3(texture(snowTex, texCoordX));
+		texColorY = vec3(texture(snowTex, texCoordY));
+		texColorZ = vec3(texture(snowTex, texCoordZ));
+	} else if (color == vec3(0.0, 1.0, 0.0)) {
+		texColorX = vec3(texture(grassTex, texCoordX));
+		texColorY = vec3(texture(grassTex, texCoordY));
+		texColorZ = vec3(texture(grassTex, texCoordZ));
+	} else if (color == vec3(0.0, 0.0, 1.0)) {
+		texColorX = vec3(texture(stoneTex, texCoordX));
+		texColorY = vec3(texture(stoneTex, texCoordY));
+		texColorZ = vec3(texture(stoneTex, texCoordZ));
+	} else {
+		texColorX = vec3(texture(snowTex, texCoordX)*color.r + texture(grassTex, texCoordX)*color.g+ texture(stoneTex, texCoordX)*color.b);
+		texColorY = vec3(texture(snowTex, texCoordY)*color.r + texture(grassTex, texCoordY)*color.g+ texture(stoneTex, texCoordY)*color.b);
+		texColorZ = vec3(texture(snowTex, texCoordZ)*color.r + texture(grassTex, texCoordZ)*color.g+ texture(stoneTex, texCoordZ)*color.b);
+	}
 	vec3 texColor = texColorX*texAxis.x + texColorY*texAxis.y + texColorZ*texAxis.z;
 
 	float diffuseScalar = 1.0*max(dot(normal, lightDir), 0.0);
@@ -43,3 +60,4 @@ void main()
 
 	FragColor = vec4(ambientScalar*texColor + diffuseScalar*texColor, 1.0);
 }
+

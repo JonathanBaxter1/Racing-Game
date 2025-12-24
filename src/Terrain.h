@@ -19,5 +19,5 @@ private:
 public:
 
 	Terrain(Shader shader, unsigned int textures[], unsigned int numTextures, float mapSize, unsigned int patchRes, std::string heightMapFileName);
-	void render();
+	void render(float resolutionDivisor);
 };

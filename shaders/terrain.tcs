@@ -3,6 +3,7 @@
 layout (vertices = 4) out;
 
 uniform vec3 viewPos;
+uniform float resolutionDivisor;
 
 void main()
 {
@@ -11,7 +12,7 @@ void main()
 	float cameraDistance = distance(viewPos, vec3(gl_in[0].gl_Position));
 	float minResolution = 1.0;
 	float maxResolution = 64.0;
-	float resolution = clamp(16384.0/cameraDistance, minResolution, maxResolution);
+	float resolution = clamp(16384.0/cameraDistance/resolutionDivisor, minResolution, maxResolution);
 	resolution = pow(2.0, ceil(log2(resolution)));
 
 	gl_TessLevelOuter[0] = resolution;
