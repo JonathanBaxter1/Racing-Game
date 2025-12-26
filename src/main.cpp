@@ -46,7 +46,9 @@ int main()
 
 	// Models
 	Shader textureShader("texture.vs", "", "", "", "texture.fs");
+	Shader textureFullShader("texture.vs", "", "", "", "textureFull.fs");
 	Shader colorShader("color.vs", "", "", "", "color.fs");
+	Shader colorFullShader("color.vs", "", "", "", "colorFull.fs");
 
 	Model airplaneModel("airplane/airplane.obj");
 	Object playerAirplane(&airplaneModel, 2188.0, 70.0, 3351.0, 1.0, M_PI/2.0, 0.0, 0.0);
@@ -250,7 +252,7 @@ int main()
 		terrain.render(1.0);
 		playerAirplane.render(textureShader, colorShader, frameCount);
 		for (unsigned int i = 0; i < numCheckpoints; i++) {
-			checkpoints[i].render(textureShader, colorShader, frameCount, checkpointColors[i]);
+			checkpoints[i].render(textureFullShader, colorFullShader, frameCount, checkpointColors[i]);
 		}
 		startFinishLine.render(textureShader, colorShader, frameCount);
 		skybox.render();
@@ -268,13 +270,13 @@ int main()
 		terrain.render(2.0);
 		playerAirplane.render(textureShader, colorShader, frameCount);
 		for (unsigned int i = 0; i < numCheckpoints; i++) {
-			checkpoints[i].render(textureShader, colorShader, frameCount, checkpointColors[i]);
+			checkpoints[i].render(textureFullShader, colorFullShader, frameCount, checkpointColors[i]);
 		}
 		startFinishLine.render(textureShader, colorShader, frameCount);
 		skybox.render();
 		// Must render transparant objects last
 		for (unsigned int i = 0; i < numBoosts; i++) {
-			boosts[boostSortIndices[i]].render(textureShader, colorShader, frameCount);
+			boosts[boostSortIndices[i]].render(textureFullShader, colorFullShader, frameCount);
 		}
 
 		setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);
@@ -285,7 +287,7 @@ int main()
 		water.render(1.0);
 		// Must render transparant objects last
 		for (unsigned int i = 0; i < numBoosts; i++) {
-			boosts[boostSortIndices[i]].render(textureShader, colorShader, frameCount);
+			boosts[boostSortIndices[i]].render(textureFullShader, colorFullShader, frameCount);
 		}
 
 		if (VSYNC_ON) glFinish(); // So we get consistent FPS
