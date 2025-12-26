@@ -85,7 +85,7 @@ int main()
 		float z = boostData[offset + 2];
 		float yaw = boostData[offset + 3];
 		float pitch = boostData[offset + 4];
-		boosts[i] = Object(&boostModel, x, y, z, 10.0, yaw, pitch, 0.0);
+		boosts[i] = Object(&boostModel, x, y, z, BOOST_RADIUS, yaw, pitch, 0.0);
 	}
 	unsigned int boostSortIndices[numBoosts] = {0};
 
@@ -218,6 +218,16 @@ int main()
 
 		playerAirplane.update();
 
+		for (unsigned int i = 0; i < numBoosts; i++) {
+			unsigned int offset = i*5;
+			float dx = playerAirplane.x - boostData[offset + 0];
+			float dy = playerAirplane.y - boostData[offset + 1];
+			float dz = playerAirplane.z - boostData[offset + 2];
+			float distanceFromBoost = sqrt(dx*dx + dy*dy + dz*dz);
+			if (distanceFromBoost <= BOOST_RADIUS) {
+				window.performBoost();
+			}
+		}
 		float boostDistances[numBoosts];
 		for (unsigned int i = 0; i < numBoosts; i++) {
 			unsigned int offset = i*5;

@@ -145,14 +145,15 @@ void Window::handleInput(float deltaT, Object* airplane)
 		}
 		speed = clamp(speed, 50.0, 220.0);
 		float speedBoost = 0.0;
-		if (timeSinceBoost < 0.5) {
-			speedBoost = 2.0*timeSinceBoost*100.0;
+		if (timeSinceBoost < 0.25) {
+			speedBoost = 4.0*timeSinceBoost*200.0;
 		} else if (timeSinceBoost < 2.0) {
-			speedBoost = 100.0;
-		} else if (timeSinceBoost < 2.5) {
-			speedBoost = 2.0*(2.5-timeSinceBoost)*100.0;
+			speedBoost = 200.0;
+		} else if (timeSinceBoost < 2.25) {
+			speedBoost = 4.0*(2.25-timeSinceBoost)*200.0;
 		}
 
+		timeSinceBoost += deltaT;
 		float q = sqrt(speed)*0.06;
 		desiredPitch = clamp(desiredPitch, -M_PI/2.0, M_PI/2.0);
 		desiredTurnAngle = clamp(desiredTurnAngle, -M_PI/2.0*q, M_PI/2.0*q);
@@ -168,9 +169,9 @@ void Window::handleInput(float deltaT, Object* airplane)
 
 		cameraYaw = M_PI + airplane->yaw;
 		cameraPitch = 0.0;
-		cameraX = airplane->x + 50.0*sin(airplane->yaw);
+		cameraX = airplane->x + (30.0 + trueSpeed*0.05)*sin(airplane->yaw);
 		cameraY = airplane->y + 0.0;
-		cameraZ = airplane->z - 50.0*cos(airplane->yaw);
+		cameraZ = airplane->z - (30.0 + trueSpeed*0.05)*cos(airplane->yaw);
 	}
 }
 
