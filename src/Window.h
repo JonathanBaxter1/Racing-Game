@@ -11,13 +11,12 @@ public:
 	Window();
 	static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 	void handleInput(float deltaT, Object* airplane);
-	unsigned int isKeyDown(int key);
+	bool isKeyDown(int key);
+	void performBoost();
 private:
 	static bool isSpectate;
-//	static float aileronAngle;
-//	static float elevatorAngle;
-//	static float rudderAngle;
 	static float desiredPitch;
 	static float desiredTurnAngle;
 	static float speed;
+	static float timeSinceBoost;
 };

@@ -4,12 +4,10 @@
 unsigned int Shader::numShaders = 0;
 unsigned int Shader::shaders[MAX_SHADERS] = {0};
 bool Window::isSpectate = false;
-//float Window::aileronAngle = 0.0;
-//float Window::elevatorAngle = 0.0;
-//float Window::rudderAngle = 0.0;
 float Window::desiredPitch = 0.0;
 float Window::desiredTurnAngle = 0.0;
 float Window::speed = 50.0;
+float Window::timeSinceBoost = 100.0;
 
 std::vector<Model*> models;
 int screenWidth;

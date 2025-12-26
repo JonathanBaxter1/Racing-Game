@@ -1,4 +1,3 @@
-- change heightmap from png to r16, make 16 bit not 8 bit
 - change normal map to bmp, custom import (faster than stbi)
 - refactor model import prop rotation
 - make 7 other airplanes controlled by computer
@@ -6,7 +5,7 @@
 - make 7 other maps
 - make a menu screen (play, options, quit)
 - show current throttle
-- collision detection (map, bridges, tunnels, other players?)
+- collision detection (bridges, tunnels, other players?)
 - minimap
 - add boost things
 - add checkpoints
