@@ -15,7 +15,9 @@ void main()
 {
 	vec3 viewDir = normalize(viewPos - fragPos);
 	vec3 norm = normalize(normal);
-	vec3 diffuseMap = vec3(texture(diffuseMapTex, texCoord));
+	vec4 diffuseMap = texture(diffuseMapTex, texCoord);
+	vec3 diffuseColor = diffuseMap.rgb;
+	float alpha = diffuseMap.a;
 	vec3 specularColor = vec3(1.0, 1.0, 1.0);
 	float diffuseScalar = 1.0*max(dot(norm, lightDir), 0.0);
 	float ambientScalar = 0.3;
@@ -25,7 +27,7 @@ void main()
 		vec3 reflectDir = reflect(-lightDir, norm);
 		specularScalar = 1.0*pow(max(dot(viewDir, reflectDir), 0.0), shininess);
 	}
-	vec3 colorOut = ambientScalar*diffuseMap + diffuseScalar*diffuseMap + specularScalar*specularColor;
+	vec3 colorOut = ambientScalar*diffuseColor + diffuseScalar*diffuseColor + specularScalar*specularColor;
 
-	FragColor = vec4(colorOut, 1.0);
+	FragColor = vec4(colorOut, alpha);
 }

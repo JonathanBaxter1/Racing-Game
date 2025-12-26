@@ -70,8 +70,21 @@ int main()
 	Model boostModel("boost/boost.obj");
 	float boostData[] = { // x, y, z, yaw, pitch
 		1542.0, 70.0, 3350.0, M_PI*0.5, 0.0,
+		1642.0, 70.0, 3350.0, M_PI*0.5, 0.0,
+		1602.0, 70.0, 3350.0, M_PI*0.5, 0.0,
 	};
-//	Object boost1(&boostModel, 1542.0, 70.0, 3350.0, 10.0, -M_PI*0.5, 0.0, 0.0);
+	unsigned int numBoosts = sizeof(boostData)/sizeof(float)/5;
+	Object boosts[numBoosts];
+	for (unsigned int i = 0; i < numBoosts; i++) {
+		unsigned int offset = i*5;
+		float x = boostData[offset];
+		float y = boostData[offset + 1];
+		float z = boostData[offset + 2];
+		float yaw = boostData[offset + 3];
+		float pitch = boostData[offset + 4];
+		boosts[i] = Object(&boostModel, x, y, z, 10.0, yaw, pitch, 0.0);
+	}
+	unsigned int boostSortIndices[numBoosts] = {0};
 
 	Model checkpointModel("checkpoint/checkpoint.obj");
 	float checkpointData[] = { // x, y, z, yaw, pitch
@@ -203,6 +216,28 @@ int main()
 
 		playerAirplane.update();
 
+		float boostDistances[numBoosts];
+		for (unsigned int i = 0; i < numBoosts; i++) {
+			unsigned int offset = i*5;
+			float dx = cameraX - boostData[offset + 0];
+			float dy = cameraY - boostData[offset + 1];
+			float dz = cameraZ - boostData[offset + 2];
+			boostDistances[i] = sqrt(dx*dx + dy*dy + dz*dz);
+		}
+		for (unsigned int i = 0; i < numBoosts; i++) {
+			float maxDistance = 0.0;
+			unsigned int maxIndex = 0;
+			for (unsigned int j = 0; j < numBoosts; j++) {
+				float distance = boostDistances[j];
+				if (distance > maxDistance) {
+					maxDistance = distance;
+					maxIndex = j;
+				}
+			}
+			boostSortIndices[i] = maxIndex;
+			boostDistances[maxIndex] = 0.0;
+		}
+
 		float newTime2 = glfwGetTime();
 		deltaT_CPU = (int)((newTime2 - newTime)*1000000);
 
@@ -214,7 +249,6 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		terrain.render(1.0);
 		playerAirplane.render(textureShader, colorShader, frameCount);
-//		boost1.render(textureShader, colorShader, frameCount);
 		for (unsigned int i = 0; i < numCheckpoints; i++) {
 			checkpoints[i].render(textureShader, colorShader, frameCount, checkpointColors[i]);
 		}
@@ -233,12 +267,15 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		terrain.render(2.0);
 		playerAirplane.render(textureShader, colorShader, frameCount);
-//		boost1.render(textureShader, colorShader, frameCount);
 		for (unsigned int i = 0; i < numCheckpoints; i++) {
 			checkpoints[i].render(textureShader, colorShader, frameCount, checkpointColors[i]);
 		}
 		startFinishLine.render(textureShader, colorShader, frameCount);
 		skybox.render();
+		// Must render transparant objects last
+		for (unsigned int i = 0; i < numBoosts; i++) {
+			boosts[boostSortIndices[i]].render(textureShader, colorShader, frameCount);
+		}
 
 		setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);
 		updateUniforms();
@@ -246,6 +283,10 @@ int main()
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, screenWidth, screenHeight);
 		water.render(1.0);
+		// Must render transparant objects last
+		for (unsigned int i = 0; i < numBoosts; i++) {
+			boosts[boostSortIndices[i]].render(textureShader, colorShader, frameCount);
+		}
 
 		if (VSYNC_ON) glFinish(); // So we get consistent FPS
 		glfwSwapBuffers(window.windowPtr);
