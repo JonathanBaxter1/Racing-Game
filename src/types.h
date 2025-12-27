@@ -42,3 +42,4 @@ typedef struct {
 	aiColor3D ambient;
 	float shininess;
 } Material;
+

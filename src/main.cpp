@@ -42,7 +42,7 @@ int main()
 	unsigned int terrainTextureIDs[] = {islandHeightMap.ID, islandNormalMap.ID, islandColorMap.ID, stoneTexture.ID, grassTexture.ID, snowTexture.ID};
 
 	Shader terrainShader("terrain.vs", "terrain.tcs", "terrain.tes", "", "terrain.fs");
-	Terrain terrain(terrainShader, terrainTextureIDs, sizeof(terrainTextureIDs)/sizeof(unsigned int), 4096.0, 64, "islandHeightMap.png");
+	Terrain terrain(terrainShader, terrainTextureIDs, sizeof(terrainTextureIDs)/sizeof(unsigned int), 4096.0, 64, "islandHeightMap.png", "islandNormalMap.png");
 
 	// Models
 	Shader textureShader("texture.vs", "", "", "", "texture.fs");
@@ -154,7 +154,7 @@ int main()
 	Texture waterDuDvTexture("waterDuDv.png", 8, GL_REPEAT);
 	unsigned int waterTextureIDs[] = {reflectionTexture, waterDuDvTexture.ID, islandHeightMap.ID};
 	Shader waterShader("water.vs", "water.tcs", "water.tes", "", "water.fs");
-	Terrain water(waterShader, waterTextureIDs, sizeof(waterTextureIDs)/sizeof(unsigned int), 100000.0, 32, "");
+	Terrain water(waterShader, waterTextureIDs, sizeof(waterTextureIDs)/sizeof(unsigned int), 100000.0, 32, "", "");
 
 	float lapStartTime = 0.0;
 	float lapTime = 0.0;

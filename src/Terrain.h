@@ -14,10 +14,11 @@ private:
 	unsigned int textures[TERRAIN_MAX_TEXTURES];
 	unsigned int numTextures;
 	unsigned int patchRes;
+	unsigned int numPatches;
 	unsigned int surfaceVerticesSize;
 
 public:
 
-	Terrain(Shader shader, unsigned int textures[], unsigned int numTextures, float mapSize, unsigned int patchRes, std::string heightMapFileName);
+	Terrain(Shader shader, unsigned int textures[], unsigned int numTextures, float mapSize, unsigned int patchRes, std::string heightMapFileName, std::string normalMapFileName);
 	void render(float resolutionDivisor);
 };
