@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <assimp/scene.h>
 
 typedef float mat3[9];

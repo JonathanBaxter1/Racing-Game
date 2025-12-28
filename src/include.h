@@ -26,3 +26,6 @@
 #include "Object.h"
 #include "Terrain.h"
 #include "Skybox.h"
+#include "Airplane.h"
+#include "Boosts.h"
+#include "Checkpoints.h"

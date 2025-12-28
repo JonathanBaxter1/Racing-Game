@@ -44,7 +44,6 @@ int main()
 	Shader terrainShader("terrain.vs", "terrain.tcs", "terrain.tes", "", "terrain.fs");
 	Terrain terrain(terrainShader, terrainTextureIDs, sizeof(terrainTextureIDs)/sizeof(unsigned int), 4096.0, 64, "islandHeightMap.png", "islandNormalMap.png");
 
-	// Models
 	Shader textureShader("texture.vs", "", "", "", "texture.fs");
 	Shader textureFullShader("texture.vs", "", "", "", "textureFull.fs");
 	Shader colorShader("color.vs", "", "", "", "color.fs");
@@ -61,70 +60,36 @@ int main()
 	float lineY = 90.0;
 	float lineZ = 3349.0;
 	Object startFinishLine(&startFinishLineModel, lineX, lineY, lineZ, START_LINE_SIZE, lineYaw, linePitch, 0.0);
-	vec4 startFinishLineEq;
-	startFinishLineEq.x = cos(linePitch)*sin(lineYaw);;
-	startFinishLineEq.y = sin(linePitch);
-	startFinishLineEq.z = cos(linePitch)*cos(lineYaw);
-	startFinishLineEq.w = startFinishLineEq.x*lineX;
-	startFinishLineEq.w += startFinishLineEq.y*lineY;
-	startFinishLineEq.w += startFinishLineEq.z*lineZ;
 	bool inRace = false;
 
 	Model boostModel("boost/boost.obj");
-	float boostData[] = { // x, y, z, yaw, pitch
-		1512.0, 60.0, 1630.0, 0.0, 0.0,
-		1807.0, 70.0, 606.0, M_PI*0.5, 0.0,
-		1875.0, 85.0, 2950.0, M_PI*0.35, 0.0,
-		2295.0, 60.0, 3308.0, M_PI*0.5, 0.0,
-	};
-	unsigned int numBoosts = sizeof(boostData)/sizeof(float)/5;
-	Object boosts[numBoosts];
-	for (unsigned int i = 0; i < numBoosts; i++) {
-		unsigned int offset = i*5;
-		float x = boostData[offset];
-		float y = boostData[offset + 1];
-		float z = boostData[offset + 2];
-		float yaw = boostData[offset + 3];
-		float pitch = boostData[offset + 4];
-		boosts[i] = Object(&boostModel, x, y, z, BOOST_RADIUS, yaw, pitch, 0.0);
-	}
-	unsigned int boostSortIndices[numBoosts] = {0};
+	Boosts boosts(boostModel, BOOST_RADIUS, textureFullShader, colorFullShader);
+	boosts.add(1512.0, 60.0, 1630.0, 0.0, 0.0);
+	boosts.add(1807.0, 70.0, 606.0, M_PI*0.5, 0.0);
+	boosts.add(1875.0, 85.0, 2950.0, M_PI*0.35, 0.0);
+	boosts.add(2295.0, 60.0, 3308.0, M_PI*0.5, 0.0);
 
 	Model checkpointModel("checkpoint/checkpoint.obj");
-	float checkpointData[] = { // x, y, z, yaw, pitch
-		1142.0, 70.0, 3244.0, -M_PI/4.0, 0.0,
-		956.0, 70.0, 2733.0, 0.0, 0.0,
-		1035.0, 70.0, 2505.0, M_PI/4.0, 0.0,
-		1314.0, 70.0, 2291.0, M_PI/4.0, 0.0,
-		1400.0, 70.0, 2064.0, M_PI/4.0, 0.0,
-		1541.0, 80.0, 715.0, M_PI/4.0, 0.0,
-		2360.0, 80.0, 678.0, M_PI*0.6, 0.0,
-		2830.0, 70.0, 930.0, M_PI*0.75, 0.0,
-		2892.0, 70.0, 1332.0, M_PI*1.2, 0.0,
-		2436.0, 80.0, 1462.0, M_PI*1.6, 0.0,
-		1956.0, 70.0, 1403.0, M_PI*0.3, 0.0,
-		1761.0, 70.0, 1572.0, M_PI*0.1, 0.0,
-		1815.0, 70.0, 1970.0, -M_PI*0.25, 0.0,
-		1890.0, 80.0, 2184.0, 0.0, 0.0,
-		1299.0, 70.0, 2757.0, 0.0, 0.0,
-		1552.0, 70.0, 3034.0, M_PI*0.5, 0.0,
-		2514.0, 75.0, 2829.0, M_PI*0.5, 0.0,
-		2862.0, 75.0, 2986.0, 0.0, 0.0,
-		2552.0, 70.0, 3352.0, M_PI*0.5, 0.0,
-	};
-	unsigned int numCheckpoints = sizeof(checkpointData)/sizeof(float)/5;
-	Object checkpoints[numCheckpoints];
-	unsigned int checkpointsPassed = 0;
-	Color checkpointColors[numCheckpoints];
-	for (unsigned int i = 0; i < numCheckpoints; i++) {
-		unsigned int offset = i*5;
-		float x = checkpointData[offset];
-		float y = checkpointData[offset + 1];
-		float z = checkpointData[offset + 2];
-		float yaw = checkpointData[offset + 3];
-		float pitch = checkpointData[offset + 4];
-		checkpoints[i] = Object(&checkpointModel, x, y, z, CHECKPOINT_RADIUS/2.0, yaw, pitch, 0.0);
-	}
+	Checkpoints checkpoints(checkpointModel, CHECKPOINT_RADIUS, textureFullShader, colorFullShader);
+	checkpoints.add(1142.0, 70.0, 3244.0, -M_PI/4.0, 0.0);
+	checkpoints.add(956.0, 70.0, 2733.0, 0.0, 0.0);
+	checkpoints.add(1035.0, 70.0, 2505.0, M_PI/4.0, 0.0);
+	checkpoints.add(1314.0, 70.0, 2291.0, M_PI/4.0, 0.0);
+	checkpoints.add(1400.0, 70.0, 2064.0, M_PI/4.0, 0.0);
+	checkpoints.add(1541.0, 80.0, 715.0, M_PI/4.0, 0.0);
+	checkpoints.add(2360.0, 80.0, 678.0, M_PI*0.6, 0.0);
+	checkpoints.add(2830.0, 70.0, 930.0, M_PI*0.75, 0.0);
+	checkpoints.add(2892.0, 70.0, 1332.0, M_PI*1.2, 0.0);
+	checkpoints.add(2436.0, 80.0, 1462.0, M_PI*1.6, 0.0);
+	checkpoints.add(1956.0, 70.0, 1403.0, M_PI*0.3, 0.0);
+	checkpoints.add(1761.0, 70.0, 1572.0, M_PI*0.1, 0.0);
+	checkpoints.add(1815.0, 70.0, 1970.0, -M_PI*0.25, 0.0);
+	checkpoints.add(1890.0, 80.0, 2184.0, 0.0, 0.0);
+	checkpoints.add(1299.0, 70.0, 2757.0, 0.0, 0.0);
+	checkpoints.add(1552.0, 70.0, 3034.0, M_PI*0.5, 0.0);
+	checkpoints.add(2514.0, 75.0, 2829.0, M_PI*0.5, 0.0);
+	checkpoints.add(2862.0, 75.0, 2986.0, 0.0, 0.0);
+	checkpoints.add(2552.0, 70.0, 3352.0, M_PI*0.5, 0.0);
 
 	unsigned int reflectionTexture;
 	glGenTextures(1, &reflectionTexture);
@@ -190,6 +155,7 @@ int main()
 				exit(0);
 			}
 		}
+
 		float dx = playerAirplane.x - checkpoints[checkpointsPassed].x;
 		float dy = playerAirplane.y - checkpoints[checkpointsPassed].y;
 		float dz = playerAirplane.z - checkpoints[checkpointsPassed].z;
@@ -212,37 +178,8 @@ int main()
 			}
 		}
 
-		for (unsigned int i = 0; i < numBoosts; i++) {
-			unsigned int offset = i*5;
-			float dx = playerAirplane.x - boostData[offset + 0];
-			float dy = playerAirplane.y - boostData[offset + 1];
-			float dz = playerAirplane.z - boostData[offset + 2];
-			float distanceFromBoost = sqrt(dx*dx + dy*dy + dz*dz);
-			if (distanceFromBoost <= BOOST_RADIUS) {
-				window.performBoost();
-			}
-		}
-		float boostDistances[numBoosts];
-		for (unsigned int i = 0; i < numBoosts; i++) {
-			unsigned int offset = i*5;
-			float dx = cameraX - boostData[offset + 0];
-			float dy = cameraY - boostData[offset + 1];
-			float dz = cameraZ - boostData[offset + 2];
-			boostDistances[i] = sqrt(dx*dx + dy*dy + dz*dz);
-		}
-		for (unsigned int i = 0; i < numBoosts; i++) {
-			float maxDistance = 0.0;
-			unsigned int maxIndex = 0;
-			for (unsigned int j = 0; j < numBoosts; j++) {
-				float distance = boostDistances[j];
-				if (distance > maxDistance) {
-					maxDistance = distance;
-					maxIndex = j;
-				}
-			}
-			boostSortIndices[i] = maxIndex;
-			boostDistances[maxIndex] = 0.0;
-		}
+		if (boosts.isHit(&playerAirplane)) playerAirplane.performBoost();
+		boosts.sortByDistance() // so transparency works correctly
 
 		float newTime2 = glfwGetTime();
 		deltaT_CPU = (int)((newTime2 - newTime)*1000000);
@@ -279,9 +216,7 @@ int main()
 		startFinishLine.render(textureShader, colorShader, frameCount);
 		skybox.render();
 		// Must render transparant objects last
-		for (unsigned int i = 0; i < numBoosts; i++) {
-			boosts[boostSortIndices[i]].render(textureFullShader, colorFullShader, frameCount);
-		}
+		boosts.render();
 
 		setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);
 		updateUniforms();
@@ -290,9 +225,7 @@ int main()
 		glViewport(0, 0, screenWidth, screenHeight);
 		water.render(1.0);
 		// Must render transparant objects last
-		for (unsigned int i = 0; i < numBoosts; i++) {
-			boosts[boostSortIndices[i]].render(textureFullShader, colorFullShader, frameCount);
-		}
+		boosts.render();
 
 		if (VSYNC_ON) glFinish(); // So we get consistent FPS
 		glfwSwapBuffers(window.windowPtr);
