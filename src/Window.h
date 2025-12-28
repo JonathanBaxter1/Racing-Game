@@ -7,13 +7,13 @@ class Window
 {
 public:
 	GLFWwindow* windowPtr;
+	static bool isSpectate;
 
 	Window();
 	static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 	vec3 handleInput(float deltaT);
 	bool isKeyDown(int key);
 private:
-	static bool isSpectate;
 	static float desiredPitch;
 	static float desiredTurnAngle;
 	static float desiredSpeed;

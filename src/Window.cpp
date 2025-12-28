@@ -141,7 +141,8 @@ vec3 Window::handleInput(float deltaT)
 		} else if (isKeyDown(GLFW_KEY_S)) {
 			desiredSpeed -= 100.0*deltaT;
 		}
-		desiredSpeed = clamp(desiredSpeed, 50.0, 220.0);
+		desiredSpeed = clamp(desiredSpeed, 50.0, 240.0);
+		float q = sqrt(desiredSpeed)*0.06;
 		desiredPitch = clamp(desiredPitch, -M_PI/2.0, M_PI/2.0);
 		desiredTurnAngle = clamp(desiredTurnAngle, -M_PI/2.0*q, M_PI/2.0*q);
 	}

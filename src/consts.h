@@ -12,3 +12,8 @@
 #define CHECKPOINT_RADIUS 15.0
 #define BOOST_RADIUS 10.0
 #define START_LINE_SIZE 4.0
+
+// Race status
+#define RACE_NOT_STARTED 0
+#define RACE_ACTIVE 1
+#define RACE_ENDED 2

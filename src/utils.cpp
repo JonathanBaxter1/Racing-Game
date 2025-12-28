@@ -6,8 +6,7 @@ unsigned int Shader::shaders[MAX_SHADERS] = {0};
 bool Window::isSpectate = false;
 float Window::desiredPitch = 0.0;
 float Window::desiredTurnAngle = 0.0;
-float Window::speed = 50.0;
-float Window::timeSinceBoost = 100.0;
+float Window::desiredSpeed = 50.0;
 
 std::vector<Model*> models;
 int screenWidth;
@@ -208,10 +207,9 @@ void eulerRotationMatrix4(mat4 matrix, float size, float yaw, float pitch, float
 
 void updateCamera(Airplane* airplane)
 {
-	camaraYaw = M_PI + airplane->object->yaw;
-	cameraPitch = 0.25*(airplane->object->pitch);
+	cameraYaw = M_PI + airplane->object->yaw;
 	float distanceFromAirplane = (30.0 + airplane->speed*0.05);
-	cameraX = airplane->object->x + distanceFromAirplane*sin(airplane->object->yaw)*cos(cameraPitch);
-	cameraY = airplane->object->y + distanceFromAirplane*sin(cameraPitch);
-	cameraZ = airplane->object->z - distanceFromAirplane*cos(airplane->object->yaw)*cos(cameraPitch);
+	cameraX = airplane->object->x + distanceFromAirplane*sin(airplane->object->yaw);
+	cameraY = airplane->object->y;
+	cameraZ = airplane->object->z - distanceFromAirplane*cos(airplane->object->yaw);
 }

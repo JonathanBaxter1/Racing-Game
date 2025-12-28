@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "Model.h"
+#include "Airplane.h"
 
 extern float clamp(float number, float min, float max);
 extern void mat3Multiply(mat3 output, mat3 input1, mat3 input2);
@@ -13,6 +14,7 @@ extern unsigned int isKeyDown(int key);
 extern vec3 normalize(vec3 vec);
 extern void eulerRotationMatrix3(mat3 matrix, float size, float yaw, float pitch, float roll);
 extern void eulerRotationMatrix4(mat4 matrix, float size, float yaw, float pitch, float roll, float x, float y, float z);
+extern void updateCamera(Airplane* airplane);
 
 // Global Variables
 extern std::vector<Model*> models;

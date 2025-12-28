@@ -29,3 +29,4 @@
 #include "Airplane.h"
 #include "Boosts.h"
 #include "Checkpoints.h"
+#include "StartLine.h"

@@ -3,6 +3,7 @@
 
 int main()
 {
+	unsigned int raceStatus = RACE_NOT_STARTED;
 	float waterHeight = 50.0;
 	Window window;
 
@@ -53,24 +54,19 @@ int main()
 	Object playerAirplaneObj(&airplaneModel, 2188.0, 70.0, 3351.0, 1.0, M_PI/2.0, 0.0, 0.0);
 	Airplane playerAirplane(&playerAirplaneObj);
 
-	Model startFinishLineModel("startFinishLine/startFinishLine.obj");
-	float linePitch = 0.0;
-	float lineYaw = M_PI/2.0;
-	float lineX = 1865.0;
-	float lineY = 90.0;
-	float lineZ = 3349.0;
-	Object startFinishLine(&startFinishLineModel, lineX, lineY, lineZ, START_LINE_SIZE, lineYaw, linePitch, 0.0);
-	bool inRace = false;
+	Model startLineModel("startFinishLine/startFinishLine.obj");
+	Object startLineObj(&startLineModel, 1865.0, 90.0, 3349.0, START_LINE_SIZE, M_PI*0.5, 0.0, 0.0);
+	StartLine startLine(&startLineObj);
 
 	Model boostModel("boost/boost.obj");
-	Boosts boosts(boostModel, BOOST_RADIUS, textureFullShader, colorFullShader);
+	Boosts boosts(&boostModel, BOOST_RADIUS);
 	boosts.add(1512.0, 60.0, 1630.0, 0.0, 0.0);
 	boosts.add(1807.0, 70.0, 606.0, M_PI*0.5, 0.0);
 	boosts.add(1875.0, 85.0, 2950.0, M_PI*0.35, 0.0);
 	boosts.add(2295.0, 60.0, 3308.0, M_PI*0.5, 0.0);
 
 	Model checkpointModel("checkpoint/checkpoint.obj");
-	Checkpoints checkpoints(checkpointModel, CHECKPOINT_RADIUS, textureFullShader, colorFullShader);
+	Checkpoints checkpoints(&checkpointModel, CHECKPOINT_RADIUS);
 	checkpoints.add(1142.0, 70.0, 3244.0, -M_PI/4.0, 0.0);
 	checkpoints.add(956.0, 70.0, 2733.0, 0.0, 0.0);
 	checkpoints.add(1035.0, 70.0, 2505.0, M_PI/4.0, 0.0);
@@ -90,6 +86,7 @@ int main()
 	checkpoints.add(2514.0, 75.0, 2829.0, M_PI*0.5, 0.0);
 	checkpoints.add(2862.0, 75.0, 2986.0, 0.0, 0.0);
 	checkpoints.add(2552.0, 70.0, 3352.0, M_PI*0.5, 0.0);
+	checkpoints.updateColors();
 
 	unsigned int reflectionTexture;
 	glGenTextures(1, &reflectionTexture);
@@ -133,7 +130,7 @@ int main()
 		deltaT = (int)(dT*1000000);
 		curTime = newTime;
 		frameCount++;
-		if (!(frameCount&7u) && GAME_DEBUG == true) { // So the print statement doesn't count as computation time
+		if (frameCount%10 == 0 && GAME_DEBUG == true) {
 			std::cout << "delta T: " << deltaT << "us; CPU: " << deltaT_CPU << "us; GPU: " << deltaT_GPU << "us" << std::endl;
 		}
 
@@ -141,45 +138,29 @@ int main()
 		// Game logic
 		glfwPollEvents();
 		vec3 controls = window.handleInput(dT);
-		playerAirplane.update(controls);
-		playerAirplane.checkCollision(waterHeight, &heightMap, heightMapWidth, heightMapHeight, 274.0);
+		if (!Window::isSpectate) {
+			playerAirplane.update(dT, controls);
+			updateCamera(&playerAirplane);
+		}
+		playerAirplane.checkCollision(waterHeight, heightMap, heightMapWidth, heightMapHeight, 274.0);
 
-		if (playerAirplane.x <= lineX && playerAirplane.z >= lineZ - START_LINE_SIZE*20.0 && playerAirplane.z <= lineZ + START_LINE_SIZE*20.0) {
-			if (checkpointsPassed == 0 && inRace == false) {
-				inRace  = true;
+		if (startLine.isIntersect(&playerAirplane)) {
+			if (raceStatus == RACE_NOT_STARTED) {
+				raceStatus = RACE_ACTIVE;
 				lapStartTime = glfwGetTime();
-			} else if (checkpointsPassed == numCheckpoints) {
-				inRace = false;
+			} else if (raceStatus == RACE_ACTIVE && checkpoints.allPassed()) {
+				raceStatus = RACE_ENDED;
 				lapTime = glfwGetTime() - lapStartTime;
 				std::cout << lapTime << "s" << std::endl;
 				exit(0);
 			}
 		}
 
-		float dx = playerAirplane.x - checkpoints[checkpointsPassed].x;
-		float dy = playerAirplane.y - checkpoints[checkpointsPassed].y;
-		float dz = playerAirplane.z - checkpoints[checkpointsPassed].z;
-		float distanceFromCheckpoint = sqrt(dx*dx + dy*dy + dz*dz);
-		if (distanceFromCheckpoint <= CHECKPOINT_RADIUS) {
-			checkpointsPassed++;
-			if (checkpointsPassed == 1) {
-				lapStartTime = glfwGetTime();
-			} else if (checkpointsPassed == numCheckpoints) {
-				lapTime = glfwGetTime() - lapStartTime;
-			}
-		}
-		for (unsigned int i = 0; i < numCheckpoints; i++) {
-			if (checkpointsPassed == i && inRace) {
-				checkpointColors[i] = {1.0, 0.6, 0.0};
-			} else if (checkpointsPassed > i && inRace) {
-				checkpointColors[i] = {0.0, 1.0, 0.0};
-			} else {
-				checkpointColors[i] = {1.0, 0.0, 0.0};
-			}
-		}
+
+		if (raceStatus == RACE_ACTIVE) checkpoints.checkIntersect(&playerAirplane);
 
 		if (boosts.isHit(&playerAirplane)) playerAirplane.performBoost();
-		boosts.sortByDistance() // so transparency works correctly
+		boosts.sortByDistance(); // so transparency works correctly
 
 		float newTime2 = glfwGetTime();
 		deltaT_CPU = (int)((newTime2 - newTime)*1000000);
@@ -192,10 +173,8 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		terrain.render(1.0);
 		playerAirplane.render(textureShader, colorShader, frameCount);
-		for (unsigned int i = 0; i < numCheckpoints; i++) {
-			checkpoints[i].render(textureFullShader, colorFullShader, frameCount, checkpointColors[i]);
-		}
-		startFinishLine.render(textureShader, colorShader, frameCount);
+		checkpoints.render(textureFullShader, colorFullShader);
+		startLine.render(textureShader, colorShader);
 		skybox.render();
 
 		float reflectionCameraY = cameraY - 2.0*(cameraY - waterHeight);
@@ -210,13 +189,11 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		terrain.render(2.0);
 		playerAirplane.render(textureShader, colorShader, frameCount);
-		for (unsigned int i = 0; i < numCheckpoints; i++) {
-			checkpoints[i].render(textureFullShader, colorFullShader, frameCount, checkpointColors[i]);
-		}
-		startFinishLine.render(textureShader, colorShader, frameCount);
+		checkpoints.render(textureFullShader, colorFullShader);
+		startLine.render(textureShader, colorShader);
 		skybox.render();
 		// Must render transparant objects last
-		boosts.render();
+		boosts.render(textureFullShader, colorFullShader);
 
 		setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);
 		updateUniforms();
@@ -225,7 +202,7 @@ int main()
 		glViewport(0, 0, screenWidth, screenHeight);
 		water.render(1.0);
 		// Must render transparant objects last
-		boosts.render();
+		boosts.render(textureFullShader, colorFullShader);
 
 		if (VSYNC_ON) glFinish(); // So we get consistent FPS
 		glfwSwapBuffers(window.windowPtr);
