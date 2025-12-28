@@ -205,3 +205,13 @@ void eulerRotationMatrix4(mat4 matrix, float size, float yaw, float pitch, float
 	matrix[14] = z;
 	matrix[15] = 1.0;
 }
+
+void updateCamera(Airplane* airplane)
+{
+	camaraYaw = M_PI + airplane->object->yaw;
+	cameraPitch = 0.25*(airplane->object->pitch);
+	float distanceFromAirplane = (30.0 + airplane->speed*0.05);
+	cameraX = airplane->object->x + distanceFromAirplane*sin(airplane->object->yaw)*cos(cameraPitch);
+	cameraY = airplane->object->y + distanceFromAirplane*sin(cameraPitch);
+	cameraZ = airplane->object->z - distanceFromAirplane*cos(airplane->object->yaw)*cos(cameraPitch);
+}

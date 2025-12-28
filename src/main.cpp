@@ -51,7 +51,8 @@ int main()
 	Shader colorFullShader("color.vs", "", "", "", "colorFull.fs");
 
 	Model airplaneModel("airplane/airplane.obj");
-	Object playerAirplane(&airplaneModel, 2188.0, 70.0, 3351.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	Object playerAirplaneObj(&airplaneModel, 2188.0, 70.0, 3351.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	Airplane playerAirplane(&playerAirplaneObj);
 
 	Model startFinishLineModel("startFinishLine/startFinishLine.obj");
 	float linePitch = 0.0;
@@ -174,14 +175,9 @@ int main()
 
 		// Game logic
 		glfwPollEvents();
-		window.handleInput(dT, &playerAirplane);
-		unsigned int roundedPlayerX = clamp((unsigned int)playerAirplane.x, 0, heightMapWidth);
-		unsigned int roundedPlayerZ = clamp((unsigned int)playerAirplane.z, 0, heightMapHeight);
-		float terrainHeight = heightMap[roundedPlayerX + roundedPlayerZ*heightMapWidth]/65536.0*274.0;
-		if (playerAirplane.y < waterHeight || playerAirplane.y < terrainHeight) {
-			std::cout << "You crashed your plane" << std::endl;
-			exit(0);
-		}
+		vec3 controls = window.handleInput(dT);
+		playerAirplane.update(controls);
+		playerAirplane.checkCollision(waterHeight, &heightMap, heightMapWidth, heightMapHeight, 274.0);
 
 		if (playerAirplane.x <= lineX && playerAirplane.z >= lineZ - START_LINE_SIZE*20.0 && playerAirplane.z <= lineZ + START_LINE_SIZE*20.0) {
 			if (checkpointsPassed == 0 && inRace == false) {
@@ -215,8 +211,6 @@ int main()
 				checkpointColors[i] = {1.0, 0.0, 0.0};
 			}
 		}
-
-		playerAirplane.update();
 
 		for (unsigned int i = 0; i < numBoosts; i++) {
 			unsigned int offset = i*5;

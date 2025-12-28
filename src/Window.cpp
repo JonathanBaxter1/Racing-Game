@@ -26,9 +26,6 @@ Window::Window()
 	glewInit();
 	glViewport(0, 0, screenWidth, screenHeight);
 
-	// Turn on/off vsync
-	glfwSwapInterval(VSYNC_ON);
-
 	// Cursor setup
 	int cursorWidth, cursorHeight, cursorNumChannels;
 	unsigned char* cursorImageData = stbi_load("textures/cursor.png", &cursorWidth, &cursorHeight, &cursorNumChannels, 0);
@@ -57,6 +54,7 @@ Window::Window()
 	stbi_set_flip_vertically_on_load(1);
 
 	// OpenGL settings
+	glfwSwapInterval(VSYNC_ON);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -98,7 +96,7 @@ void Window::mouseCallback(GLFWwindow* window, double xpos, double ypos)
 	lastY = ypos;
 }
 
-void Window::handleInput(float deltaT, Object* airplane)
+vec3 Window::handleInput(float deltaT)
 {
 	if (isKeyDown(GLFW_KEY_ESCAPE)) {
 		glfwSetWindowShouldClose(this->windowPtr, GLFW_TRUE);
@@ -139,48 +137,19 @@ void Window::handleInput(float deltaT, Object* airplane)
 		}
 	} else {
 		if (isKeyDown(GLFW_KEY_W)) {
-			speed += 100.0*deltaT;
+			desiredSpeed += 100.0*deltaT;
 		} else if (isKeyDown(GLFW_KEY_S)) {
-			speed -= 100.0*deltaT;
+			desiredSpeed -= 100.0*deltaT;
 		}
-		speed = clamp(speed, 50.0, 220.0);
-		float speedBoost = 0.0;
-		if (timeSinceBoost < 0.25) {
-			speedBoost = 4.0*timeSinceBoost*200.0;
-		} else if (timeSinceBoost < 2.0) {
-			speedBoost = 200.0;
-		} else if (timeSinceBoost < 2.25) {
-			speedBoost = 4.0*(2.25-timeSinceBoost)*200.0;
-		}
-
-		timeSinceBoost += deltaT;
-		float q = sqrt(speed)*0.06;
+		desiredSpeed = clamp(desiredSpeed, 50.0, 220.0);
 		desiredPitch = clamp(desiredPitch, -M_PI/2.0, M_PI/2.0);
 		desiredTurnAngle = clamp(desiredTurnAngle, -M_PI/2.0*q, M_PI/2.0*q);
-
-		airplane->roll = desiredTurnAngle;
-		airplane->pitch = desiredPitch;
-		airplane->yaw += desiredTurnAngle*deltaT;
-
-		float trueSpeed = (speed + speedBoost + sin(airplane->pitch)*40.0);
-		airplane->z += deltaT*(trueSpeed)*cos(airplane->yaw);
-		airplane->x -= deltaT*(trueSpeed)*sin(airplane->yaw);
-		airplane->y -= deltaT*trueSpeed*sin(airplane->pitch);
-
-		cameraYaw = M_PI + airplane->yaw;
-		cameraPitch = 0.0;
-		cameraX = airplane->x + (30.0 + trueSpeed*0.05)*sin(airplane->yaw);
-		cameraY = airplane->y + 0.0;
-		cameraZ = airplane->z - (30.0 + trueSpeed*0.05)*cos(airplane->yaw);
 	}
+	vec3 controls = {desiredTurnAngle, desiredPitch, desiredSpeed};
+	return controls;
 }
 
 bool Window::isKeyDown(int key)
 {
 	return glfwGetKey(this->windowPtr, key) == GLFW_PRESS;
-}
-
-void Window::performBoost()
-{
-	timeSinceBoost = 0.0;
 }
