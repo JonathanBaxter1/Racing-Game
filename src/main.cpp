@@ -5,6 +5,7 @@ int main()
 {
 	unsigned int raceStatus = RACE_NOT_STARTED;
 	float waterHeight = 50.0;
+	std::cout<<glfwGetTime()<<" open window:"<<std::endl;
 	Window window;
 
 	// For profiling
@@ -15,6 +16,7 @@ int main()
 	int deltaT_GPU = 0;
 	unsigned int frameCount = 0;
 
+	std::cout<<glfwGetTime()<<" load skybox:"<<std::endl;
 	// https://opengameart.org/content/clouds-skybox-1
 	Texture skyboxUp("skyboxUp.bmp", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxDown("skyboxDown.bmp", 8, GL_CLAMP_TO_EDGE);
@@ -30,28 +32,34 @@ int main()
 	int mapWidth = 4096;
 	int mapHeight = 4096;
 
+	std::cout<<glfwGetTime()<<" load island maps:"<<std::endl;
 	unsigned short* heightMap = loadRaw16("islandHeightMap.r16", mapWidth, mapHeight, 1);
 	unsigned char* normalMap = loadRaw8("islandNormalMap.rgb8", mapWidth, mapHeight, 3);
 	unsigned char* colorMap = loadRaw8("islandColorMap.rgb8", mapWidth, mapHeight, 3);
+	std::cout<<glfwGetTime()<<" island maps to GPU:"<<std::endl;
 
 	Texture islandHeightMap(heightMap, mapWidth, mapHeight, 1, GL_CLAMP_TO_EDGE);
 	Texture islandNormalMap(normalMap, mapWidth, mapHeight, 3, GL_CLAMP_TO_EDGE);
 	Texture islandColorMap(colorMap, mapWidth, mapHeight, 3, GL_CLAMP_TO_EDGE);
 
+	std::cout<<glfwGetTime()<<" load stone/grass/snow:"<<std::endl;
 	stbi_set_flip_vertically_on_load(true);
 	Texture stoneTexture("stone.jpg", 8, GL_REPEAT);
 	Texture grassTexture("grassTex.jpg", 8, GL_REPEAT);
 	Texture snowTexture("snowTex.png", 8, GL_REPEAT);
 	unsigned int terrainTextureIDs[] = {islandHeightMap.ID, islandNormalMap.ID, islandColorMap.ID, stoneTexture.ID, grassTexture.ID, snowTexture.ID};
+	std::cout<<glfwGetTime()<<" compile shaders:"<<std::endl;
 
 	Shader terrainShader("terrain.vs", "terrain.tcs", "terrain.tes", "", "terrain.fs");
 	Terrain terrain(terrainShader, terrainTextureIDs, sizeof(terrainTextureIDs)/sizeof(unsigned int), 4096.0, 64, heightMap, normalMap);
 
+	std::cout<<glfwGetTime()<<" compile shaders:"<<std::endl;
 	Shader textureShader("texture.vs", "", "", "", "texture.fs");
 	Shader textureFullShader("texture.vs", "", "", "", "textureFull.fs");
 	Shader colorShader("color.vs", "", "", "", "color.fs");
 	Shader colorFullShader("color.vs", "", "", "", "colorFull.fs");
 
+	std::cout<<glfwGetTime()<<" load models:"<<std::endl;
 	Model airplaneModel("airplane/airplane.obj");
 	Object playerAirplaneObj(&airplaneModel, 2188.0, 70.0, 3351.0, 1.0, M_PI/2.0, 0.0, 0.0);
 	Airplane playerAirplane(&playerAirplaneObj);
@@ -90,6 +98,7 @@ int main()
 	checkpoints.add(2552.0, 70.0, 3352.0, M_PI*0.5, 0.0);
 	checkpoints.updateColors();
 
+	std::cout<<glfwGetTime()<<" setup reflection buffer:"<<std::endl;
 	unsigned int reflectionTexture, reflectionBuffer;
 	unsigned int reflectionRes = 1<<(3 - GRAPHICS_SETTING); // divisor
 	setupReflectionBuffer(&reflectionTexture, &reflectionBuffer, reflectionRes);
@@ -102,6 +111,7 @@ int main()
 	float lapStartTime = 0.0;
 	float lapTime = 0.0;
 
+	std::cout<<glfwGetTime()<<" end of setup"<<std::endl;
 	// Main Loop
 	while (!glfwWindowShouldClose(window.windowPtr)) {
 

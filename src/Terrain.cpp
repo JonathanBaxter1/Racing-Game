@@ -31,6 +31,7 @@ Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTexture
 		int mapWidth = (float)mapSize;
 		int mapHeight = (float)mapSize;
 
+		std::cout<<glfwGetTime()<<" terrain water culling:"<<std::endl;
 		float waterHeight = 50.0;
 		for (unsigned int curPatch = 0; curPatch < patchRes*patchRes; curPatch++) {
 			unsigned int xStart = curPatch%patchRes;
@@ -54,6 +55,7 @@ Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTexture
 			numPatches += (unsigned int)patchAboveWater;
 		}
 
+		std::cout<<glfwGetTime()<<" terrain normal variance:"<<std::endl;
 		// Normal Variance Calcs (for terrain LOD)
 		for (unsigned int curPatch = 0; curPatch < patchRes*patchRes; curPatch++) {
 			if (!patchResolutions[curPatch]) continue;
@@ -93,14 +95,14 @@ Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTexture
 				float dRed = redAverage - (float)normalMap[offset + 0];
 				float dGreen = greenAverage - (float)normalMap[offset + 1];
 				float dBlue = blueAverage - (float)normalMap[offset + 2];
-				float normalVariance = sqrt(dRed*dRed + dGreen*dGreen + dBlue*dBlue);
+				float normalVariance = dRed*dRed + dGreen*dGreen + dBlue*dBlue;
 				maxNormalVariance = normalVariance > maxNormalVariance ? normalVariance : maxNormalVariance;
 			}
-			if (maxNormalVariance < 20.0) {
+			if (maxNormalVariance < 400.0) {
 				patchResolutions[curPatch] = 8.0;
-			} else if (maxNormalVariance < 40.0) {
+			} else if (maxNormalVariance < 1600.0) {
 				patchResolutions[curPatch] = 4.0;
-			} else if (maxNormalVariance < 80.0) {
+			} else if (maxNormalVariance < 6400.0) {
 				patchResolutions[curPatch] = 2.0;
 			}
 		}

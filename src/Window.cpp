@@ -16,6 +16,8 @@ Window::Window()
 	screenHeight = videoMode->height;
 	float aspectRatio = (float)screenWidth/(float)screenHeight;
 	std::cout << "Screen Resolution: " << screenWidth << "x" << screenHeight << std::endl;
+
+	// glfwCreateWindow takes ~0.14s
 	this->windowPtr = glfwCreateWindow(screenWidth, screenHeight, "flight sim", monitor, NULL);
 	if (this->windowPtr == NULL) {
 		std::cout << "GLFW window creation failed" << std::endl;
