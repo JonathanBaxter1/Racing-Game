@@ -81,7 +81,7 @@ void setViewMatrix(mat4 matrix, float angle, float angle2, float x, float y, flo
 	matrix[15] = 1.0;
 }
 
-void setPerspectiveMatrix(mat4 mat, float fovYdeg, float aspect, float near, float far)
+void setProjectionMatrix(mat4 mat, float fovYdeg, float aspect, float near, float far)
 {
 	float fovYrad = fovYdeg*M_PI/180.0;
 	float f = 1.0/tanf(fovYrad/2.0);

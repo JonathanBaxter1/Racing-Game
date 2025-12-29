@@ -51,7 +51,7 @@ Window::Window()
 	stbi_image_free(cursorImageData);
 
 	glfwSetCursorPosCallback(this->windowPtr, Window::mouseCallback);
-	setPerspectiveMatrix(projectionMatrix, 45.0, aspectRatio, 1.0, 100000.0);
+	setProjectionMatrix(projectionMatrix, 45.0, aspectRatio, 1.0, 100000.0);
 
 	stbi_set_flip_vertically_on_load(1);
 
