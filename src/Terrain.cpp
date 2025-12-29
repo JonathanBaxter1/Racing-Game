@@ -67,6 +67,7 @@ Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTexture
 			unsigned int redSum = 0;
 			unsigned int greenSum = 0;
 			unsigned int blueSum = 0;
+			float maxNormalVariance = 0.0;
 			for (unsigned int i = 0; i < numPoints; i++) {
 				unsigned int dx = i%(patchSize + 1);
 				unsigned int dy = i/(patchSize + 1);
@@ -78,25 +79,15 @@ Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTexture
 				redSum += (unsigned int)normalMap[offset + 0];
 				greenSum += (unsigned int)normalMap[offset + 1];
 				blueSum += (unsigned int)normalMap[offset + 2];
-			}
-			float redAverage = (float)redSum/(float)numPoints;
-			float greenAverage = (float)greenSum/(float)numPoints;
-			float blueAverage = (float)blueSum/(float)numPoints;
-			float maxNormalVariance = 0.0;
-
-			for (unsigned int i = 0; i < numPoints; i++) {
-				unsigned int dx = i%(patchSize + 1);
-				unsigned int dy = i/(patchSize + 1);
-				unsigned int x = xStart*patchSize + dx;
-				unsigned int y = yStart*patchSize + dy;
-				x = x < (unsigned int)mapWidth - 1 ? x : (unsigned int)mapWidth - 1;
-				y = y < (unsigned int)mapHeight - 1 ? y : (unsigned int)mapHeight - 1;
-				unsigned int offset = 3*(y*mapWidth + x);
+				float redAverage = (float)redSum/(float)(i + 1);
+				float greenAverage = (float)greenSum/(float)(i + 1);
+				float blueAverage = (float)blueSum/(float)(i + 1);
 				float dRed = redAverage - (float)normalMap[offset + 0];
 				float dGreen = greenAverage - (float)normalMap[offset + 1];
 				float dBlue = blueAverage - (float)normalMap[offset + 2];
 				float normalVariance = dRed*dRed + dGreen*dGreen + dBlue*dBlue;
 				maxNormalVariance = normalVariance > maxNormalVariance ? normalVariance : maxNormalVariance;
+				if (maxNormalVariance >= 6400.0) break;
 			}
 			if (maxNormalVariance < 400.0) {
 				patchResolutions[curPatch] = 8.0;
@@ -105,6 +96,7 @@ Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTexture
 			} else if (maxNormalVariance < 6400.0) {
 				patchResolutions[curPatch] = 2.0;
 			}
+
 		}
 	} else {
 		for (unsigned int i = 0; i < patchRes*patchRes; i++) {
