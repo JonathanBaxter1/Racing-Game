@@ -27,15 +27,28 @@ int main()
 	Skybox skybox(skyboxShader, skyboxTextures);
 
 	stbi_set_flip_vertically_on_load(false);
-	int heightMapWidth, heightMapHeight, heightMapNumChannels;
-	unsigned short* heightMap = stbi_load_16("textures/islandHeightMap.png", &heightMapWidth, &heightMapHeight, &heightMapNumChannels, 1);
-	if (!heightMap) {
-		std::cout << "stb_image import error" << std::endl;
-	}
+	int mapWidth = 4096;
+	int mapHeight = 4096;
+	FILE *heightMapFile = fopen("textures/islandHeightMap.r16", "rb");
+	FILE *normalMapFile = fopen("textures/islandNormalMap.rgb8", "rb");
+	FILE *colorMapFile = fopen("textures/islandColorMap.rgb8", "rb");
+	unsigned int heightMapSize = 1*mapWidth*mapHeight*sizeof(unsigned short);
+	unsigned int normalMapSize = 3*mapWidth*mapHeight*sizeof(unsigned char);
+	unsigned int colorMapSize = 3*mapWidth*mapHeight*sizeof(unsigned char);
+	unsigned short* heightMap = (unsigned short*)malloc(heightMapSize);
+	unsigned char* normalMap = (unsigned char*)malloc(normalMapSize);
+	unsigned char* colorMap = (unsigned char*)malloc(colorMapSize);
+	fread(heightMap, heightMapSize, 1, heightMapFile);
+	fread(normalMap, normalMapSize, 1, normalMapFile);
+	fread(colorMap, colorMapSize, 1, colorMapFile);
+	fclose(heightMapFile);
+	fclose(normalMapFile);
+	fclose(colorMapFile);
 
-	Texture islandHeightMap("islandHeightMap.png", 16, GL_CLAMP_TO_EDGE);
-	Texture islandNormalMap("islandNormalMap.png", 8, GL_CLAMP_TO_EDGE);
-	Texture islandColorMap("islandColorMap.png", 8, GL_CLAMP_TO_EDGE);
+	Texture islandHeightMap(heightMap, mapWidth, mapHeight, 1, GL_CLAMP_TO_EDGE);
+	Texture islandNormalMap(normalMap, mapWidth, mapHeight, 3, GL_CLAMP_TO_EDGE);
+	Texture islandColorMap(colorMap, mapWidth, mapHeight, 3, GL_CLAMP_TO_EDGE);
+
 	stbi_set_flip_vertically_on_load(true);
 	Texture stoneTexture("stone.jpg", 8, GL_REPEAT);
 	Texture grassTexture("grassTex.jpg", 8, GL_REPEAT);
@@ -43,7 +56,7 @@ int main()
 	unsigned int terrainTextureIDs[] = {islandHeightMap.ID, islandNormalMap.ID, islandColorMap.ID, stoneTexture.ID, grassTexture.ID, snowTexture.ID};
 
 	Shader terrainShader("terrain.vs", "terrain.tcs", "terrain.tes", "", "terrain.fs");
-	Terrain terrain(terrainShader, terrainTextureIDs, sizeof(terrainTextureIDs)/sizeof(unsigned int), 4096.0, 64, "islandHeightMap.png", "islandNormalMap.png");
+	Terrain terrain(terrainShader, terrainTextureIDs, sizeof(terrainTextureIDs)/sizeof(unsigned int), 4096.0, 64, heightMap, normalMap);
 
 	Shader textureShader("texture.vs", "", "", "", "texture.fs");
 	Shader textureFullShader("texture.vs", "", "", "", "textureFull.fs");
@@ -117,7 +130,7 @@ int main()
 	Texture waterDuDvTexture("waterDuDv.png", 8, GL_REPEAT);
 	unsigned int waterTextureIDs[] = {reflectionTexture, waterDuDvTexture.ID, islandHeightMap.ID};
 	Shader waterShader("water.vs", "water.tcs", "water.tes", "", "water.fs");
-	Terrain water(waterShader, waterTextureIDs, sizeof(waterTextureIDs)/sizeof(unsigned int), 100000.0, 32, "", "");
+	Terrain water(waterShader, waterTextureIDs, sizeof(waterTextureIDs)/sizeof(unsigned int), 100000.0, 32, NULL, NULL);
 
 	float lapStartTime = 0.0;
 	float lapTime = 0.0;
@@ -142,7 +155,7 @@ int main()
 			playerAirplane.update(dT, controls);
 			updateCamera(&playerAirplane);
 		}
-		playerAirplane.checkCollision(waterHeight, heightMap, heightMapWidth, heightMapHeight, 274.0);
+		playerAirplane.checkCollision(waterHeight, heightMap, mapWidth, mapHeight, 274.0);
 
 		if (startLine.isIntersect(&playerAirplane)) {
 			if (raceStatus == RACE_NOT_STARTED) {
@@ -212,7 +225,9 @@ int main()
 
 	// cleanup framebuffers
 
-	stbi_image_free(heightMap);
+	free(heightMap);
+	free(normalMap);
+	free(colorMap);
 	glfwTerminate();
 	return 0;
 }

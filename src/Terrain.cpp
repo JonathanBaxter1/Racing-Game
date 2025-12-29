@@ -1,7 +1,7 @@
 #include "include.h"
 
 
-Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTextures, float mapSize, unsigned int patchRes, std::string heightMapFileName, std::string normalMapFileName)
+Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTextures, float mapSize, unsigned int patchRes, unsigned short* heightMap, unsigned char* normalMap)
 {
 	this->patchRes = patchRes;
 	unsigned int patchSize = mapSize/patchRes;
@@ -27,35 +27,9 @@ Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTexture
 	float patchResolutions[patchRes*patchRes] = {0.0};
 	this->numPatches = 0;
 
-	if (heightMapFileName != "" && normalMapFileName != "") {
-		int heightMapWidth;
-		int heightMapHeight;
-		int heightMapNumChannels;
-		std::string heightMapPath = "textures/" + heightMapFileName;
-		stbi_set_flip_vertically_on_load(false);
-		unsigned short* heightMap = stbi_load_16(heightMapPath.c_str(), &heightMapWidth, &heightMapHeight, &heightMapNumChannels, 1);
-		if (!heightMap) {
-			std::cout << "stb_image import error: " << heightMapPath << std::endl;
-			exit(-1);
-		}
-		int normalMapWidth;
-		int normalMapHeight;
-		int normalMapNumChannels;
-		std::string normalMapPath = "textures/" + normalMapFileName;
-		unsigned char* normalMap = stbi_load(normalMapPath.c_str(), &normalMapWidth, &normalMapHeight, &normalMapNumChannels, 3);
-		stbi_set_flip_vertically_on_load(true);
-		if (!normalMap) {
-			std::cout << "stb_image import error: " << normalMapPath << std::endl;
-			exit(-1);
-		}
-
-
-		if (heightMapWidth != normalMapWidth || heightMapHeight != normalMapHeight) {
-			std::cout << "Height map and normal map for terrain must be same dimensions" << std::endl;
-			exit(-1);
-		}
-		int mapWidth = heightMapWidth;
-		int mapHeight = heightMapHeight;
+	if (heightMap != NULL && normalMap != NULL) {
+		int mapWidth = (float)mapSize;
+		int mapHeight = (float)mapSize;
 
 		float waterHeight = 50.0;
 		for (unsigned int curPatch = 0; curPatch < patchRes*patchRes; curPatch++) {
@@ -70,7 +44,7 @@ Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTexture
 				unsigned int y = yStart*patchSize + dy;
 				x = x < (unsigned int)mapWidth - 1 ? x : (unsigned int)mapWidth - 1;
 				y = y < (unsigned int)mapHeight - 1 ? y : (unsigned int)mapHeight - 1;
-				float height = ((float)heightMap[y*heightMapWidth + x])/65536.0*274.0;
+				float height = ((float)heightMap[y*mapWidth + x])/65536.0*274.0;
 				if (height >= waterHeight) {
 					patchAboveWater = true;
 					break;
@@ -130,8 +104,6 @@ Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTexture
 				patchResolutions[curPatch] = 2.0;
 			}
 		}
-		stbi_image_free(heightMap);
-		stbi_image_free(normalMap);
 	} else {
 		for (unsigned int i = 0; i < patchRes*patchRes; i++) {
 			patchResolutions[i] = 1.0;

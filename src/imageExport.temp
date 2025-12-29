@@ -1,0 +1,10 @@
+//	unsigned char* heightMap2 = stbi_load("textures/islandNormalMap.png", &heightMapWidth, &heightMapHeight, &heightMapNumChannels, 3);
+//	if (!heightMap2) {
+//		std::cout << "stb_image import error" << std::endl;
+//	}
+	//temp
+//	FILE *fout = fopen("textures/islandNormalMap.rgb8", "wb");
+//	fwrite(heightMap2, sizeof(unsigned char)*3*heightMapWidth*heightMapHeight, 1, fout);
+//	fflush(fout);
+//	fclose(fout);
+	//temp
