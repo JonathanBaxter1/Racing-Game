@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "Shader.h"
+#include "Texture.h"
 
 class Skybox
 {

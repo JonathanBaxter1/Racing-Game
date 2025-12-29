@@ -146,46 +146,22 @@ int main()
 		deltaT_CPU = (int)((newTime2 - newTime)*1000000);
 
 		// Render
-		setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);
-		updateUniforms();
+		cameraY += 2.0*(waterHeight - cameraY);
+		cameraPitch = -cameraPitch;
 
-		glClearColor(0.0, 0.0, 0.0, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		terrain.render((float)(1<<(3 - GRAPHICS_SETTING)));
-		playerAirplane.render(textureShader, colorShader, frameCount);
-		checkpoints.render(textureFullShader, colorFullShader);
-		startLine.render(textureShader, colorShader);
-		skybox.render();
+		renderPrepare(reflectionBuffer, reflectionRes);
+		renderScene(terrain, playerAirplane, checkpoints, startLine, skybox, textureShader, colorShader, textureFullShader, colorFullShader, reflectionRes, frameCount);
+		renderTransparents(boosts, textureFullShader, colorFullShader);
 
-		float reflectionCameraY = cameraY - 2.0*(cameraY - waterHeight);
-		float reflectionCameraPitch = -cameraPitch;
-		setViewMatrix(viewMatrix, reflectionCameraPitch, cameraYaw, cameraX, reflectionCameraY, cameraZ);
-		updateUniforms();
+		cameraY += 2.0*(waterHeight - cameraY);
+		cameraPitch = -cameraPitch;
 
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glBindFramebuffer(GL_FRAMEBUFFER, reflectionBuffer);
-		glViewport(0, 0, screenWidth/reflectionRes, screenHeight/reflectionRes);
-		glClearColor(0.0, 0.0, 0.0, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		terrain.render((float)((1<<(3 - GRAPHICS_SETTING))*reflectionRes));
-		playerAirplane.render(textureShader, colorShader, frameCount);
-		checkpoints.render(textureFullShader, colorFullShader);
-		startLine.render(textureShader, colorShader);
-		skybox.render();
-		// Must render transparant objects last
-		boosts.render(textureFullShader, colorFullShader);
-
-		setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);
-		updateUniforms();
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, screenWidth, screenHeight);
+		renderPrepare(0, 1);
+		renderScene(terrain, playerAirplane, checkpoints, startLine, skybox, textureShader, colorShader, textureFullShader, colorFullShader, 1, frameCount);
 		water.render(1.0);
-		// Must render transparant objects last
-		boosts.render(textureFullShader, colorFullShader);
+		renderTransparents(boosts, textureFullShader, colorFullShader);
 
-		if (VSYNC_ON) glFinish(); // So we get consistent FPS
-		glfwSwapBuffers(window.windowPtr);
+		renderFinish(window);
 
 		deltaT_GPU = (int)((glfwGetTime() - newTime2)*1000000);
 	}

@@ -2,7 +2,13 @@
 
 #include "types.h"
 #include "Model.h"
+#include "Terrain.h"
 #include "Airplane.h"
+#include "Checkpoints.h"
+#include "StartLine.h"
+#include "Skybox.h"
+#include "Boosts.h"
+#include "Window.h"
 
 extern float clamp(float number, float min, float max);
 extern void mat3Multiply(mat3 output, mat3 input1, mat3 input2);
@@ -18,6 +24,10 @@ extern void updateCamera(Airplane* airplane);
 extern unsigned char* loadRaw8(std::string fileName, unsigned int width, unsigned int height, unsigned int numChannels);
 extern unsigned short* loadRaw16(std::string fileName, unsigned int width, unsigned int height, unsigned int numChannels);
 extern void setupReflectionBuffer(unsigned int* texturePtr, unsigned int* bufferPtr, unsigned int resDivisor);
+extern void renderPrepare(unsigned int framebuffer, unsigned int resDivisor);
+extern void renderScene(Terrain terrain, Airplane playerAirplane, Checkpoints checkpoints, StartLine startLine, Skybox skybox, Shader textureShader, Shader colorShader, Shader textureFullShader, Shader colorFullShader, unsigned int resDivisor, unsigned int frameCount);
+extern void renderTransparents(Boosts boosts, Shader textureFullShader, Shader colorFullShader);
+extern void renderFinish(Window window);
 
 // Global Variables
 extern std::vector<Model*> models;

@@ -262,3 +262,34 @@ void setupReflectionBuffer(unsigned int* texturePtr, unsigned int* bufferPtr, un
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
+void renderPrepare(unsigned int framebuffer, unsigned int resDivisor)
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	glViewport(0, 0, screenWidth/resDivisor, screenHeight/resDivisor);
+
+	setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);
+	updateUniforms();
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void renderScene(Terrain terrain, Airplane playerAirplane, Checkpoints checkpoints, StartLine startLine, Skybox skybox, Shader textureShader, Shader colorShader, Shader textureFullShader, Shader colorFullShader, unsigned int resDivisor, unsigned int frameCount)
+{
+	terrain.render((float)((1<<(3 - GRAPHICS_SETTING))/resDivisor));
+	playerAirplane.render(textureShader, colorShader, frameCount);
+	checkpoints.render(textureFullShader, colorFullShader);
+	startLine.render(textureShader, colorShader);
+	skybox.render();
+}
+
+void renderTransparents(Boosts boosts, Shader textureFullShader, Shader colorFullShader)
+{
+	boosts.render(textureFullShader, colorFullShader);
+}
+
+void renderFinish(Window window)
+{
+	if (VSYNC_ON) glFinish(); // So we get consistent FPS
+	glfwSwapBuffers(window.windowPtr);
+}
