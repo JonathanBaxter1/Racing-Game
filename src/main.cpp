@@ -29,21 +29,10 @@ int main()
 	stbi_set_flip_vertically_on_load(false);
 	int mapWidth = 4096;
 	int mapHeight = 4096;
-	FILE *heightMapFile = fopen("textures/islandHeightMap.r16", "rb");
-	FILE *normalMapFile = fopen("textures/islandNormalMap.rgb8", "rb");
-	FILE *colorMapFile = fopen("textures/islandColorMap.rgb8", "rb");
-	unsigned int heightMapSize = 1*mapWidth*mapHeight*sizeof(unsigned short);
-	unsigned int normalMapSize = 3*mapWidth*mapHeight*sizeof(unsigned char);
-	unsigned int colorMapSize = 3*mapWidth*mapHeight*sizeof(unsigned char);
-	unsigned short* heightMap = (unsigned short*)malloc(heightMapSize);
-	unsigned char* normalMap = (unsigned char*)malloc(normalMapSize);
-	unsigned char* colorMap = (unsigned char*)malloc(colorMapSize);
-	fread(heightMap, heightMapSize, 1, heightMapFile);
-	fread(normalMap, normalMapSize, 1, normalMapFile);
-	fread(colorMap, colorMapSize, 1, colorMapFile);
-	fclose(heightMapFile);
-	fclose(normalMapFile);
-	fclose(colorMapFile);
+
+	unsigned short* heightMap = loadRaw16("islandHeightMap.r16", mapWidth, mapHeight, 1);
+	unsigned char* normalMap = loadRaw8("islandNormalMap.rgb8", mapWidth, mapHeight, 3);
+	unsigned char* colorMap = loadRaw8("islandColorMap.rgb8", mapWidth, mapHeight, 3);
 
 	Texture islandHeightMap(heightMap, mapWidth, mapHeight, 1, GL_CLAMP_TO_EDGE);
 	Texture islandNormalMap(normalMap, mapWidth, mapHeight, 3, GL_CLAMP_TO_EDGE);
@@ -101,31 +90,9 @@ int main()
 	checkpoints.add(2552.0, 70.0, 3352.0, M_PI*0.5, 0.0);
 	checkpoints.updateColors();
 
-	unsigned int reflectionTexture;
-	glGenTextures(1, &reflectionTexture);
-	glBindTexture(GL_TEXTURE_2D, reflectionTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth/2, screenHeight/2, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	unsigned int depthTexture;
-	glGenTextures(1, &depthTexture);
-	glBindTexture(GL_TEXTURE_2D, depthTexture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenWidth/2, screenWidth/2, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	unsigned int reflectionBuffer;
-	glGenFramebuffers(1, &reflectionBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, reflectionBuffer);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, reflectionTexture, 0);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
-	glDrawBuffer(GL_COLOR_ATTACHMENT0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	unsigned int reflectionTexture, reflectionBuffer;
+	unsigned int reflectionRes = 1<<(3 - GRAPHICS_SETTING); // divisor
+	setupReflectionBuffer(&reflectionTexture, &reflectionBuffer, reflectionRes);
 
 	Texture waterDuDvTexture("waterDuDv.png", 8, GL_REPEAT);
 	unsigned int waterTextureIDs[] = {reflectionTexture, waterDuDvTexture.ID, islandHeightMap.ID};
@@ -184,7 +151,7 @@ int main()
 
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		terrain.render(1.0);
+		terrain.render((float)(1<<(3 - GRAPHICS_SETTING)));
 		playerAirplane.render(textureShader, colorShader, frameCount);
 		checkpoints.render(textureFullShader, colorFullShader);
 		startLine.render(textureShader, colorShader);
@@ -197,10 +164,10 @@ int main()
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, reflectionBuffer);
-		glViewport(0, 0, screenWidth/2, screenHeight/2);
+		glViewport(0, 0, screenWidth/reflectionRes, screenHeight/reflectionRes);
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		terrain.render(2.0);
+		terrain.render((float)((1<<(3 - GRAPHICS_SETTING))*reflectionRes));
 		playerAirplane.render(textureShader, colorShader, frameCount);
 		checkpoints.render(textureFullShader, colorFullShader);
 		startLine.render(textureShader, colorShader);
@@ -223,11 +190,10 @@ int main()
 		deltaT_GPU = (int)((glfwGetTime() - newTime2)*1000000);
 	}
 
-	// cleanup framebuffers
-
 	free(heightMap);
 	free(normalMap);
 	free(colorMap);
+
 	glfwTerminate();
 	return 0;
 }

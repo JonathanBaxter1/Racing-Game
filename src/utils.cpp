@@ -213,3 +213,52 @@ void updateCamera(Airplane* airplane)
 	cameraY = airplane->object->y;
 	cameraZ = airplane->object->z - distanceFromAirplane*cos(airplane->object->yaw);
 }
+
+unsigned char* loadRaw8(std::string fileName, unsigned int width, unsigned int height, unsigned int numChannels)
+{
+	std::string path = "textures/" + fileName;
+	FILE *file = fopen(path.c_str(), "rb");
+	unsigned int fileSize = numChannels*width*height*sizeof(unsigned char);
+	unsigned char* data = (unsigned char*)malloc(fileSize);
+	fread(data, fileSize, 1, file);
+	fclose(file);
+	return data;
+}
+
+unsigned short* loadRaw16(std::string fileName, unsigned int width, unsigned int height, unsigned int numChannels)
+{
+	std::string path = "textures/" + fileName;
+	FILE *file = fopen(path.c_str(), "rb");
+	unsigned int fileSize = numChannels*width*height*sizeof(unsigned short);
+	unsigned short* data = (unsigned short*)malloc(fileSize);
+	fread(data, fileSize, 1, file);
+	fclose(file);
+	return data;
+}
+
+void setupReflectionBuffer(unsigned int* texturePtr, unsigned int* bufferPtr, unsigned int resDivisor)
+{
+	glGenTextures(1, texturePtr);
+	glBindTexture(GL_TEXTURE_2D, *texturePtr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth/resDivisor, screenHeight/resDivisor, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	unsigned int depthTexture;
+	glGenTextures(1, &depthTexture);
+	glBindTexture(GL_TEXTURE_2D, depthTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenWidth/resDivisor, screenWidth/resDivisor, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glGenFramebuffers(1, bufferPtr);
+	glBindFramebuffer(GL_FRAMEBUFFER, *bufferPtr);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, *texturePtr, 0);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}

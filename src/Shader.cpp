@@ -22,24 +22,20 @@ unsigned int Shader::createShaderProgram(char* vertexShader, char* tessControlSh
 
 	vs = compileShader(GL_VERTEX_SHADER, vertexShader);
 	glAttachShader(program, vs);
-	std::cout << "vertex" << std::endl;
 	if (tessControlShader[0] != '\0') {
 		tcs = compileShader(GL_TESS_CONTROL_SHADER, tessControlShader);
 		glAttachShader(program, tcs);
 	}
-	std::cout << "tcs" << std::endl;
 	if (tessEvalShader[0] != '\0') {
 		tes = compileShader(GL_TESS_EVALUATION_SHADER, tessEvalShader);
 		glAttachShader(program, tes);
 	}
-	std::cout << "tes" << std::endl;
 	if (geometryShader[0] != '\0') {
 		gs = compileShader(GL_GEOMETRY_SHADER, geometryShader);
 		glAttachShader(program, gs);
 	}
 	fs = compileShader(GL_FRAGMENT_SHADER, fragmentShader);
 	glAttachShader(program, fs);
-	std::cout << "fragment" << std::endl;
 
 	glLinkProgram(program);
 	glValidateProgram(program);

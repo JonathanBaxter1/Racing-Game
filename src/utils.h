@@ -15,6 +15,9 @@ extern vec3 normalize(vec3 vec);
 extern void eulerRotationMatrix3(mat3 matrix, float size, float yaw, float pitch, float roll);
 extern void eulerRotationMatrix4(mat4 matrix, float size, float yaw, float pitch, float roll, float x, float y, float z);
 extern void updateCamera(Airplane* airplane);
+extern unsigned char* loadRaw8(std::string fileName, unsigned int width, unsigned int height, unsigned int numChannels);
+extern unsigned short* loadRaw16(std::string fileName, unsigned int width, unsigned int height, unsigned int numChannels);
+extern void setupReflectionBuffer(unsigned int* texturePtr, unsigned int* bufferPtr, unsigned int resDivisor);
 
 // Global Variables
 extern std::vector<Model*> models;
