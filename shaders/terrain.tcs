@@ -29,10 +29,10 @@ void main()
 		vec4 screenPos3 = projection*view*worldPos3;
 		vec4 worldPos4 = gl_in[3].gl_Position;
 		vec4 screenPos4 = projection*view*worldPos4;
-		bool notInView1 = screenPos1.x/screenPos1.z < -1.2 || screenPos1.x/screenPos1.z > 1.2;
-		bool notInView2 = screenPos2.x/screenPos2.z < -1.2 || screenPos2.x/screenPos2.z > 1.2;
-		bool notInView3 = screenPos3.x/screenPos3.z < -1.2 || screenPos3.x/screenPos3.z > 1.2;
-		bool notInView4 = screenPos4.x/screenPos4.z < -1.2 || screenPos4.x/screenPos4.z > 1.2;
+		bool notInView1 = screenPos1.x/screenPos1.z < -1.2 || screenPos1.x/screenPos1.z > 1.2 || screenPos1.z < 0.0;
+		bool notInView2 = screenPos2.x/screenPos2.z < -1.2 || screenPos2.x/screenPos2.z > 1.2 || screenPos2.z < 0.0;
+		bool notInView3 = screenPos3.x/screenPos3.z < -1.2 || screenPos3.x/screenPos3.z > 1.2 || screenPos3.z < 0.0;
+		bool notInView4 = screenPos4.x/screenPos4.z < -1.2 || screenPos4.x/screenPos4.z > 1.2 || screenPos4.z < 0.0;
 		if (notInView1 && notInView2 && notInView3 && notInView4) {
 			resolution = 0.0;
 		}
