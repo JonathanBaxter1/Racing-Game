@@ -142,6 +142,7 @@ Terrain::Terrain(Shader shader, unsigned int textures[], unsigned int numTexture
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 	glBindVertexArray(0);
 	free(surfaceVertices);
+	glFinish();
 }
 
 void Terrain::render(float resolutionDivisor)

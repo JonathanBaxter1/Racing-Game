@@ -27,6 +27,7 @@ Window::Window()
 	glfwMakeContextCurrent(this->windowPtr);
 	glewInit();
 	glViewport(0, 0, screenWidth, screenHeight);
+	glFinish();
 
 	// Cursor setup
 	int cursorWidth, cursorHeight, cursorNumChannels;
@@ -50,6 +51,7 @@ Window::Window()
 	}
 	stbi_image_free(cursorImageData);
 
+	glfwSetCursorPos(this->windowPtr, (float)screenWidth/2.0, (float)screenHeight/2.0);
 	glfwSetCursorPosCallback(this->windowPtr, Window::mouseCallback);
 	setProjectionMatrix(projectionMatrix, 45.0, aspectRatio, 1.0, 100000.0);
 
@@ -71,9 +73,10 @@ void Window::mouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
 	static double lastX;
 	static double lastY;
-	static bool isFirstFrame = true;
-	if (isFirstFrame) {
-		isFirstFrame = false;
+	static unsigned int frameCount = 0;
+	if (frameCount < 4) {
+		lastX = xpos;
+		lastY = ypos;
 	} else {
 		double deltaX = (xpos - lastX)*MOUSE_SENSITIVITY;
 		double deltaY = (ypos - lastY)*MOUSE_SENSITIVITY;
@@ -96,6 +99,7 @@ void Window::mouseCallback(GLFWwindow* window, double xpos, double ypos)
 	}
 	lastX = xpos;
 	lastY = ypos;
+	frameCount++;
 }
 
 vec3 Window::handleInput(float deltaT)

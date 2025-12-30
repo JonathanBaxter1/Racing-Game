@@ -92,4 +92,5 @@ Shader::Shader(std::string vertexFileName, std::string tessControlFileName, std:
 	this->numShaders++;
 
 	this->ID = shader;
+	glFinish(); // Ensure shader is compiled
 }

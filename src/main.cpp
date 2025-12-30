@@ -8,14 +8,6 @@ int main()
 	std::cout<<glfwGetTime()<<" open window:"<<std::endl;
 	Window window;
 
-	// For profiling
-	float curTime = glfwGetTime();
-	float dT = 0.0;
-	int deltaT = 0;
-	int deltaT_CPU = 0;
-	int deltaT_GPU = 0;
-	unsigned int frameCount = 0;
-
 	std::cout<<glfwGetTime()<<" load skybox:"<<std::endl;
 	// https://opengameart.org/content/clouds-skybox-1
 	Texture skyboxUp("skyboxUp.bmp", 8, GL_CLAMP_TO_EDGE);
@@ -112,6 +104,14 @@ int main()
 	float lapTime = 0.0;
 
 	std::cout<<glfwGetTime()<<" end of setup"<<std::endl;
+
+	// For profiling
+	float curTime = glfwGetTime();
+	float dT = 0.0;
+	int deltaT = 0;
+	int deltaT_CPU = 0;
+	int deltaT_GPU = 0;
+	unsigned int frameCount = 0;
 	// Main Loop
 	while (!glfwWindowShouldClose(window.windowPtr)) {
 

@@ -64,6 +64,7 @@ void Texture::initFile(std::string fileName, std::string directory, unsigned int
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(tex1data);
 	this->ID = texture;
+	glFinish();
 }
 
 void Texture::initData(void* data, unsigned int width, unsigned int height, unsigned int numChannels, unsigned int bits, GLint param)
