@@ -10,7 +10,17 @@ int main()
 
 	std::cout<<glfwGetTime()<<" load skybox:"<<std::endl;
 	// https://opengameart.org/content/clouds-skybox-1
+	std::cout<<glfwGetTime()<<" end of setup"<<std::endl;
+
+	Texture loadingTex("loading.png", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxUp("skyboxUp.bmp", 8, GL_CLAMP_TO_EDGE);
+	glViewport(0, 0, screenWidth, screenHeight);
+	glClearColor(1.0, 0.0, 1.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glFinish();
+	glfwSwapBuffers(window.windowPtr);
+
+
 	Texture skyboxDown("skyboxDown.bmp", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxNorth("skyboxNorth.bmp", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxEast("skyboxEast.bmp", 8, GL_CLAMP_TO_EDGE);
@@ -102,8 +112,6 @@ int main()
 
 	float lapStartTime = 0.0;
 	float lapTime = 0.0;
-
-	std::cout<<glfwGetTime()<<" end of setup"<<std::endl;
 
 	// For profiling
 	float curTime = glfwGetTime();
