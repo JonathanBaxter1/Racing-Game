@@ -149,8 +149,8 @@ void Terrain::render(float resolutionDivisor)
 {
 	glUseProgram(this->shader);
 	glBindVertexArray(this->vao);
-	int resolutionDivisorLoc = glGetUniformLocation(this->shader, "resolutionDivisor");
-	glUniform1f(resolutionDivisorLoc, resolutionDivisor);
+	int graphicsSettingLoc = glGetUniformLocation(this->shader, "graphicsSetting");
+	glUniform1f(graphicsSettingLoc, GRAPHICS_SETTING - resolutionDivisor + 1.0);
 
 	for (unsigned int i = 0; i < numTextures; i++) {
 		glActiveTexture(GL_TEXTURE0 + i);

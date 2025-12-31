@@ -8,7 +8,7 @@
 #define MOUSE_SENSITIVITY 0.001
 #define MOVEMENT_SPEED 90.0 // M/s
 #define TERRAIN_MAX_TEXTURES 8
-#define GRAPHICS_SETTING 3 // 1 = low, 2 = medium, 3 = high
+#define GRAPHICS_SETTING 2 // 1 = low, 2 = medium, 3 = high
 #define CHECKPOINT_RADIUS 15.0
 #define BOOST_RADIUS 10.0
 #define START_LINE_SIZE 4.0

@@ -102,7 +102,12 @@ int main()
 
 	std::cout<<glfwGetTime()<<" setup reflection buffer:"<<std::endl;
 	unsigned int reflectionTexture, reflectionBuffer;
-	unsigned int reflectionRes = 1<<(3 - GRAPHICS_SETTING); // divisor
+	unsigned int reflectionRes;
+	if (GRAPHICS_SETTING == 3) {
+		reflectionRes = 1;
+	} else {
+		reflectionRes = 2;
+	}
 	setupReflectionBuffer(&reflectionTexture, &reflectionBuffer, reflectionRes);
 
 	Texture waterDuDvTexture("waterDuDv.png", 8, GL_REPEAT);

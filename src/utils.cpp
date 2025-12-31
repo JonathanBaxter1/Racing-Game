@@ -207,6 +207,7 @@ void eulerRotationMatrix4(mat4 matrix, float size, float yaw, float pitch, float
 
 void updateCamera(Airplane* airplane)
 {
+	cameraPitch = 0.0;
 	cameraYaw = M_PI + airplane->object->yaw;
 	float distanceFromAirplane = (30.0 + airplane->speed*0.05);
 	cameraX = airplane->object->x + distanceFromAirplane*sin(airplane->object->yaw);
@@ -276,7 +277,7 @@ void renderPrepare(unsigned int framebuffer, unsigned int resDivisor)
 
 void renderScene(Terrain terrain, Airplane playerAirplane, Checkpoints checkpoints, StartLine startLine, Skybox skybox, Shader textureShader, Shader colorShader, Shader textureFullShader, Shader colorFullShader, unsigned int resDivisor, unsigned int frameCount)
 {
-	terrain.render((float)((1<<(3 - GRAPHICS_SETTING))/resDivisor));
+	terrain.render((float)resDivisor);
 	playerAirplane.render(textureShader, colorShader, frameCount);
 	checkpoints.render(textureFullShader, colorFullShader);
 	startLine.render(textureShader, colorShader);

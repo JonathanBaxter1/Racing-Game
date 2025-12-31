@@ -15,14 +15,13 @@ out vec4 FragColor;
 
 void main()
 {
-//	vec2 texCoord;
-	vec3 norm = normalize(normal);
+	vec3 norm = normal;
 	float nx = abs(norm.x);
 	float ny = abs(norm.y);
 	float nz = abs(norm.z);
-	vec2 texCoordX = coord.yz/30.0;
-	vec2 texCoordY = coord.xz/30.0;
-	vec2 texCoordZ = coord.xy/30.0;
+	vec2 texCoordX = coord.yz;
+	vec2 texCoordY = coord.xz;
+	vec2 texCoordZ = coord.xy;
 
 	vec3 texAxis;
 	texAxis.x = clamp((nx - ny*0.9)*5.0, 0.0, 1.0);
@@ -33,25 +32,25 @@ void main()
 	texAxis.z *= clamp((nz - ny*0.9)*5.0, 0.0, 1.0);
 
 	texAxis = texAxis/(texAxis.x + texAxis.y + texAxis.z);
-	vec3 texColorX;
-	vec3 texColorY;
-	vec3 texColorZ;
+	vec3 texColorX = vec3(0.0, 0.0, 0.0);
+	vec3 texColorY = vec3(0.0, 0.0, 0.0);
+	vec3 texColorZ = vec3(0.0, 0.0, 0.0);
 	if (color == vec3(1.0, 0.0, 0.0)) {
-		texColorX = vec3(texture(snowTex, texCoordX));
-		texColorY = vec3(texture(snowTex, texCoordY));
-		texColorZ = vec3(texture(snowTex, texCoordZ));
+		if (texAxis.x > 0.0) texColorX = vec3(texture(snowTex, texCoordX));
+		if (texAxis.y > 0.0) texColorY = vec3(texture(snowTex, texCoordY));
+		if (texAxis.z > 0.0) texColorZ = vec3(texture(snowTex, texCoordZ));
 	} else if (color == vec3(0.0, 1.0, 0.0)) {
-		texColorX = vec3(texture(grassTex, texCoordX));
-		texColorY = vec3(texture(grassTex, texCoordY));
-		texColorZ = vec3(texture(grassTex, texCoordZ));
+		if (texAxis.x > 0.0) texColorX = vec3(texture(grassTex, texCoordX));
+		if (texAxis.y > 0.0) texColorY = vec3(texture(grassTex, texCoordY));
+		if (texAxis.z > 0.0) texColorZ = vec3(texture(grassTex, texCoordZ));
 	} else if (color == vec3(0.0, 0.0, 1.0)) {
-		texColorX = vec3(texture(stoneTex, texCoordX));
-		texColorY = vec3(texture(stoneTex, texCoordY));
-		texColorZ = vec3(texture(stoneTex, texCoordZ));
+		if (texAxis.x > 0.0) texColorX = vec3(texture(stoneTex, texCoordX));
+		if (texAxis.y > 0.0) texColorY = vec3(texture(stoneTex, texCoordY));
+		if (texAxis.z > 0.0) texColorZ = vec3(texture(stoneTex, texCoordZ));
 	} else {
-		texColorX = vec3(texture(snowTex, texCoordX)*color.r + texture(grassTex, texCoordX)*color.g+ texture(stoneTex, texCoordX)*color.b);
-		texColorY = vec3(texture(snowTex, texCoordY)*color.r + texture(grassTex, texCoordY)*color.g+ texture(stoneTex, texCoordY)*color.b);
-		texColorZ = vec3(texture(snowTex, texCoordZ)*color.r + texture(grassTex, texCoordZ)*color.g+ texture(stoneTex, texCoordZ)*color.b);
+		if (texAxis.x > 0.0) texColorX = vec3(texture(snowTex, texCoordX)*color.r + texture(grassTex, texCoordX)*color.g+ texture(stoneTex, texCoordX)*color.b);
+		if (texAxis.y > 0.0) texColorY = vec3(texture(snowTex, texCoordY)*color.r + texture(grassTex, texCoordY)*color.g+ texture(stoneTex, texCoordY)*color.b);
+		if (texAxis.z > 0.0) texColorZ = vec3(texture(snowTex, texCoordZ)*color.r + texture(grassTex, texCoordZ)*color.g+ texture(stoneTex, texCoordZ)*color.b);
 	}
 	vec3 texColor = texColorX*texAxis.x + texColorY*texAxis.y + texColorZ*texAxis.z;
 

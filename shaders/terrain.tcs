@@ -5,7 +5,7 @@ layout (vertices = 4) out;
 uniform vec3 viewPos;
 uniform mat4 view;
 uniform mat4 projection;
-uniform float resolutionDivisor;
+uniform float graphicsSetting;
 
 flat in float resolutionDivisor2[];
 
@@ -17,7 +17,18 @@ void main()
 		float cameraDistance = length(viewPos - gl_in[0].gl_Position.xyz);
 		float minResolution = 4.0;
 		float maxResolution = 64.0;
-		float resolution = 8192.0*2.0/cameraDistance/resolutionDivisor/resolutionDivisor2[0];
+		float resolution;
+		if (graphicsSetting == 0.0) {
+			resolution = 4096.0/cameraDistance/resolutionDivisor2[0];
+			maxResolution = 32.0;
+		} else if (graphicsSetting == 1.0) {
+			resolution = 8192.0/cameraDistance/resolutionDivisor2[0];
+			maxResolution = 32.0;
+		} else if (graphicsSetting == 2.0) {
+			resolution = 8192.0*2.0/cameraDistance/resolutionDivisor2[0];
+		} else { // 3.0
+			resolution = maxResolution/resolutionDivisor2[0];
+		}
 		resolution = clamp(resolution, minResolution, maxResolution);
 		resolution = pow(2.0, ceil(log2(resolution)));
 
