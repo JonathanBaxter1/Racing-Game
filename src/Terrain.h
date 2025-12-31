@@ -9,16 +9,17 @@ class Terrain
 private:
 	unsigned int vao;
 	unsigned int vbo;
-	unsigned int ibo;
+	unsigned int occluderVao;
+	unsigned int occluderVbo;
 	unsigned int shader;
+	unsigned int occluderShader;
 	unsigned int textures[TERRAIN_MAX_TEXTURES];
 	unsigned int numTextures;
 	unsigned int patchRes;
 	unsigned int numPatches;
-	unsigned int surfaceVerticesSize;
 
 public:
 
-	Terrain(Shader shader, unsigned int textures[], unsigned int numTextures, float mapSize, unsigned int patchRes, unsigned short* heightMap, unsigned char* normalMap);
+	Terrain(Shader shader, Shader occluderShader, unsigned int textures[], unsigned int numTextures, float mapSize, unsigned int patchRes, unsigned short* heightMap, unsigned char* normalMap);
 	void render(float resolutionDivisor);
 };

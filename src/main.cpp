@@ -10,7 +10,13 @@ int main()
 
 	std::cout<<glfwGetTime()<<" load skybox:"<<std::endl;
 	// https://opengameart.org/content/clouds-skybox-1
-	std::cout<<glfwGetTime()<<" end of setup"<<std::endl;
+	std::cout<<glfwGetTime()<<" compile shaders:"<<std::endl;
+	Shader textureShader("texture.vs", "", "", "", "texture.fs");
+	Shader textureFullShader("texture.vs", "", "", "", "textureFull.fs");
+	Shader colorShader("color.vs", "", "", "", "color.fs");
+	Shader colorFullShader("color.vs", "", "", "", "colorFull.fs");
+	Shader colorFullShader2("colorFull.vs", "", "", "", "colorFull.fs");
+
 
 	Texture loadingTex("loading.png", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxUp("skyboxUp.bmp", 8, GL_CLAMP_TO_EDGE);
@@ -53,13 +59,7 @@ int main()
 	std::cout<<glfwGetTime()<<" compile shaders:"<<std::endl;
 
 	Shader terrainShader("terrain.vs", "terrain.tcs", "terrain.tes", "", "terrain.fs");
-	Terrain terrain(terrainShader, terrainTextureIDs, sizeof(terrainTextureIDs)/sizeof(unsigned int), 4096.0, 64, heightMap, normalMap);
-
-	std::cout<<glfwGetTime()<<" compile shaders:"<<std::endl;
-	Shader textureShader("texture.vs", "", "", "", "texture.fs");
-	Shader textureFullShader("texture.vs", "", "", "", "textureFull.fs");
-	Shader colorShader("color.vs", "", "", "", "color.fs");
-	Shader colorFullShader("color.vs", "", "", "", "colorFull.fs");
+	Terrain terrain(terrainShader, colorFullShader2, terrainTextureIDs, sizeof(terrainTextureIDs)/sizeof(unsigned int), 4096.0, 64, heightMap, normalMap);
 
 	std::cout<<glfwGetTime()<<" load models:"<<std::endl;
 	Model airplaneModel("airplane/airplane.obj");
@@ -112,8 +112,8 @@ int main()
 
 	Texture waterDuDvTexture("waterDuDv.png", 8, GL_REPEAT);
 	unsigned int waterTextureIDs[] = {reflectionTexture, waterDuDvTexture.ID, islandHeightMap.ID};
-	Shader waterShader("water.vs", "water.tcs", "water.tes", "", "water.fs");
-	Terrain water(waterShader, waterTextureIDs, sizeof(waterTextureIDs)/sizeof(unsigned int), 100000.0, 32, NULL, NULL);
+	Shader waterShader("water.vs", "", "", "", "water.fs");
+	Water water(waterShader, waterTextureIDs, sizeof(waterTextureIDs)/sizeof(unsigned int), 100000.0, 64);
 
 	float lapStartTime = 0.0;
 	float lapTime = 0.0;
@@ -139,7 +139,7 @@ int main()
 
 
 		// Game logic
-		glfwPollEvents();
+		glfwPollEvents(); // 97% of CPU time goes to this function lol
 		vec3 controls = window.handleInput(dT);
 		if (!Window::isSpectate) {
 			playerAirplane.update(dT, controls);
@@ -181,7 +181,7 @@ int main()
 
 		renderPrepare(0, 1);
 		renderScene(terrain, playerAirplane, checkpoints, startLine, skybox, textureShader, colorShader, textureFullShader, colorFullShader, 1, frameCount);
-		water.render(1.0);
+		water.render();
 		renderTransparents(boosts, textureFullShader, colorFullShader);
 
 		renderFinish(window);
