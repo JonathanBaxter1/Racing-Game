@@ -1,9 +1,10 @@
 #version 430
-out vec4 FragColor;
 
 uniform vec3 diffuseColor;
 
+out vec4 FragColor;
+
 void main()
 {
-	FragColor = vec4(diffuseColor, 1.0);
+	FragColor = vec4(diffuseColor.rgb, 1.0);
 }
