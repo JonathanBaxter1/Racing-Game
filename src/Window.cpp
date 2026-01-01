@@ -60,7 +60,8 @@ Window::Window()
 	// OpenGL settings
 	glfwSwapInterval(VSYNC_ON);
 	glShadeModel(GL_SMOOTH);
-	glEnable(GL_BLEND);
+//	glEnable(GL_BLEND);
+	glDisable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_CLIP_DISTANCE0);
 	glEnable(GL_DEPTH_TEST);

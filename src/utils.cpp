@@ -237,6 +237,18 @@ unsigned short* loadRaw16(std::string fileName, unsigned int width, unsigned int
 	return data;
 }
 
+unsigned char* R16ToRGB8(unsigned short* r16Data, unsigned int width, unsigned int height)
+{
+	size_t rgb8DataSize = width*height*3*sizeof(unsigned char);
+	unsigned char* rgb8Data = (unsigned char*)malloc(rgb8DataSize);
+	for (unsigned int i = 0; i < width*height; i++) {
+		rgb8Data[i*3 + 0] = (unsigned char)(r16Data[i]>>8);
+		rgb8Data[i*3 + 1] = (unsigned char)(r16Data[i]&255u);
+		rgb8Data[i*3 + 2] = 0;
+	}
+	return rgb8Data;
+}
+
 void setupReflectionBuffer(unsigned int* texturePtr, unsigned int* bufferPtr, unsigned int resDivisor)
 {
 	glGenTextures(1, texturePtr);

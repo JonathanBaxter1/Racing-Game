@@ -1,13 +1,12 @@
 #pragma once
 
-#define VSYNC_ON 1
+#define VSYNC_ON 0
 #define GAME_DEBUG true
 #define MAX_SHADERS 256
 #define MAX_SHADER_SIZE 8192 // bytes
 #define CURSOR_ENABLED false
 #define MOUSE_SENSITIVITY 0.001
 #define MOVEMENT_SPEED 90.0 // M/s
-#define TERRAIN_MAX_TEXTURES 8
 #define WATER_MAX_TEXTURES 8
 #define GRAPHICS_SETTING 2 // 1 = low, 2 = medium, 3 = high
 #define CHECKPOINT_RADIUS 15.0

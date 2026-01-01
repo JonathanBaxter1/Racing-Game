@@ -15,8 +15,7 @@ int main()
 	Shader textureFullShader("texture.vs", "", "", "", "textureFull.fs");
 	Shader colorShader("color.vs", "", "", "", "color.fs");
 	Shader colorFullShader("color.vs", "", "", "", "colorFull.fs");
-	Shader colorFullShader2("colorFull.vs", "", "", "", "colorFull.fs");
-
+	Shader depthShader("colorFull.vs", "", "", "", "depth.fs");
 
 	Texture loadingTex("loading.png", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxUp("skyboxUp.bmp", 8, GL_CLAMP_TO_EDGE);
@@ -45,21 +44,25 @@ int main()
 	unsigned char* normalMap = loadRaw8("islandNormalMap.rgb8", mapWidth, mapHeight, 3);
 	unsigned char* colorMap = loadRaw8("islandColorMap.rgb8", mapWidth, mapHeight, 3);
 	std::cout<<glfwGetTime()<<" island maps to GPU:"<<std::endl;
+	unsigned char* heightMapRGB8 = R16ToRGB8(heightMap, mapWidth, mapHeight);
 
+	void* mapData[] = {(void*)heightMapRGB8, (void*)normalMap, (void*)colorMap};
+	unsigned int numMapData = sizeof(mapData)/sizeof(void*);
+	TextureArray terrainMaps(mapData, numMapData, mapWidth, mapHeight, 3, 8, GL_CLAMP_TO_EDGE);
 	Texture islandHeightMap(heightMap, mapWidth, mapHeight, 1, GL_CLAMP_TO_EDGE);
-	Texture islandNormalMap(normalMap, mapWidth, mapHeight, 3, GL_CLAMP_TO_EDGE);
-	Texture islandColorMap(colorMap, mapWidth, mapHeight, 3, GL_CLAMP_TO_EDGE);
 
 	std::cout<<glfwGetTime()<<" load stone/grass/snow:"<<std::endl;
 	stbi_set_flip_vertically_on_load(true);
-	Texture stoneTexture("stone.jpg", 8, GL_REPEAT);
-	Texture grassTexture("grassTex.jpg", 8, GL_REPEAT);
-	Texture snowTexture("snowTex.png", 8, GL_REPEAT);
-	unsigned int terrainTextureIDs[] = {islandHeightMap.ID, islandNormalMap.ID, islandColorMap.ID, stoneTexture.ID, grassTexture.ID, snowTexture.ID};
-	std::cout<<glfwGetTime()<<" compile shaders:"<<std::endl;
+	std::string terrainTextureFiles[] = {"stone2.png", "grass2.png", "snow2.png"};
+	unsigned int numTerrainTextures = sizeof(terrainTextureFiles)/sizeof(std::string);
+	TextureArray terrainTextures(terrainTextureFiles, numTerrainTextures, 3, 8, GL_REPEAT);
 
 	Shader terrainShader("terrain.vs", "terrain.tcs", "terrain.tes", "", "terrain.fs");
-	Terrain terrain(terrainShader, colorFullShader2, terrainTextureIDs, sizeof(terrainTextureIDs)/sizeof(unsigned int), 4096.0, 64, heightMap, normalMap);
+	Terrain terrain(terrainShader, depthShader, terrainMaps, terrainTextures, 4096.0, 64, heightMap, normalMap);
+	// Wait to free heightMap so it can be used for collision detection
+	free(normalMap);
+	free(colorMap);
+	free(heightMapRGB8);
 
 	std::cout<<glfwGetTime()<<" load models:"<<std::endl;
 	Model airplaneModel("airplane/airplane.obj");
@@ -190,8 +193,6 @@ int main()
 	}
 
 	free(heightMap);
-	free(normalMap);
-	free(colorMap);
 
 	glfwTerminate();
 	return 0;

@@ -19,6 +19,7 @@
 #include "utils.h"
 
 #include "Texture.h"
+#include "TextureArray.h"
 #include "Shader.h"
 #include "Window.h"
 #include "Mesh.h"
