@@ -6,7 +6,7 @@ unsigned int Shader::shaders[MAX_SHADERS] = {0};
 bool Window::isSpectate = false;
 float Window::desiredPitch = 0.0;
 float Window::desiredTurnAngle = 0.0;
-float Window::desiredSpeed = 50.0;
+float Window::desiredSpeed = 160.0;
 
 std::vector<Model*> models;
 int screenWidth;
@@ -320,10 +320,12 @@ void renderPrepare(unsigned int framebuffer, unsigned int resDivisor)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void renderScene(Terrain terrain, Airplane playerAirplane, Checkpoints checkpoints, StartLine startLine, Skybox skybox, Shader textureShader, Shader colorShader, Shader textureFullShader, Shader colorFullShader, unsigned int resDivisor, unsigned int frameCount)
+void renderScene(Terrain terrain, Airplane playerAirplane, Airplane aiAirplane1, Airplane aiAirplane2, Checkpoints checkpoints, StartLine startLine, Skybox skybox, Shader textureShader, Shader colorShader, Shader textureFullShader, Shader colorFullShader, unsigned int resDivisor, unsigned int frameCount)
 {
 	terrain.render((float)resDivisor);
 	playerAirplane.render(textureShader, colorShader, frameCount);
+	aiAirplane1.render(textureShader, colorShader, frameCount);
+	aiAirplane2.render(textureShader, colorShader, frameCount);
 	checkpoints.render(textureFullShader, colorFullShader);
 	startLine.render(textureShader, colorShader);
 	skybox.render();

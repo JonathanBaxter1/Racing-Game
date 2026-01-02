@@ -29,6 +29,7 @@
 #include "Water.h"
 #include "Skybox.h"
 #include "Airplane.h"
+#include "AiAirplane.h"
 #include "Boosts.h"
 #include "Checkpoints.h"
 #include "StartLine.h"

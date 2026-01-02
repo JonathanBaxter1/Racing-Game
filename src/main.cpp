@@ -68,6 +68,12 @@ int main()
 	Model airplaneModel("airplane/airplane.obj");
 	Object playerAirplaneObj(&airplaneModel, 2188.0, 70.0, 3351.0, 1.0, M_PI/2.0, 0.0, 0.0);
 	Airplane playerAirplane(&playerAirplaneObj);
+	Object aiAirplane1Obj(&airplaneModel, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	Object aiAirplane2Obj(&airplaneModel, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	AiAirplane aiAirplane1(&aiAirplane1Obj);
+	AiAirplane aiAirplane2(&aiAirplane2Obj);
+	aiAirplane1.setPersonality(250);
+	aiAirplane2.setPersonality(230);
 
 	Model startLineModel("startFinishLine/startFinishLine.obj");
 	Object startLineObj(&startLineModel, 1865.0, 90.0, 3349.0, START_LINE_SIZE, M_PI*0.5, 0.0, 0.0);
@@ -143,10 +149,11 @@ int main()
 		glfwPollEvents(); // 97% of CPU time goes to this function lol
 		vec3 controls = window.handleInput(dT);
 		if (!Window::isSpectate) {
+			aiAirplane1.update(dT, checkpoints);
+			aiAirplane2.update(dT, checkpoints);
 			playerAirplane.playerUpdate(dT, controls);
 			updateCamera(&playerAirplane);
-		} else {
-			playerAirplane.aiUpdate(dT, checkpoints);
+//			updateCamera(&aiAirplane2);
 		}
 		playerAirplane.checkCollision(waterHeight, heightMap, mapWidth, mapHeight, 274.0);
 
@@ -176,14 +183,14 @@ int main()
 		cameraPitch = -cameraPitch;
 
 		renderPrepare(reflectionBuffer, reflectionRes);
-		renderScene(terrain, playerAirplane, checkpoints, startLine, skybox, textureShader, colorShader, textureFullShader, colorFullShader, reflectionRes, frameCount);
+		renderScene(terrain, playerAirplane, aiAirplane1, aiAirplane2, checkpoints, startLine, skybox, textureShader, colorShader, textureFullShader, colorFullShader, reflectionRes, frameCount);
 		renderTransparents(boosts, textureFullShader, colorFullShader);
 
 		cameraY += 2.0*(waterHeight - cameraY);
 		cameraPitch = -cameraPitch;
 
 		renderPrepare(0, 1);
-		renderScene(terrain, playerAirplane, checkpoints, startLine, skybox, textureShader, colorShader, textureFullShader, colorFullShader, 1, frameCount);
+		renderScene(terrain, playerAirplane, aiAirplane1, aiAirplane2, checkpoints, startLine, skybox, textureShader, colorShader, textureFullShader, colorFullShader, 1, frameCount);
 		water.render();
 		renderTransparents(boosts, textureFullShader, colorFullShader);
 
