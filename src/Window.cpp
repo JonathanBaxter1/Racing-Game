@@ -27,7 +27,6 @@ Window::Window()
 	glfwMakeContextCurrent(this->windowPtr);
 	glewInit();
 	glViewport(0, 0, screenWidth, screenHeight);
-	glFinish();
 
 	// Cursor setup
 	int cursorWidth, cursorHeight, cursorNumChannels;

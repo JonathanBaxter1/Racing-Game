@@ -71,7 +71,6 @@ TextureArray::TextureArray(std::string fileNames[], unsigned int numTextures, un
 	}
 	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 	this->ID = textureArray;
-	glFinish();
 }
 
 TextureArray::TextureArray(void* textureData[], unsigned int numTextures, unsigned int width, unsigned int height, unsigned int numChannels, unsigned int bits, GLint param)
@@ -112,7 +111,6 @@ TextureArray::TextureArray(void* textureData[], unsigned int numTextures, unsign
 	}
 	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 	this->ID = textureArray;
-	glFinish();
 }
 
 unsigned int TextureArray::genTextureID()
