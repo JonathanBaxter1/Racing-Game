@@ -8,14 +8,13 @@ Airplane::Airplane(Object* object)
 
 void Airplane::aiUpdate(float deltaT, Checkpoints checkpoints)
 {
-	static float t = 0.0;
-	static unsigned int curCheckpoint = 0;
+	static float t = 0.05;
+	static unsigned int curCheckpoint = 16;
+
+	float aiSpeed = 250.0;
 
 	unsigned int numCheckpoints = checkpoints.objects.size();
 	unsigned int nextCheckpoint = (curCheckpoint + 1)%numCheckpoints;
-	unsigned int nextCheckpoint2 = (curCheckpoint + 2)%numCheckpoints;
-	unsigned int nextCheckpoint3 = (curCheckpoint + 3)%numCheckpoints;
-	unsigned int lastCheckpoint = (curCheckpoint + numCheckpoints - 1)%numCheckpoints;
 	float x1 = checkpoints.objects[curCheckpoint].x;
 	float y1 = checkpoints.objects[curCheckpoint].y;
 	float z1 = checkpoints.objects[curCheckpoint].z;
@@ -24,8 +23,8 @@ void Airplane::aiUpdate(float deltaT, Checkpoints checkpoints)
 	float y2 = checkpoints.objects[nextCheckpoint].y;
 	float z2 = checkpoints.objects[nextCheckpoint].z;
 	float angle2 = -checkpoints.objects[nextCheckpoint].yaw;
-	float mag1 = checkpoints.tangentMags[curCheckpoint];
-	float mag2 = checkpoints.tangentMags[nextCheckpoint];
+	float mag1 = checkpoints.tangentMagsStart[curCheckpoint];
+	float mag2 = checkpoints.tangentMagsEnd[curCheckpoint];
 
 	// Hermite Spline Calcs
 	float dx1 = mag1*sin(angle1);
@@ -58,18 +57,18 @@ void Airplane::aiUpdate(float deltaT, Checkpoints checkpoints)
 	float ddx = ddh00*x1 + ddh10*dx1 + ddh01*x2 + ddh11*dx2;
 	float ddz = ddh00*z1 + ddh10*dz1 + ddh01*z2 + ddh11*dz2;
 
-	float cross = dx * ddz - dz * ddx;
+	float cross = dx*ddz - dz*ddx;
 	float denom = pow(dx*dx + dz*dz, 1.5);
-	float yawRate = speed * cross / denom;
+	float yawRate = aiSpeed*cross/denom;
 
 	this->object->x = x;
 	this->object->y = y;
 	this->object->z = z;
-	this->object->roll = yawRate;
+	this->object->roll = (this->object->roll*(1.0 - deltaT*6.0) + yawRate*deltaT*6.0);
 	this->object->pitch = -atan(dy/sqrt(dx*dx + dz*dz));
 	this->object->yaw = atan2(dz, dx) - M_PI*0.5;
 	this->object->update();
-	t += deltaT*100.0/dl;
+	t += deltaT*aiSpeed/dl;
 	if (t >= 1.0) {
 		t = 0.0;
 		curCheckpoint++;

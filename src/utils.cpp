@@ -339,20 +339,3 @@ void renderFinish(Window window)
 	if (VSYNC_ON) glFinish(); // So we get consistent FPS
 	glfwSwapBuffers(window.windowPtr);
 }
-
-vec3 catmullRomTangent(vec3 p0, vec3 p1, vec3 p2, vec3 p3, float alpha)
-{
-	float t0 = 0.0f;
-	float t1 = t0 + pow(sqrt(distance(p1, p0)), alpha);
-	float t2 = t1 + pow(sqrt(distance(p2, p1)), alpha);
-	float t3 = t2 + pow(sqrt(distance(p3, p2)), alpha);
-
-	float num1 = (t1 - t0)/(t2 - t1);
-	float num2 = (t2 - t1)/(t1 - t0);
-	vec3 m1;
-	m1.x = ((p2.x - p1.x)*num1 + (p1.x - p0.x)*num2)*0.5;
-	m1.y = ((p2.y - p1.y)*num1 + (p1.y - p0.y)*num2)*0.5;
-	m1.z = ((p2.z - p1.z)*num1 + (p1.z - p0.z)*num2)*0.5;
-
-	return m1;
-}

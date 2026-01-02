@@ -78,29 +78,27 @@ int main()
 	boosts.add(1512.0, 60.0, 1630.0, 0.0, 0.0);
 	boosts.add(1807.0, 70.0, 606.0, M_PI*0.5, 0.0);
 	boosts.add(1875.0, 85.0, 2950.0, M_PI*0.35, 0.0);
-	boosts.add(2295.0, 60.0, 3308.0, M_PI*0.5, 0.0);
+	boosts.add(2500.0, 60.0, 3370.0, M_PI*0.5, 0.0);
 
 	Model checkpointModel("checkpoint/checkpoint.obj");
 	Checkpoints checkpoints(&checkpointModel, CHECKPOINT_RADIUS);
-	checkpoints.add(1142.0, 70.0, 3244.0, M_PI*0.75, 600.0);
-	checkpoints.add(956.0, 70.0, 2733.0, M_PI*1.0, 250.0);
-	checkpoints.add(1035.0, 70.0, 2505.0, -M_PI*0.75, 300.0);
-	checkpoints.add(1314.0, 70.0, 2291.0, -M_PI*0.75, 200.0);
-	checkpoints.add(1400.0, 70.0, 2064.0, -M_PI*0.75, 500.0);
-	checkpoints.add(1541.0, 80.0, 715.0, -M_PI*0.75, 800.0);
-	checkpoints.add(2360.0, 80.0, 678.0, -M_PI*0.4, 300.0);
-	checkpoints.add(2830.0, 70.0, 930.0, -M_PI*0.25, 300.0);
-	checkpoints.add(2892.0, 70.0, 1332.0, M_PI*0.2, 300.0);
-	checkpoints.add(2436.0, 80.0, 1462.0, M_PI*0.6, 300.0);
-	checkpoints.add(1956.0, 70.0, 1403.0, M_PI*0.3, 300.0);
-	checkpoints.add(1761.0, 70.0, 1572.0, M_PI*0.1, 300.0);
-	checkpoints.add(1815.0, 70.0, 1970.0, -M_PI*0.25, 300.0);
-	checkpoints.add(1890.0, 80.0, 2184.0, 0.0, 300.0);
-	checkpoints.add(1299.0, 70.0, 2757.0, 0.0, 300.0);
-	checkpoints.add(1552.0, 70.0, 3034.0, -M_PI*0.5, 300.0);
-	checkpoints.add(2514.0, 75.0, 2829.0, -M_PI*0.5, 300.0);
-	checkpoints.add(2862.0, 75.0, 2986.0, 0.0, 300.0);
-	checkpoints.add(2552.0, 70.0, 3352.0, M_PI*0.5, 300.0);
+	checkpoints.add(1142.0, 70.0, 3244.0, M_PI*0.75, 600.0, 300.0);
+	checkpoints.add(956.0, 70.0, 2733.0, M_PI*1.0, 150.0, 300.0);
+	checkpoints.add(1035.0, 70.0, 2505.0, -M_PI*0.75, 300.0, 300.0);
+	checkpoints.add(1314.0, 70.0, 2291.0, -M_PI*0.75, 1600.0, 1200.0);
+	checkpoints.add(1541.0, 80.0, 715.0, -M_PI*0.75, 600.0, 900.0);
+	checkpoints.add(2360.0, 80.0, 678.0, -M_PI*0.4, 600.0, 400.0);
+	checkpoints.add(2830.0, 70.0, 930.0, -M_PI*0.25, 500.0, 400.0);
+	checkpoints.add(2892.0, 70.0, 1332.0, M_PI*0.2, 400.0, 600.0);
+	checkpoints.add(2436.0, 80.0, 1462.0, M_PI*0.6, 600.0, 1300.0);
+	checkpoints.add(1761.0, 70.0, 1572.0, M_PI*0.1, 500.0, 500.0);
+	checkpoints.add(1830.0, 70.0, 1970.0, -M_PI*0.1, 600.0, 500.0);
+	checkpoints.add(1750.0, 80.0, 2450.0, M_PI*0.35, 600.0, 900.0);
+	checkpoints.add(1299.0, 70.0, 2757.0, 0.0, 500.0, 500.0);
+	checkpoints.add(1552.0, 70.0, 3034.0, -M_PI*0.5, 700.0, 1000.0); //g
+	checkpoints.add(2514.0, 75.0, 2829.0, -M_PI*0.5, 600.0, 600.0);
+	checkpoints.add(2900.0, 75.0, 3100.0, 0.0, 750.0, 1200.0);
+	checkpoints.add(2252.0, 70.0, 3340.0, M_PI*0.5, 1600.0, 900.0);
 	checkpoints.updateColors();
 
 	std::cout<<glfwGetTime()<<" setup reflection buffer:"<<std::endl;
@@ -149,9 +147,8 @@ int main()
 			updateCamera(&playerAirplane);
 		} else {
 			playerAirplane.aiUpdate(dT, checkpoints);
-			updateCamera(&playerAirplane);
 		}
-//		playerAirplane.checkCollision(waterHeight, heightMap, mapWidth, mapHeight, 274.0);
+		playerAirplane.checkCollision(waterHeight, heightMap, mapWidth, mapHeight, 274.0);
 
 		if (startLine.isIntersect(&playerAirplane)) {
 			if (raceStatus == RACE_NOT_STARTED) {

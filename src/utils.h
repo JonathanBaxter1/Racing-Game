@@ -33,7 +33,6 @@ extern void renderPrepare(unsigned int framebuffer, unsigned int resDivisor);
 extern void renderScene(Terrain terrain, Airplane playerAirplane, Checkpoints checkpoints, StartLine startLine, Skybox skybox, Shader textureShader, Shader colorShader, Shader textureFullShader, Shader colorFullShader, unsigned int resDivisor, unsigned int frameCount);
 extern void renderTransparents(Boosts boosts, Shader textureFullShader, Shader colorFullShader);
 extern void renderFinish(Window window);
-extern vec3 catmullRomTangent(vec3 p0, vec3 p1, vec3 p2, vec3 p3, float alpha);
 
 // Global Variables
 extern std::vector<Model*> models;
