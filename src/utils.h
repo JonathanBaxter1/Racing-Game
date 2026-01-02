@@ -18,6 +18,10 @@ extern void setProjectionMatrix(mat4 mat, float fovYdeg, float aspect, float nea
 extern void updateUniforms();
 extern unsigned int isKeyDown(int key);
 extern vec3 normalize(vec3 vec);
+extern vec3 add(vec3 in1, vec3 in2);
+extern vec4 add(vec4 in1, vec4 in2);
+extern float distance(vec3 in1, vec3 in2);
+extern float distance(vec4 in1, vec4 in2);
 extern void eulerRotationMatrix3(mat3 matrix, float size, float yaw, float pitch, float roll);
 extern void eulerRotationMatrix4(mat4 matrix, float size, float yaw, float pitch, float roll, float x, float y, float z);
 extern void updateCamera(Airplane* airplane);
@@ -29,6 +33,7 @@ extern void renderPrepare(unsigned int framebuffer, unsigned int resDivisor);
 extern void renderScene(Terrain terrain, Airplane playerAirplane, Checkpoints checkpoints, StartLine startLine, Skybox skybox, Shader textureShader, Shader colorShader, Shader textureFullShader, Shader colorFullShader, unsigned int resDivisor, unsigned int frameCount);
 extern void renderTransparents(Boosts boosts, Shader textureFullShader, Shader colorFullShader);
 extern void renderFinish(Window window);
+extern vec3 catmullRomTangent(vec3 p0, vec3 p1, vec3 p2, vec3 p3, float alpha);
 
 // Global Variables
 extern std::vector<Model*> models;

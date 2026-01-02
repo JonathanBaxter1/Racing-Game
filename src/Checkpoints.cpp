@@ -7,12 +7,13 @@ Checkpoints::Checkpoints(Model* model, float radius)
 	this->radius = radius;
 }
 
-void Checkpoints::add(float x, float y, float z, float yaw, float pitch)
+void Checkpoints::add(float x, float y, float z, float yaw, float tangentMag)
 {
-	Object object(this->model, x, y, z, this->radius/2.0, yaw, pitch, 0.0);
+	Object object(this->model, x, y, z, this->radius/2.0, yaw, 0.0, 0.0);
 	this->objects.push_back(object);
 	Color red = {1.0, 0.0, 0.0};
 	this->colors.push_back(red);
+	this->tangentMags.push_back(tangentMag);
 }
 
 void Checkpoints::render(Shader textureShader, Shader colorShader)

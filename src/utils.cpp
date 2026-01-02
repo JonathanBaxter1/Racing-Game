@@ -29,7 +29,8 @@ mat4 projectionMatrix = {
 	0.0, 0.0, 0.0, 0.0,
 };
 
-float clamp(float number, float min, float max) {
+float clamp(float number, float min, float max)
+{
 	float temp = number > max ? max : number;
 	return temp < min ? min : temp;
 }
@@ -120,7 +121,8 @@ void updateUniforms()
 	}
 }
 
-vec3 normalize(vec3 vec) {
+vec3 normalize(vec3 vec)
+{
 	vec3 output;
 	float magnitude = sqrt(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z);
 	output.x = vec.x/magnitude;
@@ -129,7 +131,37 @@ vec3 normalize(vec3 vec) {
 	return output;
 }
 
-void eulerRotationMatrix3(mat3 matrix, float size, float yaw, float pitch, float roll) {
+vec3 add(vec3 in1, vec3 in2)
+{
+	vec3 result = {in1.x + in2.x, in1.y + in2.y, in1.z + in2.z};
+	return result;
+}
+
+vec4 add(vec4 in1, vec4 in2)
+{
+	vec4 result = {in1.x + in2.x, in1.y + in2.y, in1.z + in2.z, in1.w + in2.w};
+	return result;
+}
+
+float distance(vec3 in1, vec3 in2)
+{
+	float dx = in1.x - in2.x;
+	float dy = in1.y - in2.y;
+	float dz = in1.z - in2.z;
+	return sqrt(dx*dx + dy*dy + dz*dz);
+}
+
+float distance(vec4 in1, vec4 in2)
+{
+	float dx = in1.x - in2.x;
+	float dy = in1.y - in2.y;
+	float dz = in1.z - in2.z;
+	float dw = in1.w - in2.w;
+	return sqrt(dx*dx + dy*dy + dz*dz + dw*dw);
+}
+
+void eulerRotationMatrix3(mat3 matrix, float size, float yaw, float pitch, float roll)
+{
 	mat3 scaleMatrix = {0.0};
 	mat3 yawMatrix = {0.0};
 	mat3 pitchMatrix = {0.0};
@@ -164,7 +196,8 @@ void eulerRotationMatrix3(mat3 matrix, float size, float yaw, float pitch, float
 	mat3Multiply(matrix, rollMatrix, tempMatrix2);
 }
 
-void eulerRotationMatrix4(mat4 matrix, float size, float yaw, float pitch, float roll, float x, float y, float z) {
+void eulerRotationMatrix4(mat4 matrix, float size, float yaw, float pitch, float roll, float x, float y, float z)
+{
 	mat4 scaleMatrix = {0.0};
 	mat4 yawMatrix = {0.0};
 	mat4 pitchMatrix = {0.0};
@@ -305,4 +338,21 @@ void renderFinish(Window window)
 {
 	if (VSYNC_ON) glFinish(); // So we get consistent FPS
 	glfwSwapBuffers(window.windowPtr);
+}
+
+vec3 catmullRomTangent(vec3 p0, vec3 p1, vec3 p2, vec3 p3, float alpha)
+{
+	float t0 = 0.0f;
+	float t1 = t0 + pow(sqrt(distance(p1, p0)), alpha);
+	float t2 = t1 + pow(sqrt(distance(p2, p1)), alpha);
+	float t3 = t2 + pow(sqrt(distance(p3, p2)), alpha);
+
+	float num1 = (t1 - t0)/(t2 - t1);
+	float num2 = (t2 - t1)/(t1 - t0);
+	vec3 m1;
+	m1.x = ((p2.x - p1.x)*num1 + (p1.x - p0.x)*num2)*0.5;
+	m1.y = ((p2.y - p1.y)*num1 + (p1.y - p0.y)*num2)*0.5;
+	m1.z = ((p2.z - p1.z)*num1 + (p1.z - p0.z)*num2)*0.5;
+
+	return m1;
 }
