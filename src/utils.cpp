@@ -6,7 +6,7 @@ unsigned int Shader::shaders[MAX_SHADERS] = {0};
 bool Window::isSpectate = false;
 float Window::desiredPitch = 0.0;
 float Window::desiredTurnAngle = 0.0;
-float Window::desiredSpeed = 160.0;
+float Window::desiredSpeed = 240.0;
 
 std::vector<Model*> models;
 int screenWidth;
@@ -334,7 +334,9 @@ void renderScene(Terrain terrain, Airplane playerAirplane, Airplane* aiAirplanes
 
 void renderTransparents(Boosts boosts, Shader textureFullShader, Shader colorFullShader)
 {
+	glEnable(GL_BLEND);
 	boosts.render(textureFullShader, colorFullShader);
+	glDisable(GL_BLEND);
 }
 
 void renderFinish(Window window)

@@ -63,52 +63,6 @@ int main()
 	free(colorMap);
 	free(heightMapRGB8);
 
-	std::cout<<glfwGetTime()<<" load models:"<<std::endl;
-	Model airplaneModel1("airplane/airplane.obj");
-	Model airplaneModel2("airplane/airplane2.obj");
-	Model airplaneModel3("airplane/airplane3.obj");
-	Model airplaneModel4("airplane/airplane4.obj");
-	Model airplaneModel5("airplane/airplane5.obj");
-	Model airplaneModel6("airplane/airplane6.obj");
-	Model airplaneModel7("airplane/airplane7.obj");
-	Model airplaneModel8("airplane/airplane8.obj");
-	Object playerAirplaneObj(&airplaneModel1, 2188.0, 70.0, 3351.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	Airplane playerAirplane(&playerAirplaneObj);
-	Object aiAirplane1Obj(&airplaneModel2, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	Object aiAirplane2Obj(&airplaneModel3, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	Object aiAirplane3Obj(&airplaneModel4, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	Object aiAirplane4Obj(&airplaneModel5, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	Object aiAirplane5Obj(&airplaneModel6, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	Object aiAirplane6Obj(&airplaneModel7, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	Object aiAirplane7Obj(&airplaneModel8, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	AiAirplane aiAirplane1(&aiAirplane1Obj);
-	AiAirplane aiAirplane2(&aiAirplane2Obj);
-	AiAirplane aiAirplane3(&aiAirplane3Obj);
-	AiAirplane aiAirplane4(&aiAirplane4Obj);
-	AiAirplane aiAirplane5(&aiAirplane5Obj);
-	AiAirplane aiAirplane6(&aiAirplane6Obj);
-	AiAirplane aiAirplane7(&aiAirplane7Obj);
-	aiAirplane1.setPersonality(230);
-	aiAirplane2.setPersonality(235);
-	aiAirplane3.setPersonality(240);
-	aiAirplane4.setPersonality(245);
-	aiAirplane5.setPersonality(255);
-	aiAirplane6.setPersonality(265);
-	aiAirplane7.setPersonality(275);
-	Airplane* aiAirplanes[] = {&aiAirplane1, &aiAirplane2, &aiAirplane3, &aiAirplane4, &aiAirplane5, &aiAirplane6, &aiAirplane7};
-	unsigned int numAiAirplanes = sizeof(aiAirplanes)/sizeof(Airplane*);
-
-	Model startLineModel("startFinishLine/startFinishLine.obj");
-	Object startLineObj(&startLineModel, 1865.0, 90.0, 3349.0, START_LINE_SIZE, M_PI*0.5, 0.0, 0.0);
-	StartLine startLine(&startLineObj);
-
-	Model boostModel("boost/boost.obj");
-	Boosts boosts(&boostModel, BOOST_RADIUS);
-	boosts.add(1512.0, 60.0, 1630.0, 0.0, 0.0);
-	boosts.add(1807.0, 70.0, 606.0, M_PI*0.5, 0.0);
-	boosts.add(1875.0, 85.0, 2950.0, M_PI*0.35, 0.0);
-	boosts.add(2500.0, 60.0, 3370.0, M_PI*0.5, 0.0);
-
 	Model checkpointModel("checkpoint/checkpoint.obj");
 	Checkpoints checkpoints(&checkpointModel, CHECKPOINT_RADIUS);
 	checkpoints.add(1142.0, 70.0, 3244.0, M_PI*0.75, 600.0, 300.0);
@@ -124,11 +78,49 @@ int main()
 	checkpoints.add(1830.0, 70.0, 1970.0, -M_PI*0.1, 600.0, 500.0);
 	checkpoints.add(1750.0, 80.0, 2450.0, M_PI*0.35, 600.0, 900.0);
 	checkpoints.add(1299.0, 70.0, 2757.0, 0.0, 500.0, 500.0);
-	checkpoints.add(1552.0, 70.0, 3034.0, -M_PI*0.5, 700.0, 1000.0); //g
+	checkpoints.add(1552.0, 70.0, 3034.0, -M_PI*0.5, 700.0, 1000.0);
 	checkpoints.add(2514.0, 75.0, 2829.0, -M_PI*0.5, 600.0, 600.0);
 	checkpoints.add(2900.0, 75.0, 3100.0, 0.0, 750.0, 1200.0);
 	checkpoints.add(2252.0, 70.0, 3340.0, M_PI*0.5, 1600.0, 900.0);
 	checkpoints.updateColors();
+
+	Model airplaneModel1("airplane/airplane.obj");
+	Model airplaneModel2("airplane/airplane2.obj");
+	Model airplaneModel3("airplane/airplane3.obj");
+	Model airplaneModel4("airplane/airplane4.obj");
+	Model airplaneModel5("airplane/airplane5.obj");
+	Model airplaneModel6("airplane/airplane6.obj");
+	Model airplaneModel7("airplane/airplane7.obj");
+	Model airplaneModel8("airplane/airplane8.obj");
+	Object playerAirplaneObj(&airplaneModel1, 2200.0, 65.0, 3347.0, 1.0, M_PI*0.48, 0.0, 0.0);
+	Airplane playerAirplane(&playerAirplaneObj);
+	Object aiAirplane1Obj(&airplaneModel2, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	Object aiAirplane2Obj(&airplaneModel3, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	Object aiAirplane3Obj(&airplaneModel4, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	Object aiAirplane4Obj(&airplaneModel5, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	Object aiAirplane5Obj(&airplaneModel6, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	Object aiAirplane6Obj(&airplaneModel7, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	Object aiAirplane7Obj(&airplaneModel8, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	AiAirplane aiAirplane1(&aiAirplane1Obj, checkpoints, 290, 0.8); // Yellow
+	AiAirplane aiAirplane2(&aiAirplane2Obj, checkpoints, 255, 1.0); // Orange
+	AiAirplane aiAirplane3(&aiAirplane3Obj, checkpoints, 270, 0.7); // Green
+	AiAirplane aiAirplane4(&aiAirplane4Obj, checkpoints, 265, 1.0); // Light blue
+	AiAirplane aiAirplane5(&aiAirplane5Obj, checkpoints, 300, 0.6); // Blue
+	AiAirplane aiAirplane6(&aiAirplane6Obj, checkpoints, 277, 1.0); // Dark blue/Purple
+	AiAirplane aiAirplane7(&aiAirplane7Obj, checkpoints, 350, 0.5); // Magenta
+	Airplane* aiAirplanes[] = {&aiAirplane1, &aiAirplane2, &aiAirplane3, &aiAirplane4, &aiAirplane5, &aiAirplane6, &aiAirplane7};
+	unsigned int numAiAirplanes = sizeof(aiAirplanes)/sizeof(Airplane*);
+
+	Model startLineModel("startFinishLine/startFinishLine.obj");
+	Object startLineObj(&startLineModel, 1865.0, 90.0, 3349.0, START_LINE_SIZE, M_PI*0.5, 0.0, 0.0);
+	StartLine startLine(&startLineObj);
+
+	Model boostModel("boost/boost.obj");
+	Boosts boosts(&boostModel, BOOST_RADIUS);
+	boosts.add(1512.0, 60.0, 1630.0, 0.0, 0.0);
+	boosts.add(1807.0, 70.0, 606.0, M_PI*0.5, 0.0);
+	boosts.add(1875.0, 85.0, 2950.0, M_PI*0.35, 0.0);
+	boosts.add(2500.0, 60.0, 3370.0, M_PI*0.5, 0.0);
 
 	std::cout<<glfwGetTime()<<" setup reflection buffer:"<<std::endl;
 	unsigned int reflectionTexture, reflectionBuffer;

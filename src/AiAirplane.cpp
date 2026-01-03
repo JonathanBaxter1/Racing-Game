@@ -1,9 +1,18 @@
 #include "include.h"
 
-AiAirplane::AiAirplane(Object* object) : Airplane(object)
+float AiAirplane::staticRand = 1.5;
+
+AiAirplane::AiAirplane(Object* object, Checkpoints checkpoints, float speed, float corneringSpeed) : Airplane(object)
 {
+	this->speed = speed;
+	this->corneringSpeed = corneringSpeed;
 	this->hermiteT = 0.05;
-	this->curCheckpoint = 16;
+	this->curCheckpoint = checkpoints.objects.size() - 1;
+	this->pseudoRand = 1.0;
+	this->pseudoRand2 = 1.3;
+	this->lastPseudoRand = 35.0;
+	this->lastPseudoRand2 = 35.0;
+	this->updateSplinePoints(checkpoints);
 }
 
 void AiAirplane::update(float deltaT, Checkpoints checkpoints)
@@ -11,17 +20,16 @@ void AiAirplane::update(float deltaT, Checkpoints checkpoints)
 	unsigned int numCheckpoints = checkpoints.objects.size();
 	float t = this->hermiteT;
 
-	unsigned int nextCheckpoint = (curCheckpoint + 1)%numCheckpoints;
-	float x1 = checkpoints.objects[curCheckpoint].x;
-	float y1 = checkpoints.objects[curCheckpoint].y;
-	float z1 = checkpoints.objects[curCheckpoint].z;
-	float angle1 = -checkpoints.objects[curCheckpoint].yaw;
-	float x2 = checkpoints.objects[nextCheckpoint].x;
-	float y2 = checkpoints.objects[nextCheckpoint].y;
-	float z2 = checkpoints.objects[nextCheckpoint].z;
-	float angle2 = -checkpoints.objects[nextCheckpoint].yaw;
-	float mag1 = checkpoints.tangentMagsStart[curCheckpoint];
-	float mag2 = checkpoints.tangentMagsEnd[curCheckpoint];
+	float x1 = this->splineX1;
+	float y1 = this->splineY1;
+	float z1 = this->splineZ1;
+	float angle1 = this->splineAngle1;
+	float mag1 = this->splineMag1;
+	float x2 = this->splineX2;
+	float y2 = this->splineY2;
+	float z2 = this->splineZ2;
+	float angle2 = this->splineAngle2;
+	float mag2 = this->splineMag2;
 
 	// Hermite Spline Calcs
 	float dx1 = mag1*sin(angle1);
@@ -61,19 +69,50 @@ void AiAirplane::update(float deltaT, Checkpoints checkpoints)
 	this->object->x = x;
 	this->object->y = y;
 	this->object->z = z;
-	this->object->roll = (this->object->roll*(1.0 - deltaT*6.0) + yawRate*deltaT*6.0);
+	this->object->roll = (this->object->roll*(1.0 - deltaT*3.0) + yawRate*deltaT*3.0); // LPF
 	this->object->pitch = -atan(dy/sqrt(dx*dx + dz*dz));
 	this->object->yaw = atan2(dz, dx) - M_PI*0.5;
 	this->object->update();
-	this->hermiteT += deltaT*this->speed/dl;
+	float corneringMult = abs(clamp(yawRate, -M_PI*0.5, M_PI*0.5)/(M_PI*0.5));
+	float trueSpeed = this->speed*(1.0 - (1.0 - this->corneringSpeed)*corneringMult);
+	this->hermiteT += deltaT*trueSpeed/dl;
 	if (this->hermiteT >= 1.0) {
 		this->hermiteT = 0.0;
-		curCheckpoint++;
+		this->curCheckpoint++;
 		this->curCheckpoint %= numCheckpoints;
+		this->lastPseudoRand = pseudoRand;
+		this->lastPseudoRand2 = pseudoRand2;
+		this->pseudoRand = fmod(this->pseudoRand*420.0, 69.69);
+		this->staticRand = fmod(this->staticRand*314.59, 67.67);
+		this->pseudoRand2 = this->staticRand;
+		this->updateSplinePoints(checkpoints);
 	}
 }
 
-void AiAirplane::setPersonality(float speed)
+void AiAirplane::updateSplinePoints(Checkpoints checkpoints)
 {
-	this->speed = speed;
+	unsigned int numCheckpoints = checkpoints.objects.size();
+	unsigned int nextCheckpoint = (this->curCheckpoint + 1)%numCheckpoints;
+
+	float lastRand1 = lastPseudoRand/70.0*2.0 - 1.0;
+	float lastRand2 = fmod(lastPseudoRand*lastPseudoRand2, 42.0)/42.0*2.0 - 1.0;
+	float lastRand3 = lastPseudoRand2/70.0*2.0 - 1.0;
+	float lastRand4 = fmod(lastPseudoRand*lastPseudoRand2, 69.0)/69.0*2.0 - 1.0;
+
+	float rand1 = pseudoRand/70.0*2.0 - 1.0;
+	float rand2 = fmod(pseudoRand*pseudoRand2, 42.0)/42.0*2.0 - 1.0;
+	float rand3 = pseudoRand2/70.0*2.0 - 1.0;
+	float rand4 = fmod(pseudoRand*pseudoRand2, 69.0)/69.0*2.0- 1.0;
+
+	this->splineX1 = checkpoints.objects[this->curCheckpoint].x + lastRand1*CHECKPOINT_RADIUS*0.7;
+	this->splineY1 = checkpoints.objects[this->curCheckpoint].y + lastRand2*CHECKPOINT_RADIUS*0.7;
+	this->splineZ1 = checkpoints.objects[this->curCheckpoint].z + lastRand3*CHECKPOINT_RADIUS*0.7;
+	this->splineAngle1 = -checkpoints.objects[this->curCheckpoint].yaw + lastRand4*0.1;
+	this->splineMag1 = checkpoints.tangentMagsStart[this->curCheckpoint];
+
+	this->splineX2 = checkpoints.objects[nextCheckpoint].x + rand1*CHECKPOINT_RADIUS*0.7;
+	this->splineY2 = checkpoints.objects[nextCheckpoint].y + rand2*CHECKPOINT_RADIUS*0.7;
+	this->splineZ2 = checkpoints.objects[nextCheckpoint].z + rand3*CHECKPOINT_RADIUS*0.7;
+	this->splineAngle2 = -checkpoints.objects[nextCheckpoint].yaw + rand4*0.1;
+	this->splineMag2 = checkpoints.tangentMagsEnd[this->curCheckpoint];
 }

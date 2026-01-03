@@ -41,11 +41,15 @@ Terrain::Terrain(Shader shader, Shader occluderShader, TextureArray mapArray, Te
 		numPatches += (unsigned int)patchAboveWater;
 	}
 
-	float patchMinX[patchRes*patchRes];
-	float patchMinY[patchRes*patchRes];
+	float patchMinX[patchRes*patchRes] = {0.0};
+	float patchMinY[patchRes*patchRes] = {0.0};
 	// Create occluders
 	for (unsigned int curPatch = 0; curPatch < patchRes*patchRes; curPatch++) {
-		if (!patchResolutions[curPatch]) continue;
+		if (!patchResolutions[curPatch]) {
+			patchMinX[curPatch] = waterHeight;
+			patchMinY[curPatch] = waterHeight;
+			continue;
+		}
 		unsigned int xStart = curPatch%patchRes;
 		unsigned int yStart = curPatch/patchRes;
 		unsigned int numPoints = patchSize + 1;
@@ -53,20 +57,24 @@ Terrain::Terrain(Shader shader, Shader occluderShader, TextureArray mapArray, Te
 
 		patchMinX[curPatch] = FLT_MAX;
 		patchMinY[curPatch] = FLT_MAX;
-		y = yStart*patchSize;
+		y = yStart*patchSize - 1;
+		y = y > 0 ? y : 0;
 		y = y < (unsigned int)mapHeight - 1 ? y : (unsigned int)mapHeight - 1;
-		for (unsigned int i = 0; i < numPoints; i++) {
+		for (int i = -1; i < (int)numPoints; i++) {
 			x = xStart*patchSize + i;
+			x = x > 0 ? x : 0;
 			x = x < (unsigned int)mapWidth - 1 ? x : (unsigned int)mapWidth - 1;
 			float height = ((float)heightMap[y*mapWidth + x])/65536.0*274.0;
 			patchMinX[curPatch] = patchMinX[curPatch] < height ? patchMinX[curPatch] : height;
 		}
 		patchMinX[curPatch] = patchMinX[curPatch] > waterHeight ? patchMinX[curPatch] : waterHeight;
 
-		x = xStart*patchSize;
+		x = xStart*patchSize - 1;
+		x = x > 0 ? x : 0;
 		x = x < (unsigned int)mapWidth - 1 ? x : (unsigned int)mapWidth - 1;
-		for (unsigned int i = 0; i < numPoints; i++) {
+		for (int i = -1; i < (int)numPoints; i++) {
 			y = yStart*patchSize + i;
+			y = y > 0 ? y : 0;
 			y = y < (unsigned int)mapHeight - 1 ? y : (unsigned int)mapHeight - 1;
 			float height = ((float)heightMap[y*mapWidth + x])/65536.0*274.0;
 			patchMinY[curPatch] = patchMinY[curPatch] < height ? patchMinY[curPatch] : height;
@@ -120,50 +128,51 @@ Terrain::Terrain(Shader shader, Shader occluderShader, TextureArray mapArray, Te
 
 	unsigned int surfaceVerticesSize = 12*numPatches*sizeof(float);
 	float* surfaceVertices = (float*)malloc(surfaceVerticesSize);
-	unsigned int occluderVerticesSize = 3*4*3*numPatches*sizeof(float);
+	unsigned int occluderVerticesSize = 3*4*3*patchRes*patchRes*sizeof(float);
 	float* occluderVertices = (float*)malloc(occluderVerticesSize);
 	unsigned int surfaceOffset = 0;
 	unsigned int occluderOffset = 0;
 	for (unsigned int i = 0; i < patchRes*patchRes; i++) {
-		if (patchResolutions[i] == 0.0) continue;
 		unsigned int x = i%patchRes;
 		unsigned int y = i/patchRes;
-		surfaceVertices[surfaceOffset + 0] = x*patchSize;
-		surfaceVertices[surfaceOffset + 1] = y*patchSize;
-		surfaceVertices[surfaceOffset + 2] = patchResolutions[i];
-		surfaceVertices[surfaceOffset + 3] = x*patchSize;
-		surfaceVertices[surfaceOffset + 4] = (y + 1)*patchSize;
-		surfaceVertices[surfaceOffset + 5] = patchResolutions[i];
-		surfaceVertices[surfaceOffset + 6] = (x + 1)*patchSize;
-		surfaceVertices[surfaceOffset + 7] = (y + 1)*patchSize;
-		surfaceVertices[surfaceOffset + 8] = patchResolutions[i];
-		surfaceVertices[surfaceOffset + 9] = (x + 1)*patchSize;
-		surfaceVertices[surfaceOffset + 10] = y*patchSize;
-		surfaceVertices[surfaceOffset + 11] = patchResolutions[i];
-		surfaceOffset += 12;
+		if (patchResolutions[i] != 0.0) {
+			surfaceVertices[surfaceOffset + 0] = x*patchSize;
+			surfaceVertices[surfaceOffset + 1] = y*patchSize;
+			surfaceVertices[surfaceOffset + 2] = patchResolutions[i];
+			surfaceVertices[surfaceOffset + 3] = x*patchSize;
+			surfaceVertices[surfaceOffset + 4] = (y + 1)*patchSize;
+			surfaceVertices[surfaceOffset + 5] = patchResolutions[i];
+			surfaceVertices[surfaceOffset + 6] = (x + 1)*patchSize;
+			surfaceVertices[surfaceOffset + 7] = (y + 1)*patchSize;
+			surfaceVertices[surfaceOffset + 8] = patchResolutions[i];
+			surfaceVertices[surfaceOffset + 9] = (x + 1)*patchSize;
+			surfaceVertices[surfaceOffset + 10] = y*patchSize;
+			surfaceVertices[surfaceOffset + 11] = patchResolutions[i];
+			surfaceOffset += 12;
+		}
 
 		occluderVertices[occluderOffset + 0] = x*patchSize;
-		occluderVertices[occluderOffset + 1] = 0.0;
+		occluderVertices[occluderOffset + 1] = waterHeight;
 		occluderVertices[occluderOffset + 2] = y*patchSize;
 		occluderVertices[occluderOffset + 3] = x*patchSize;
 		occluderVertices[occluderOffset + 4] = patchMinX[i];
 		occluderVertices[occluderOffset + 5] = y*patchSize;
 		occluderVertices[occluderOffset + 6] = (x + 1)*patchSize;
-		occluderVertices[occluderOffset + 7] = 0.0;
+		occluderVertices[occluderOffset + 7] = waterHeight;
 		occluderVertices[occluderOffset + 8] = y*patchSize;
 
 		occluderVertices[occluderOffset + 9] = x*patchSize;
-		occluderVertices[occluderOffset + 10] = 0.0;
+		occluderVertices[occluderOffset + 10] = waterHeight;
 		occluderVertices[occluderOffset + 11] = y*patchSize;
 		occluderVertices[occluderOffset + 12] = x*patchSize;
 		occluderVertices[occluderOffset + 13] = patchMinY[i];
 		occluderVertices[occluderOffset + 14] = y*patchSize;
 		occluderVertices[occluderOffset + 15] = x*patchSize;
-		occluderVertices[occluderOffset + 16] = 0.0;
+		occluderVertices[occluderOffset + 16] = waterHeight;
 		occluderVertices[occluderOffset + 17] = (y + 1)*patchSize;
 
 		occluderVertices[occluderOffset + 18] = (x + 1)*patchSize;
-		occluderVertices[occluderOffset + 19] = 0.0;
+		occluderVertices[occluderOffset + 19] = waterHeight;
 		occluderVertices[occluderOffset + 20] = y*patchSize;
 		occluderVertices[occluderOffset + 21] = (x + 1)*patchSize;
 		occluderVertices[occluderOffset + 22] = patchMinX[i];
@@ -173,7 +182,7 @@ Terrain::Terrain(Shader shader, Shader occluderShader, TextureArray mapArray, Te
 		occluderVertices[occluderOffset + 26] = y*patchSize;
 
 		occluderVertices[occluderOffset + 27] = x*patchSize;
-		occluderVertices[occluderOffset + 28] = 0.0;
+		occluderVertices[occluderOffset + 28] = waterHeight;
 		occluderVertices[occluderOffset + 29] = (y + 1)*patchSize;
 		occluderVertices[occluderOffset + 30] = x*patchSize;
 		occluderVertices[occluderOffset + 31] = patchMinY[i];
@@ -228,7 +237,7 @@ void Terrain::render(float resolutionDivisor)
 	glUseProgram(this->occluderShader);
 	glBindVertexArray(this->occluderVao);
 
-	glDrawArrays(GL_TRIANGLES, 0, 12*this->numPatches);
+	glDrawArrays(GL_TRIANGLES, 0, 12*patchRes*patchRes);
 
 	glEnable(GL_CULL_FACE);
 	glColorMask(1, 1, 1, 1);
