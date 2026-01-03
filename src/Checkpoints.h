@@ -16,6 +16,7 @@ public:
 	std::vector<Color> colors;
 	std::vector<float> tangentMagsStart;
 	std::vector<float> tangentMagsEnd;
+	unsigned int lapsCompleted;
 
 	Checkpoints(Model* model, float radius);
 	void add(float x, float y, float z, float yaw, float tangentMagStart, float tangentMagEnd);

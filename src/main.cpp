@@ -142,6 +142,8 @@ int main()
 
 	float lapStartTime = 0.0;
 	float lapTime = 0.0;
+	float courseTime = 0.0;
+	unsigned int lapsCompleted = 0;
 
 	// For profiling
 	float curTime = glfwGetTime();
@@ -176,7 +178,6 @@ int main()
 			aiAirplane7.update(dT, checkpoints);
 			playerAirplane.playerUpdate(dT, controls);
 			updateCamera(&playerAirplane);
-//			updateCamera(&aiAirplane2);
 		}
 		playerAirplane.checkCollision(waterHeight, heightMap, mapWidth, mapHeight, 274.0);
 
@@ -184,11 +185,18 @@ int main()
 			if (raceStatus == RACE_NOT_STARTED) {
 				raceStatus = RACE_ACTIVE;
 				lapStartTime = glfwGetTime();
-			} else if (raceStatus == RACE_ACTIVE && checkpoints.allPassed()) {
-				raceStatus = RACE_ENDED;
-				lapTime = glfwGetTime() - lapStartTime;
-				std::cout << lapTime << "s" << std::endl;
-				exit(0);
+			} else if (raceStatus == RACE_ACTIVE && checkpoints.allPassed() && lapsCompleted != checkpoints.lapsCompleted) {
+				lapsCompleted = checkpoints.lapsCompleted;
+				float newTime = glfwGetTime();
+				lapTime = newTime - lapStartTime;
+				lapStartTime = newTime;
+				courseTime += lapTime;
+				std::cout << "Lap " << checkpoints.lapsCompleted << " time: " << lapTime << "s" << std::endl;
+				if (checkpoints.lapsCompleted == 3) {
+					std::cout << "Course time: " << courseTime << "s" << std::endl;
+					raceStatus = RACE_ENDED;
+					exit(0);
+				}
 			}
 		}
 

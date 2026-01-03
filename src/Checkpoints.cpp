@@ -3,6 +3,7 @@
 Checkpoints::Checkpoints(Model* model, float radius)
 {
 	this->checkpointsPassed = 0;
+	this->lapsCompleted = 0;
 	this->model = model;
 	this->radius = radius;
 }
@@ -32,6 +33,10 @@ void Checkpoints::checkIntersect(Airplane* airplane)
 	float distance = sqrt(dx*dx + dy*dy + dz*dz);
 	if (distance <= this->radius) {
 		this->checkpointsPassed++;
+		if (this->checkpointsPassed >= this->objects.size()) {
+			this->checkpointsPassed = 0;
+			this->lapsCompleted++;
+		}
 		this->updateColors();
 	}
 }
@@ -51,5 +56,5 @@ void Checkpoints::updateColors()
 
 bool Checkpoints::allPassed()
 {
-	return this->checkpointsPassed == this->objects.size();
+	return this->checkpointsPassed == 0 && this->lapsCompleted >= 1;
 }

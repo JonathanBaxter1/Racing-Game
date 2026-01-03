@@ -1,7 +1,7 @@
 #pragma once
 
 #define VSYNC_ON 1
-#define GAME_DEBUG true
+#define GAME_DEBUG false
 #define MAX_SHADERS 256
 #define MAX_SHADER_SIZE 8192 // bytes
 #define CURSOR_ENABLED false
