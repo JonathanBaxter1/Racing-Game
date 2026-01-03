@@ -40,7 +40,7 @@ void Sprite::render()
 	glDisable(GL_DEPTH_TEST);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->textureID);
-	glDrawArrays(GL_TRIANGLES, 0, 12);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 }
