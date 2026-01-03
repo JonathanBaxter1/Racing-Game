@@ -33,3 +33,4 @@
 #include "Boosts.h"
 #include "Checkpoints.h"
 #include "StartLine.h"
+#include "Sprite.h"

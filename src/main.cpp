@@ -18,13 +18,16 @@ int main()
 	Shader depthShader("colorFull.vs", "", "", "", "depth.fs");
 
 	Texture loadingTex("loading.png", 8, GL_CLAMP_TO_EDGE);
-	Texture skyboxUp("skyboxUp.bmp", 8, GL_CLAMP_TO_EDGE);
-	glViewport(0, 0, screenWidth, screenHeight);
-	glClearColor(1.0, 0.0, 1.0, 1.0);
+	Shader spriteShader("sprite.vs", "", "", "", "sprite.fs");
+	float aspectRatio = (float)screenWidth/(float)screenHeight;
+	Sprite loadingSprite(loadingTex, spriteShader, -1.0, -0.25*aspectRatio, 2.0, 0.5*aspectRatio);
+
+	glClearColor(0.0, 0.6, 0.9, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	loadingSprite.render();
 	glfwSwapBuffers(window.windowPtr);
 
-
+	Texture skyboxUp("skyboxUp.bmp", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxDown("skyboxDown.bmp", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxNorth("skyboxNorth.bmp", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxEast("skyboxEast.bmp", 8, GL_CLAMP_TO_EDGE);
