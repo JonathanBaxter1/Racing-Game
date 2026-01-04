@@ -8,36 +8,31 @@ int main()
 	std::cout<<glfwGetTime()<<" open window:"<<std::endl;
 	Window window;
 
-	std::cout<<glfwGetTime()<<" load skybox:"<<std::endl;
-	// https://opengameart.org/content/clouds-skybox-1
-	std::cout<<glfwGetTime()<<" compile shaders:"<<std::endl;
-	Shader textureShader("texture.vs", "", "", "", "texture.fs");
-	Shader textureFullShader("texture.vs", "", "", "", "textureFull.fs");
-	Shader colorShader("color.vs", "", "", "", "color.fs");
-	Shader colorFullShader("color.vs", "", "", "", "colorFull.fs");
-	Shader depthShader("colorFull.vs", "", "", "", "depth.fs");
+	Shader spriteShader("sprite.vs", "", "", "", "sprite.fs");
+	Shader textShader("text.vs", "", "", "", "text.fs");
+	Text::setupStart(textShader);
+	Font arial48("arial.ttf", 48);
+	Text::setupFinish();
 
 	Texture loadingTex("loading.png", 8, GL_CLAMP_TO_EDGE);
-	Shader spriteShader("sprite.vs", "", "", "", "sprite.fs");
 	float aspectRatio = (float)screenWidth/(float)screenHeight;
 	Sprite loadingSprite(loadingTex, spriteShader, -1.0, -0.25*aspectRatio, 2.0, 0.5*aspectRatio);
 
 	glClearColor(0.0, 0.6, 0.9, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	loadingSprite.render();
+	Text::render("Hello, World!", 0.4, 0.4, arial48);
 	glfwSwapBuffers(window.windowPtr);
+	while(1){};
 
-	FT_Library ft;
-	if (FT_Init_FreeType(&ft)) {
-		std::cout << "Could not init freetype" << std::endl;
-		exit(-1);
-	}
-	FT_Face face;
-	if (FT_New_Face(ft, "fonts/arial.ttf", 0, &face)) {
-		std::cout << "Failed to load font" << std::endl;
-		exit(-1);
-	}
+	Shader textureShader("texture.vs", "", "", "", "texture.fs");
+	Shader textureFullShader("texture.vs", "", "", "", "textureFull.fs");
+	Shader colorShader("color.vs", "", "", "", "color.fs");
+	Shader colorFullShader("color.vs", "", "", "", "colorFull.fs");
+	Shader depthShader("colorFull.vs", "", "", "", "depth.fs");
 
+	std::cout<<glfwGetTime()<<" load skybox:"<<std::endl;
+	// https://opengameart.org/content/clouds-skybox-1
 	Texture skyboxUp("skyboxUp.bmp", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxDown("skyboxDown.bmp", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxNorth("skyboxNorth.bmp", 8, GL_CLAMP_TO_EDGE);

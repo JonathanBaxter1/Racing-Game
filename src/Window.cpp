@@ -57,6 +57,7 @@ Window::Window()
 	stbi_set_flip_vertically_on_load(1);
 
 	// OpenGL settings
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glfwSwapInterval(VSYNC_ON);
 	glShadeModel(GL_SMOOTH);
 	glDisable(GL_BLEND);

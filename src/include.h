@@ -36,3 +36,5 @@
 #include "Checkpoints.h"
 #include "StartLine.h"
 #include "Sprite.h"
+#include "Font.h"
+#include "Text.h"
