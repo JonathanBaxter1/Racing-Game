@@ -2,4 +2,17 @@
 sudo apt install libglew-dev libglfw3-dev libassimp-dev
 
 # To compile program
-sudo apt install libxxf86vm-dev libxi-dev libxinerama-dev libxcursor-dev
+sudo apt install libxxf86vm-dev libxi-dev libxinerama-dev libxcursor-dev pkg-config
+# install freetype, extract to folder, in folder run:
+./configure
+make
+sudo make install
+
+#Then run this for windows libs:
+./configure \
+  --host=x86_64-w64-mingw32 \
+  --prefix=/opt/freetype-windows
+
+make
+sudo make install
+

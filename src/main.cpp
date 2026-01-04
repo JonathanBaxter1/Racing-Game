@@ -27,6 +27,17 @@ int main()
 	loadingSprite.render();
 	glfwSwapBuffers(window.windowPtr);
 
+	FT_Library ft;
+	if (FT_Init_FreeType(&ft)) {
+		std::cout << "Could not init freetype" << std::endl;
+		exit(-1);
+	}
+	FT_Face face;
+	if (FT_New_Face(ft, "fonts/arial.ttf", 0, &face)) {
+		std::cout << "Failed to load font" << std::endl;
+		exit(-1);
+	}
+
 	Texture skyboxUp("skyboxUp.bmp", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxDown("skyboxDown.bmp", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxNorth("skyboxNorth.bmp", 8, GL_CLAMP_TO_EDGE);

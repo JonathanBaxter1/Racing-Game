@@ -232,6 +232,7 @@ Terrain::Terrain(Shader shader, Shader occluderShader, TextureArray mapArray, Te
 
 void Terrain::render(float resolutionDivisor)
 {
+	glEnable(GL_CLIP_DISTANCE0);
 	glDisable(GL_CULL_FACE);
 	glColorMask(0, 0, 0, 0);
 	glUseProgram(this->occluderShader);
@@ -252,4 +253,5 @@ void Terrain::render(float resolutionDivisor)
 	glBindTexture(GL_TEXTURE_2D_ARRAY, this->textureArrayID);
 
 	glDrawArrays(GL_PATCHES, 0, 4*this->numPatches);
+	glDisable(GL_CLIP_DISTANCE0);
 }

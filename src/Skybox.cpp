@@ -77,6 +77,7 @@ Skybox::Skybox(Shader shader, Texture textures[])
 
 void Skybox::render()
 {
+	glEnable(GL_CLIP_DISTANCE0);
 	glUseProgram(this->shaderID);
 	glBindVertexArray(this->vao);
 
@@ -86,4 +87,5 @@ void Skybox::render()
 	}
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDisable(GL_CLIP_DISTANCE0);
 }
