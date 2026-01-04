@@ -23,7 +23,6 @@ int main()
 	loadingSprite.render();
 	Text::render("Hello, World!", 0.4, 0.4, arial48);
 	glfwSwapBuffers(window.windowPtr);
-	while(1){};
 
 	Shader textureShader("texture.vs", "", "", "", "texture.fs");
 	Shader textureFullShader("texture.vs", "", "", "", "textureFull.fs");
