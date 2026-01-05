@@ -1,34 +1,5 @@
 #include "include.h"
 
-// Global Variables
-unsigned int Shader::numShaders = 0;
-unsigned int Shader::shaders[MAX_SHADERS] = {0};
-bool Window::isSpectate = false;
-float Window::desiredPitch = 0.0;
-float Window::desiredTurnAngle = 0.0;
-float Window::desiredSpeed = 240.0;
-
-std::vector<Model*> models;
-int screenWidth;
-int screenHeight;
-float cameraPitch = 0.0;
-float cameraYaw = 0.0;
-float cameraX = 0.0;
-float cameraY = 1000.0;
-float cameraZ = 0.0;
-mat4 viewMatrix = {
-	0.0, 0.0, 0.0, 0.0,
-	0.0, 0.0, 0.0, 0.0,
-	0.0, 0.0, 0.0, 0.0,
-	0.0, 0.0, 0.0, 0.0,
-};
-mat4 projectionMatrix = {
-	0.0, 0.0, 0.0, 0.0,
-	0.0, 0.0, 0.0, 0.0,
-	0.0, 0.0, 0.0, 0.0,
-	0.0, 0.0, 0.0, 0.0,
-};
-
 float clamp(float number, float min, float max)
 {
 	float temp = number > max ? max : number;
@@ -97,16 +68,16 @@ void setProjectionMatrix(mat4 mat, float fovYdeg, float aspect, float near, floa
 
 void updateUniforms()
 {
-	for (int i = 0; i < MAX_SHADERS; i++) {
+	for (unsigned int i = 0; i < Shader::shaders.size(); i++) {
 		unsigned int shaderID = Shader::shaders[i];
 		if (shaderID == 0) break;
 		glUseProgram(shaderID);
 
 		int viewMatrixLoc = glGetUniformLocation(shaderID, "view");
-		glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, viewMatrix);
+		glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, Camera::viewMatrix);
 
 		int viewPosUniformLoc = glGetUniformLocation(shaderID, "viewPos");
-		glUniform3f(viewPosUniformLoc, cameraX, cameraY, cameraZ);
+		glUniform3f(viewPosUniformLoc, Camera::x, Camera::y, Camera::z);
 
 		int shininessUniformLoc = glGetUniformLocation(shaderID, "shininess");
 		glUniform1f(shininessUniformLoc, 32.0);
@@ -238,16 +209,6 @@ void eulerRotationMatrix4(mat4 matrix, float size, float yaw, float pitch, float
 	matrix[15] = 1.0;
 }
 
-void updateCamera(Airplane* airplane)
-{
-	cameraPitch = 0.0;
-	cameraYaw = M_PI + airplane->object->yaw;
-	float distanceFromAirplane = (30.0 + airplane->speed*0.05);
-	cameraX = airplane->object->x + distanceFromAirplane*sin(airplane->object->yaw);
-	cameraY = airplane->object->y;
-	cameraZ = airplane->object->z - distanceFromAirplane*cos(airplane->object->yaw);
-}
-
 unsigned char* loadRaw8(std::string fileName, unsigned int width, unsigned int height, unsigned int numChannels)
 {
 	std::string path = "textures/" + fileName;
@@ -286,7 +247,7 @@ void setupReflectionBuffer(unsigned int* texturePtr, unsigned int* bufferPtr, un
 {
 	glGenTextures(1, texturePtr);
 	glBindTexture(GL_TEXTURE_2D, *texturePtr);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth/resDivisor, screenHeight/resDivisor, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Window::width/resDivisor, Window::height/resDivisor, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -298,7 +259,7 @@ void setupReflectionBuffer(unsigned int* texturePtr, unsigned int* bufferPtr, un
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenWidth/resDivisor, screenWidth/resDivisor, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, Window::width/resDivisor, Window::height/resDivisor, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glGenFramebuffers(1, bufferPtr);
@@ -312,9 +273,9 @@ void setupReflectionBuffer(unsigned int* texturePtr, unsigned int* bufferPtr, un
 void renderPrepare(unsigned int framebuffer, unsigned int resDivisor)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-	glViewport(0, 0, screenWidth/resDivisor, screenHeight/resDivisor);
+	glViewport(0, 0, Window::width/resDivisor, Window::height/resDivisor);
 
-	setViewMatrix(viewMatrix, cameraPitch, cameraYaw, cameraX, cameraY, cameraZ);
+	setViewMatrix(Camera::viewMatrix, Camera::pitch, Camera::yaw, Camera::x, Camera::y, Camera::z);
 	updateUniforms();
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -339,7 +300,7 @@ void renderTransparents(Boosts boosts, Shader textureFullShader, Shader colorFul
 	glDisable(GL_BLEND);
 }
 
-void renderFinish(Window window)
+void renderFinish()
 {
-	glfwSwapBuffers(window.windowPtr);
+	glfwSwapBuffers(Window::ptr);
 }

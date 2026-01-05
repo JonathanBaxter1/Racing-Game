@@ -1,13 +1,10 @@
 #include "include.h"
 
-Font::Font(std::string fontFileName, unsigned int fontSize)
+Font::Font() {}
+
+void Font::init(std::string fontFileName, unsigned int fontSize)
 {
 	this->init(fontFileName, fontSize, 128);
-}
-
-Font::Font(std::string fontFileName, unsigned int fontSize, unsigned int numChars)
-{
-	this->init(fontFileName, fontSize, numChars);
 }
 
 void Font::init(std::string fontFileName, unsigned int fontSize, unsigned int numChars)

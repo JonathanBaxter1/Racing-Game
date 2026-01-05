@@ -1,6 +1,8 @@
 #include "include.h"
 
-Skybox::Skybox(Shader shader, Texture textures[])
+Skybox::Skybox() {}
+
+void Skybox::init(Shader shader, Texture textures[])
 {
 	this->shaderID = shader.ID;
 	glUseProgram(this->shaderID);

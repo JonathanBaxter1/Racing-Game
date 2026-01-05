@@ -6,6 +6,8 @@
 class Model
 {
 public:
+	static std::vector<Model*> models;
+
 	Model(std::string path);
 	void render(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix, unsigned int frame, Color color);
 

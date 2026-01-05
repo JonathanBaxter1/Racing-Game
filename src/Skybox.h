@@ -10,6 +10,7 @@ private:
 	unsigned int vao, vbo, shaderID;
 	unsigned int textures[6];
 public:
-	Skybox(Shader shader, Texture textures[]);
+	Skybox();
+	void init(Shader shader, Texture textures[]);
 	void render();
 };

@@ -38,3 +38,5 @@
 #include "Sprite.h"
 #include "Font.h"
 #include "Text.h"
+#include "Camera.h"
+#include "Game.h"

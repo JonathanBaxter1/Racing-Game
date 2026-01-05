@@ -1,6 +1,8 @@
 #include "include.h"
 
-Sprite::Sprite(Texture texture, Shader shader, float x, float y, float width, float height)
+Sprite::Sprite() {}
+
+void Sprite::init(Texture texture, Shader shader, float x, float y, float width, float height)
 {
 	this->textureID = texture.ID;
 	this->shaderID = shader.ID;

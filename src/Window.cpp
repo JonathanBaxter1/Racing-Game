@@ -1,6 +1,18 @@
 #include "include.h"
 
-Window::Window()
+namespace Window
+{//
+
+unsigned int width;
+unsigned int height;
+float aspectRatio;
+GLFWwindow* ptr;
+bool isSpectate = false;
+float desiredPitch = 0.0;
+float desiredTurnAngle = 0.0;
+float desiredSpeed = 240.0;
+
+void init()
 {
 	if (!glfwInit()) {
 		std::cout << "GLFW initialization failed" << std::endl;
@@ -12,21 +24,21 @@ Window::Window()
 
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* videoMode = glfwGetVideoMode(monitor);
-	screenWidth = videoMode->width;
-	screenHeight = videoMode->height;
-	float aspectRatio = (float)screenWidth/(float)screenHeight;
-	std::cout << "Screen Resolution: " << screenWidth << "x" << screenHeight << std::endl;
+	width = videoMode->width;
+	height = videoMode->height;
+	aspectRatio = (float)width/(float)height;
+	std::cout << "Screen Resolution: " << width << "x" << height << std::endl;
 
 	// glfwCreateWindow takes ~0.14s
-	this->windowPtr = glfwCreateWindow(screenWidth, screenHeight, "flight sim", monitor, NULL);
-	if (this->windowPtr == NULL) {
+	ptr = glfwCreateWindow(width, height, "flight sim", monitor, NULL);
+	if (ptr == NULL) {
 		std::cout << "GLFW window creation failed" << std::endl;
 		glfwTerminate();
 		exit(-1);
 	}
-	glfwMakeContextCurrent(this->windowPtr);
+	glfwMakeContextCurrent(ptr);
 	glewInit();
-	glViewport(0, 0, screenWidth, screenHeight);
+	glViewport(0, 0, width, height);
 
 	// Cursor setup
 	int cursorWidth, cursorHeight, cursorNumChannels;
@@ -43,16 +55,16 @@ Window::Window()
 
 	if (CURSOR_ENABLED) {
 		GLFWcursor* cursor = glfwCreateCursor(&cursorImage, 0, 0);
-		glfwSetCursor(this->windowPtr, cursor);
-		glfwSetInputMode(this->windowPtr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		glfwSetCursor(ptr, cursor);
+		glfwSetInputMode(ptr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	} else {
-		glfwSetInputMode(this->windowPtr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetInputMode(ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 	stbi_image_free(cursorImageData);
 
-	glfwSetCursorPos(this->windowPtr, (float)screenWidth/2.0, (float)screenHeight/2.0);
-	glfwSetCursorPosCallback(this->windowPtr, Window::mouseCallback);
-	setProjectionMatrix(projectionMatrix, 45.0, aspectRatio, 1.0, 100000.0);
+	glfwSetCursorPos(ptr, (float)width/2.0, (float)height/2.0);
+	glfwSetCursorPosCallback(ptr, mouseCallback);
+	setProjectionMatrix(Camera::projMatrix, 45.0, aspectRatio, 1.0, 100000.0);
 
 	stbi_set_flip_vertically_on_load(1);
 
@@ -68,7 +80,12 @@ Window::Window()
 	glCullFace(GL_BACK);
 }
 
-void Window::mouseCallback(GLFWwindow* window, double xpos, double ypos)
+void exit()
+{
+	glfwTerminate();
+}
+
+void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
 	static double lastX;
 	static double lastY;
@@ -81,16 +98,16 @@ void Window::mouseCallback(GLFWwindow* window, double xpos, double ypos)
 		double deltaY = (ypos - lastY)*MOUSE_SENSITIVITY;
 
 		if (isSpectate) {
-			float newCameraPitch = cameraPitch - deltaY;
-			float newCameraYaw = cameraYaw + deltaX;
+			float newCameraPitch = Camera::pitch - deltaY;
+			float newCameraYaw = Camera::yaw + deltaX;
 			if (newCameraPitch > M_PI/2.0) {
-				cameraPitch = M_PI/2.0;
+				Camera::pitch = M_PI/2.0;
 			} else if (newCameraPitch < -M_PI/2.0) {
-				cameraPitch = -M_PI/2.0;
+				Camera::pitch = -M_PI/2.0;
 			} else {
-				cameraPitch = newCameraPitch;
+				Camera::pitch = newCameraPitch;
 			}
-			cameraYaw = fmod(newCameraYaw, 2*M_PI);
+			Camera::yaw = fmod(newCameraYaw, 2*M_PI);
 		} else {
 			desiredPitch = desiredPitch - deltaY*1.0;
 			desiredTurnAngle = desiredTurnAngle + deltaX*1.0;
@@ -101,10 +118,10 @@ void Window::mouseCallback(GLFWwindow* window, double xpos, double ypos)
 	frameCount++;
 }
 
-vec3 Window::handleInput(float deltaT)
+vec3 handleInput(float deltaT)
 {
 	if (isKeyDown(GLFW_KEY_ESCAPE)) {
-		glfwSetWindowShouldClose(this->windowPtr, GLFW_TRUE);
+		glfwSetWindowShouldClose(ptr, GLFW_TRUE);
 	}
 	if (isKeyDown(GLFW_KEY_1)) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -118,27 +135,27 @@ vec3 Window::handleInput(float deltaT)
 
 	if (isSpectate) {
 		if (isKeyDown(GLFW_KEY_S)) {
-			cameraZ += MOVEMENT_SPEED*deltaT*cos(cameraYaw);
-			cameraX -= MOVEMENT_SPEED*deltaT*sin(cameraYaw);
+			Camera::z += MOVEMENT_SPEED*deltaT*cos(Camera::yaw);
+			Camera::x -= MOVEMENT_SPEED*deltaT*sin(Camera::yaw);
 		} else if (isKeyDown(GLFW_KEY_W)) {
-			cameraZ -= MOVEMENT_SPEED*deltaT*cos(cameraYaw);
-			cameraX += MOVEMENT_SPEED*deltaT*sin(cameraYaw);
+			Camera::z -= MOVEMENT_SPEED*deltaT*cos(Camera::yaw);
+			Camera::x += MOVEMENT_SPEED*deltaT*sin(Camera::yaw);
 		}
 		if (isKeyDown(GLFW_KEY_D)) {
-			cameraZ += MOVEMENT_SPEED*deltaT*sin(cameraYaw);
-			cameraX += MOVEMENT_SPEED*deltaT*cos(cameraYaw);
+			Camera::z += MOVEMENT_SPEED*deltaT*sin(Camera::yaw);
+			Camera::x += MOVEMENT_SPEED*deltaT*cos(Camera::yaw);
 		} else if (isKeyDown(GLFW_KEY_A)) {
-			cameraZ -= MOVEMENT_SPEED*deltaT*sin(cameraYaw);
-			cameraX -= MOVEMENT_SPEED*deltaT*cos(cameraYaw);
+			Camera::z -= MOVEMENT_SPEED*deltaT*sin(Camera::yaw);
+			Camera::x -= MOVEMENT_SPEED*deltaT*cos(Camera::yaw);
 		}
 		if (isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-			cameraY += MOVEMENT_SPEED*10*deltaT;
+			Camera::y += MOVEMENT_SPEED*10*deltaT;
 		} else if (isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-			cameraY -= MOVEMENT_SPEED*10*deltaT;
+			Camera::y -= MOVEMENT_SPEED*10*deltaT;
 		}
 		if (isKeyDown(GLFW_KEY_SPACE)) {
-			cameraZ -= MOVEMENT_SPEED*50.0*deltaT*cos(cameraYaw);
-			cameraX += MOVEMENT_SPEED*50.0*deltaT*sin(cameraYaw);
+			Camera::z -= MOVEMENT_SPEED*50.0*deltaT*cos(Camera::yaw);
+			Camera::x += MOVEMENT_SPEED*50.0*deltaT*sin(Camera::yaw);
 		}
 	} else {
 		if (isKeyDown(GLFW_KEY_W)) {
@@ -155,7 +172,9 @@ vec3 Window::handleInput(float deltaT)
 	return controls;
 }
 
-bool Window::isKeyDown(int key)
+bool isKeyDown(int key)
 {
-	return glfwGetKey(this->windowPtr, key) == GLFW_PRESS;
+	return glfwGetKey(ptr, key) == GLFW_PRESS;
 }
+
+}//

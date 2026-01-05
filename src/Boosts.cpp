@@ -30,9 +30,9 @@ void Boosts::sortByDistance()
 	unsigned int numBoosts = this->objects.size();
 	float boostDistances[numBoosts];
 	for (unsigned int i = 0; i < numBoosts; i++) {
-		float dx = cameraX - this->objects[i].x;
-		float dy = cameraY - this->objects[i].y;
-		float dz = cameraZ - this->objects[i].z;
+		float dx = Camera::x - this->objects[i].x;
+		float dy = Camera::y - this->objects[i].y;
+		float dz = Camera::z - this->objects[i].z;
 		boostDistances[i] = sqrt(dx*dx + dy*dy + dz*dz);
 	}
 	for (unsigned int i = 0; i < numBoosts; i++) {

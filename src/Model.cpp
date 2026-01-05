@@ -1,5 +1,7 @@
 #include "include.h"
 
+std::vector<Model*> Model::models;
+
 Model::Model(std::string path)
 {
 	loadModel("models/" + path);
@@ -26,7 +28,7 @@ void Model::loadModel(std::string path)
 	}
 	directory = path.substr(0, path.find_last_of('/'));
 	processNode(scene->mRootNode, scene);
-	models.push_back(this);
+	Model::models.push_back(this);
 }
 
 void Model::processNode(aiNode *node, const aiScene *scene)

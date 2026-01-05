@@ -6,7 +6,7 @@ namespace Text
 unsigned int vao, vbo, shaderID;
 FT_Library ft;
 
-void setupStart(Shader shader)
+void init(Shader shader)
 {
 	if (FT_Init_FreeType(&ft)) {
 		std::cout << "Could not init freetype" << std::endl;
@@ -26,7 +26,7 @@ void setupStart(Shader shader)
 	glEnableVertexAttribArray(1);
 }
 
-void setupFinish()
+void exit()
 {
 	FT_Done_FreeType(ft);
 }
@@ -39,14 +39,13 @@ void render(std::string text, float x, float y, Font font)
 	glActiveTexture(GL_TEXTURE0);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-	float aspectRatio = (float)screenWidth/(float)screenHeight;
-	float scale = 1.0/(float)screenHeight*2.0;
+	float scale = 1.0/(float)Window::height*2.0;
 	for (unsigned int i = 0; i < text.size(); i++) {
 		unsigned char c = text[i];
 
-		float xPos = x + (float)font.bearingX[c]*scale/aspectRatio;
+		float xPos = x + (float)font.bearingX[c]*scale/Window::aspectRatio;
 		float yPos = y - ((float)font.height[c] - (float)font.bearingY[c])*scale;
-		float width = (float)font.width[c]*scale/aspectRatio;
+		float width = (float)font.width[c]*scale/Window::aspectRatio;
 		float height = (float)font.height[c]*scale;
 
 		float vertices[6*4] = { // x, y, u, v
@@ -65,7 +64,7 @@ void render(std::string text, float x, float y, Font font)
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		// Advance is in 1/64th pixels
-		x += (float)(font.advance[c] >> 6)*scale/aspectRatio;
+		x += (float)(font.advance[c] >> 6)*scale/Window::aspectRatio;
 	}
 	glDisable(GL_BLEND);
 }

@@ -1,5 +1,9 @@
 #include "include.h"
 
+std::vector<unsigned int> Shader::shaders;
+
+Shader::Shader() {}
+
 unsigned int Shader::compileShader(unsigned int type, char* source)
 {
 	unsigned int shaderId = glCreateShader(type);
@@ -49,7 +53,17 @@ unsigned int Shader::createShaderProgram(char* vertexShader, char* tessControlSh
 	return program;
 }
 
-Shader::Shader(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string geometryFileName, std::string fragmentFileName)
+void Shader::init(std::string vertexFileName, std::string fragmentFileName)
+{
+	this->init(vertexFileName, "", "", "", fragmentFileName);
+}
+
+void Shader::init(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string fragmentFileName)
+{
+	this->init(vertexFileName, tessControlFileName, tessEvalFileName, "", fragmentFileName);
+}
+
+void Shader::init(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string geometryFileName, std::string fragmentFileName)
 {
 	std::string vertexFilePath = "shaders/" + vertexFileName;
 	std::string tessControlFilePath = "shaders/" + tessControlFileName;
@@ -87,9 +101,8 @@ Shader::Shader(std::string vertexFileName, std::string tessControlFileName, std:
 
 	glUseProgram(shader);
 	int projectionMatrixLoc = glGetUniformLocation(shader, "projection");
-	glUniformMatrix4fv(projectionMatrixLoc, 1, GL_FALSE, projectionMatrix);
-	this->shaders[this->numShaders] = shader;
-	this->numShaders++;
+	glUniformMatrix4fv(projectionMatrixLoc, 1, GL_FALSE, Camera::projMatrix);
+	this->shaders.push_back(shader);
 
 	this->ID = shader;
 }
