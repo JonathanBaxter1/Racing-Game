@@ -55,29 +55,29 @@ void init()
 
 	Object playerAirplaneObj(&airplaneModel1, 2200.0, 65.0, 3347.0, 1.0, M_PI*0.48, 0.0, 0.0);
 	Airplane playerAirplane(&playerAirplaneObj);
-	Object aiAirplane1Obj(&airplaneModel2, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	Object aiAirplane2Obj(&airplaneModel3, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	Object aiAirplane3Obj(&airplaneModel4, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	Object aiAirplane4Obj(&airplaneModel5, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	Object aiAirplane5Obj(&airplaneModel6, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	Object aiAirplane6Obj(&airplaneModel7, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	Object aiAirplane7Obj(&airplaneModel8, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	AiAirplane aiAirplane1(&aiAirplane1Obj, checkpoints, 290, 0.8); // Yellow
-	AiAirplane aiAirplane2(&aiAirplane2Obj, checkpoints, 255, 1.0); // Orange
-	AiAirplane aiAirplane3(&aiAirplane3Obj, checkpoints, 270, 0.7); // Green
-	AiAirplane aiAirplane4(&aiAirplane4Obj, checkpoints, 265, 1.0); // Light blue
-	AiAirplane aiAirplane5(&aiAirplane5Obj, checkpoints, 300, 0.6); // Blue
-	AiAirplane aiAirplane6(&aiAirplane6Obj, checkpoints, 277, 1.0); // Dark blue/Purple
-	AiAirplane aiAirplane7(&aiAirplane7Obj, checkpoints, 350, 0.5); // Magenta
-	Airplane* aiAirplanes[] = {&aiAirplane1, &aiAirplane2, &aiAirplane3, &aiAirplane4, &aiAirplane5, &aiAirplane6, &aiAirplane7};
-	unsigned int numAiAirplanes = sizeof(aiAirplanes)/sizeof(Airplane*);
+	aiAirplane1Obj.init(&airplaneModel2, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	aiAirplane2Obj.init(&airplaneModel3, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	aiAirplane3Obj.init(&airplaneModel4, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	aiAirplane4Obj.init(&airplaneModel5, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	aiAirplane5Obj.init(&airplaneModel6, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	aiAirplane6Obj.init(&airplaneModel7, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	aiAirplane7Obj.init(&airplaneModel8, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+	aiAirplane1.init(&aiAirplane1Obj, checkpoints, 290, 0.8); // Yellow
+	aiAirplane2.init(&aiAirplane2Obj, checkpoints, 255, 1.0); // Orange
+	aiAirplane3.init(&aiAirplane3Obj, checkpoints, 270, 0.7); // Green
+	aiAirplane4.init(&aiAirplane4Obj, checkpoints, 265, 1.0); // Light blue
+	aiAirplane5.init(&aiAirplane5Obj, checkpoints, 300, 0.6); // Blue
+	aiAirplane6.init(&aiAirplane6Obj, checkpoints, 277, 1.0); // Dark blue/Purple
+	aiAirplane7.init(&aiAirplane7Obj, checkpoints, 350, 0.5); // Magenta
+	aiAirplanes[NUM_AI_AIRPLANES] = {&aiAirplane1, &aiAirplane2, &aiAirplane3, &aiAirplane4, &aiAirplane5, &aiAirplane6, &aiAirplane7};
 
-	Model startLineModel("startFinishLine/startFinishLine.obj");
-	Object startLineObj(&startLineModel, 1865.0, 90.0, 3349.0, START_LINE_SIZE, M_PI*0.5, 0.0, 0.0);
-	StartLine startLine(&startLineObj);
+	startLineModel.init("startFinishLine/startFinishLine.obj");
+	startLineObj.init(&startLineModel, 1865.0, 90.0, 3349.0, START_LINE_SIZE, M_PI*0.5, 0.0, 0.0);
+	startLine.init(&startLineObj);
 
 	// Temp
 	screen = RACE_SCREEN;
+	Race::init(0);
 }
 
 void exit()
@@ -87,6 +87,7 @@ void exit()
 
 void update()
 {
+	screenCurFrame = screen;
 	switch (screen) {
 	case RACE_SCREEN:
 		Race::update();
@@ -99,6 +100,7 @@ void update()
 
 void render()
 {
+	if (screenCurFrame != screen) return;
 	switch (screen) {
 	case RACE_SCREEN:
 		Race::render();
@@ -119,23 +121,19 @@ void renderLoadingScreen()
 
 namespace Race
 {
-	unsigned int raceStatus = RACE_NOT_STARTED;
-
-	void load(unsigned int course)
+	void init(unsigned int course)
 	{
+		renderLoadingScreen();
 		stbi_set_flip_vertically_on_load(false);
-		int mapWidth = 4096;
-		int mapHeight = 4096;
-
-		unsigned short* heightMap = loadRaw16("islandHeightMap.r16", mapWidth, mapHeight, 1);
-		unsigned char* normalMap = loadRaw8("islandNormalMap.rgb8", mapWidth, mapHeight, 3);
-		unsigned char* colorMap = loadRaw8("islandColorMap.rgb8", mapWidth, mapHeight, 3);
-		unsigned char* heightMapRGB8 = R16ToRGB8(heightMap, mapWidth, mapHeight);
+		heightMap = loadRaw16("islandHeightMap.r16", MAP_WIDTH, MAP_HEIGHT, 1);
+		unsigned char* normalMap = loadRaw8("islandNormalMap.rgb8", MAP_WIDTH, MAP_HEIGHT, 3);
+		unsigned char* colorMap = loadRaw8("islandColorMap.rgb8", MAP_WIDTH, MAP_HEIGHT, 3);
+		unsigned char* heightMapRGB8 = R16ToRGB8(heightMap, MAP_WIDTH, MAP_HEIGHT);
 
 		void* mapData[] = {(void*)heightMapRGB8, (void*)normalMap, (void*)colorMap};
 		unsigned int numMapData = sizeof(mapData)/sizeof(void*);
-		TextureArray terrainMaps(mapData, numMapData, mapWidth, mapHeight, 3, 8, GL_CLAMP_TO_EDGE);
-		Texture islandHeightMap(heightMap, mapWidth, mapHeight, 1, GL_CLAMP_TO_EDGE);
+		TextureArray terrainMaps(mapData, numMapData, MAP_WIDTH, MAP_HEIGHT, 3, 8, GL_CLAMP_TO_EDGE);
+		Texture islandHeightMap(heightMap, MAP_WIDTH, MAP_HEIGHT, 1, GL_CLAMP_TO_EDGE);
 
 		stbi_set_flip_vertically_on_load(true);
 		std::string terrainTextureFiles[] = {"stone2.png", "grass2.png", "snow2.png"};
@@ -149,8 +147,8 @@ namespace Race
 		free(colorMap);
 		free(heightMapRGB8);
 
-		Model checkpointModel("checkpoint/checkpoint.obj");
-		Checkpoints checkpoints(&checkpointModel, CHECKPOINT_RADIUS);
+		checkpointModel.init("checkpoint/checkpoint.obj");
+		checkpoints.init(&checkpointModel, CHECKPOINT_RADIUS);
 		checkpoints.add(1142.0, 70.0, 3244.0, M_PI*0.75, 600.0, 300.0);
 		checkpoints.add(956.0, 70.0, 2733.0, M_PI*1.0, 150.0, 300.0);
 		checkpoints.add(1035.0, 70.0, 2505.0, -M_PI*0.75, 300.0, 300.0);
@@ -170,16 +168,14 @@ namespace Race
 		checkpoints.add(2252.0, 70.0, 3340.0, M_PI*0.5, 1600.0, 900.0);
 		checkpoints.updateColors();
 
-		Model boostModel("boost/boost.obj");
-		Boosts boosts(&boostModel, BOOST_RADIUS);
+		boostModel.init("boost/boost.obj");
+		boosts.init(&boostModel, BOOST_RADIUS);
 		boosts.add(1512.0, 60.0, 1630.0, 0.0, 0.0);
 		boosts.add(1807.0, 70.0, 606.0, M_PI*0.5, 0.0);
 		boosts.add(1875.0, 85.0, 2950.0, M_PI*0.35, 0.0);
 		boosts.add(2500.0, 60.0, 3370.0, M_PI*0.5, 0.0);
 
-		std::cout<<glfwGetTime()<<" setup reflection buffer:"<<std::endl;
-		unsigned int reflectionTexture, reflectionBuffer;
-		unsigned int reflectionRes;
+		unsigned int reflectionTexture;
 		if (GRAPHICS_SETTING == 3) {
 			reflectionRes = 1;
 		} else {
@@ -190,13 +186,7 @@ namespace Race
 		Texture waterDuDvTexture("waterDuDv.png", 8, GL_REPEAT);
 		unsigned int waterTextureIDs[] = {reflectionTexture, waterDuDvTexture.ID, islandHeightMap.ID};
 		Shader waterShader("water.vs", "", "", "", "water.fs");
-		Water water(waterShader, waterTextureIDs, sizeof(waterTextureIDs)/sizeof(unsigned int), 100000.0, 64);
-
-		float lapStartTime = 0.0;
-		float lapTime = 0.0;
-		float courseTime = 0.0;
-		unsigned int lapsCompleted = 0;
-
+		water.init(waterShader, waterTextureIDs, sizeof(waterTextureIDs)/sizeof(unsigned int), 100000.0, 64);
 	}
 
 	void exit()
@@ -219,7 +209,7 @@ namespace Race
 			playerAirplane.playerUpdate(dT, controls);
 			Camera::update(&playerAirplane);
 		}
-		playerAirplane.checkCollision(WATER_HEIGHT, heightMap, mapWidth, mapHeight, 274.0);
+		playerAirplane.checkCollision(WATER_HEIGHT, heightMap, MAP_WIDTH, MAP_HEIGHT, 274.0);
 
 		if (startLine.isIntersect(&playerAirplane)) {
 			if (raceStatus == RACE_NOT_STARTED) {
@@ -228,15 +218,10 @@ namespace Race
 			} else if (raceStatus == RACE_ACTIVE && checkpoints.allPassed() && lapsCompleted != checkpoints.lapsCompleted) {
 				lapsCompleted = checkpoints.lapsCompleted;
 				float newTime = glfwGetTime();
-				lapTime = newTime - lapStartTime;
+				lapTimes[lapsCompleted] = newTime - lapStartTime;
 				lapStartTime = newTime;
 				courseTime += lapTime;
-				std::cout << "Lap " << checkpoints.lapsCompleted << " time: " << lapTime << "s" << std::endl;
-				if (checkpoints.lapsCompleted == 3) {
-					std::cout << "Course time: " << courseTime << "s" << std::endl;
-					raceStatus = RACE_ENDED;
-					exit(0);
-				}
+				if (lapsCompleted == NUM_LAPS) raceStatus = RACE_ENDED;
 			}
 		}
 
@@ -246,8 +231,12 @@ namespace Race
 		if (boosts.isHit(&playerAirplane)) playerAirplane.performBoost();
 		boosts.sortByDistance(); // so transparency works correctly
 
-		float newTime2 = glfwGetTime();
-		deltaT_CPU = (int)((newTime2 - newTime)*1000000);
+		if (raceStatus == RACE_ENDED) {
+			screen = RACE_RESULTS_SCREEN;
+			Race::exit();
+			RaceResults::init();
+			return;
+		}
 	}
 
 	void render()
@@ -256,14 +245,14 @@ namespace Race
 		Camera::pitch = -Camera::pitch;
 
 		renderPrepare(reflectionBuffer, reflectionRes);
-		renderScene(terrain, playerAirplane, aiAirplanes, numAiAirplanes, checkpoints, startLine, skybox, textureShader, colorShader, textureFullShader, colorFullShader, reflectionRes, frameCount);
+		renderScene(terrain, playerAirplane, aiAirplanes, NUM_AI_AIRPLANES, checkpoints, startLine, skybox, textureShader, colorShader, textureFullShader, colorFullShader, reflectionRes, frameCount);
 		renderTransparents(boosts, textureFullShader, colorFullShader);
 
 		Camera::y += 2.0*(WATER_HEIGHT - Camera::y);
 		Camera::pitch = -Camera::pitch;
 
 		renderPrepare(0, 1);
-		renderScene(terrain, playerAirplane, aiAirplanes, numAiAirplanes, checkpoints, startLine, skybox, textureShader, colorShader, textureFullShader, colorFullShader, 1, frameCount);
+		renderScene(terrain, playerAirplane, aiAirplanes, NUM_AI_AIRPLANES, checkpoints, startLine, skybox, textureShader, colorShader, textureFullShader, colorFullShader, 1, frameCount);
 		water.render();
 		renderTransparents(boosts, textureFullShader, colorFullShader);
 
@@ -285,6 +274,22 @@ namespace LevelSelect
 
 namespace PauseMenu
 {
+}
+
+namespace RaceResults
+{
+	void init()
+	{
+		for (unsigned int i = 0; i < NUM_LAPS; i++) {
+			lapTimes[i] = Race::lapTimes[i];
+		}
+		courseTime = Race::courseTime;
+	}
+
+	void exit()
+	{
+		exit(0);
+	}
 }
 
 }//

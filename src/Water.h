@@ -18,6 +18,8 @@ private:
 
 public:
 
+	Water();
 	Water(Shader shader, unsigned int textures[], unsigned int numTextures, float mapSize, unsigned int patchRes);
+	void init(Shader shader, unsigned int textures[], unsigned int numTextures, float mapSize, unsigned int patchRes);
 	void render();
 };

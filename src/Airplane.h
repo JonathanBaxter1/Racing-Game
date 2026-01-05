@@ -12,7 +12,9 @@ public:
 	Object* object;
 	float speed;
 
+	Airplane();
 	Airplane(Object* object);
+	void init(Object* object);
 	void performBoost();
 	void aiUpdate(float deltaT, Checkpoints checkpoints);
 	void playerUpdate(float deltaT, vec3 controls);

@@ -1,6 +1,13 @@
 #include "include.h"
 
+Boosts::Boosts() {}
+
 Boosts::Boosts(Model* model, float radius)
+{
+	this->init(model, radius);
+}
+
+void Boosts::init(Model* model, float radius)
 {
 	this->model = model;
 	this->radius = radius;

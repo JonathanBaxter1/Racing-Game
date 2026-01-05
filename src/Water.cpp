@@ -1,7 +1,14 @@
 #include "include.h"
 
 
+Water::Water() {}
+
 Water::Water(Shader shader, unsigned int textures[], unsigned int numTextures, float mapSize, unsigned int patchRes)
+{
+	this->init(shader, textures, numTextures, mapSize, patchRes);
+}
+
+void Water::init(Shader shader, unsigned int textures[], unsigned int numTextures, float mapSize, unsigned int patchRes)
 {
 	this->patchRes = patchRes;
 	unsigned int patchSize = mapSize/patchRes;

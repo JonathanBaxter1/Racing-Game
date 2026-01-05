@@ -4,6 +4,11 @@ Object::Object() {}
 
 Object::Object(Model* model, float x, float y, float z, float size, float yaw, float pitch, float roll)
 {
+	this->init(model, x, y, z, size, yaw, pitch, roll);
+}
+
+void Object::init(Model* model, float x, float y, float z, float size, float yaw, float pitch, float roll)
+{
 	this->x = x;
 	this->y = y;
 	this->z = z;

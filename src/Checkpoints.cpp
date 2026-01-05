@@ -1,6 +1,13 @@
 #include "include.h"
 
+Checkpoints::Checkpoints() {}
+
 Checkpoints::Checkpoints(Model* model, float radius)
+{
+	this->init(model, radius);
+}
+
+void Checkpoints::init(Model* model, float radius)
 {
 	this->checkpointsPassed = 0;
 	this->lapsCompleted = 0;
