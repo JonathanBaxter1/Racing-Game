@@ -10,7 +10,7 @@ void init(Shader shader)
 {
 	if (FT_Init_FreeType(&ft)) {
 		std::cout << "Could not init freetype" << std::endl;
-		exit(-1);
+		std::exit(-1);
 	}
 	shaderID = shader.ID;
 

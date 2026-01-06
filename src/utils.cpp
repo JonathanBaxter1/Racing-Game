@@ -269,38 +269,3 @@ void setupReflectionBuffer(unsigned int* texturePtr, unsigned int* bufferPtr, un
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-
-void renderPrepare(unsigned int framebuffer, unsigned int resDivisor)
-{
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-	glViewport(0, 0, Window::width/resDivisor, Window::height/resDivisor);
-
-	setViewMatrix(Camera::viewMatrix, Camera::pitch, Camera::yaw, Camera::x, Camera::y, Camera::z);
-	updateUniforms();
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void renderScene(Terrain terrain, Airplane playerAirplane, Airplane* aiAirplanes[], unsigned int numAiAirplanes, Checkpoints checkpoints, StartLine startLine, Skybox skybox, Shader textureShader, Shader colorShader, Shader textureFullShader, Shader colorFullShader, unsigned int resDivisor, unsigned int frameCount)
-{
-	terrain.render((float)resDivisor);
-	playerAirplane.render(textureShader, colorShader, frameCount);
-	for (unsigned int i = 0; i < numAiAirplanes; i++) {
-		aiAirplanes[i]->render(textureShader, colorShader, frameCount);
-	}
-	checkpoints.render(textureFullShader, colorFullShader);
-	startLine.render(textureShader, colorShader);
-	skybox.render();
-}
-
-void renderTransparents(Boosts boosts, Shader textureFullShader, Shader colorFullShader)
-{
-	glEnable(GL_BLEND);
-	boosts.render(textureFullShader, colorFullShader);
-	glDisable(GL_BLEND);
-}
-
-void renderFinish()
-{
-	glfwSwapBuffers(Window::ptr);
-}

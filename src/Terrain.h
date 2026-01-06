@@ -21,7 +21,8 @@ private:
 	unsigned int numPatches;
 
 public:
-
+	Terrain();
 	Terrain(Shader shader, Shader occluderShader, TextureArray mapArray, TextureArray textureArray, float mapSize, unsigned int patchRes, unsigned short* heightMap, unsigned char* normalMap);
+	void init(Shader shader, Shader occluderShader, TextureArray mapArray, TextureArray textureArray, float mapSize, unsigned int patchRes, unsigned short* heightMap, unsigned char* normalMap);
 	void render(float resolutionDivisor);
 };

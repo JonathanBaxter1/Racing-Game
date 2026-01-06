@@ -27,7 +27,3 @@ extern unsigned char* loadRaw8(std::string fileName, unsigned int width, unsigne
 extern unsigned short* loadRaw16(std::string fileName, unsigned int width, unsigned int height, unsigned int numChannels);
 extern unsigned char* R16ToRGB8(unsigned short* r16Data, unsigned int width, unsigned int height);
 extern void setupReflectionBuffer(unsigned int* texturePtr, unsigned int* bufferPtr, unsigned int resDivisor);
-extern void renderPrepare(unsigned int framebuffer, unsigned int resDivisor);
-extern void renderScene(Terrain terrain, Airplane playerAirplane, Airplane* aiAirplanes[], unsigned int numAiAirplanes, Checkpoints checkpoints, StartLine startLine, Skybox skybox, Shader textureShader, Shader colorShader, Shader textureFullShader, Shader colorFullShader, unsigned int resDivisor, unsigned int frameCount);
-extern void renderTransparents(Boosts boosts, Shader textureFullShader, Shader colorFullShader);
-extern void renderFinish();

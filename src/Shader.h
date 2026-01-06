@@ -11,6 +11,9 @@ public:
 	unsigned int ID;
 
 	Shader();
+	Shader(std::string vertexFileName, std::string fragmentFileName);
+	Shader(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string fragmentFileName);
+	Shader(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string geometryFileName, std::string fragmentFileName);
 	void init(std::string vertexFileName, std::string fragmentFileName);
 	void init(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string fragmentFileName);
 	void init(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string geometryFileName, std::string fragmentFileName);

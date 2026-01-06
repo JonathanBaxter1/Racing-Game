@@ -16,7 +16,7 @@ void init()
 {
 	if (!glfwInit()) {
 		std::cout << "GLFW initialization failed" << std::endl;
-		exit(-1);
+		std::exit(-1);
 	}
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -34,7 +34,7 @@ void init()
 	if (ptr == NULL) {
 		std::cout << "GLFW window creation failed" << std::endl;
 		glfwTerminate();
-		exit(-1);
+		std::exit(-1);
 	}
 	glfwMakeContextCurrent(ptr);
 	glewInit();
@@ -46,7 +46,7 @@ void init()
 
 	if (cursorNumChannels != 4) {
 		std::cout << "Error: cursor image data must have 4 channels (RGBA)" << std::endl;
-		exit(-1);
+		std::exit(-1);
 	}
 	GLFWimage cursorImage;
 	cursorImage.width = cursorWidth;

@@ -3,7 +3,7 @@
 namespace Game
 {//
 
-void isRunning()
+bool isRunning()
 {
 	return !glfwWindowShouldClose(Window::ptr);
 }
@@ -29,8 +29,8 @@ void init()
 	terrainShader.init("terrain.vs", "terrain.tcs", "terrain.tes", "terrain.fs");
 
 	// Load fonts
-	Text::init(texShader);
-	arial48.init();
+	Text::init(textShader);
+	arial48.init("arial.ttf", 48);
 	Text::exit();
 
 	// Load skybox
@@ -53,8 +53,8 @@ void init()
 	airplaneModel7.init("airplane/airplane7.obj");
 	airplaneModel8.init("airplane/airplane8.obj");
 
-	Object playerAirplaneObj(&airplaneModel1, 2200.0, 65.0, 3347.0, 1.0, M_PI*0.48, 0.0, 0.0);
-	Airplane playerAirplane(&playerAirplaneObj);
+	playerAirplaneObj.init(&airplaneModel1, 2200.0, 65.0, 3347.0, 1.0, M_PI*0.48, 0.0, 0.0);
+	playerAirplane.init(&playerAirplaneObj);
 	aiAirplane1Obj.init(&airplaneModel2, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
 	aiAirplane2Obj.init(&airplaneModel3, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
 	aiAirplane3Obj.init(&airplaneModel4, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
@@ -62,14 +62,6 @@ void init()
 	aiAirplane5Obj.init(&airplaneModel6, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
 	aiAirplane6Obj.init(&airplaneModel7, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
 	aiAirplane7Obj.init(&airplaneModel8, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	aiAirplane1.init(&aiAirplane1Obj, checkpoints, 290, 0.8); // Yellow
-	aiAirplane2.init(&aiAirplane2Obj, checkpoints, 255, 1.0); // Orange
-	aiAirplane3.init(&aiAirplane3Obj, checkpoints, 270, 0.7); // Green
-	aiAirplane4.init(&aiAirplane4Obj, checkpoints, 265, 1.0); // Light blue
-	aiAirplane5.init(&aiAirplane5Obj, checkpoints, 300, 0.6); // Blue
-	aiAirplane6.init(&aiAirplane6Obj, checkpoints, 277, 1.0); // Dark blue/Purple
-	aiAirplane7.init(&aiAirplane7Obj, checkpoints, 350, 0.5); // Magenta
-	aiAirplanes[NUM_AI_AIRPLANES] = {&aiAirplane1, &aiAirplane2, &aiAirplane3, &aiAirplane4, &aiAirplane5, &aiAirplane6, &aiAirplane7};
 
 	startLineModel.init("startFinishLine/startFinishLine.obj");
 	startLineObj.init(&startLineModel, 1865.0, 90.0, 3349.0, START_LINE_SIZE, M_PI*0.5, 0.0, 0.0);
@@ -91,10 +83,17 @@ void update()
 	switch (screen) {
 	case RACE_SCREEN:
 		Race::update();
+		break;
 	case MAIN_MENU_SCREEN:
+		break;
 	case SETTINGS_SCREEN:
+		break;
 	case LEVEL_SELECT_SCREEN:
+		break;
 	case PAUSE_MENU_SCREEN:
+		break;
+	case RACE_RESULTS_SCREEN:
+		break;
 	}
 }
 
@@ -104,10 +103,17 @@ void render()
 	switch (screen) {
 	case RACE_SCREEN:
 		Race::render();
+		break;
 	case MAIN_MENU_SCREEN:
+		break;
 	case SETTINGS_SCREEN:
+		break;
 	case LEVEL_SELECT_SCREEN:
+		break;
 	case PAUSE_MENU_SCREEN:
+		break;
+	case RACE_RESULTS_SCREEN:
+		break;
 	}
 }
 
@@ -140,7 +146,7 @@ namespace Race
 		unsigned int numTerrainTextures = sizeof(terrainTextureFiles)/sizeof(std::string);
 		TextureArray terrainTextures(terrainTextureFiles, numTerrainTextures, 3, 8, GL_REPEAT);
 
-		Terrain terrain(terrainShader, depthShader, terrainMaps, terrainTextures, 4096.0, 64, heightMap, normalMap);
+		terrain.init(terrainShader, depthShader, terrainMaps, terrainTextures, 4096.0, 64, heightMap, normalMap);
 
 		// Wait to free heightMap so it can be used for collision detection
 		free(normalMap);
@@ -175,6 +181,14 @@ namespace Race
 		boosts.add(1875.0, 85.0, 2950.0, M_PI*0.35, 0.0);
 		boosts.add(2500.0, 60.0, 3370.0, M_PI*0.5, 0.0);
 
+		aiAirplane1.init(&aiAirplane1Obj, checkpoints, 290, 0.8); // Yellow
+		aiAirplane2.init(&aiAirplane2Obj, checkpoints, 255, 1.0); // Orange
+		aiAirplane3.init(&aiAirplane3Obj, checkpoints, 270, 0.7); // Green
+		aiAirplane4.init(&aiAirplane4Obj, checkpoints, 265, 1.0); // Light blue
+		aiAirplane5.init(&aiAirplane5Obj, checkpoints, 300, 0.6); // Blue
+		aiAirplane6.init(&aiAirplane6Obj, checkpoints, 277, 1.0); // Dark blue/Purple
+		aiAirplane7.init(&aiAirplane7Obj, checkpoints, 350, 0.5); // Magenta
+
 		unsigned int reflectionTexture;
 		if (GRAPHICS_SETTING == 3) {
 			reflectionRes = 1;
@@ -185,8 +199,9 @@ namespace Race
 
 		Texture waterDuDvTexture("waterDuDv.png", 8, GL_REPEAT);
 		unsigned int waterTextureIDs[] = {reflectionTexture, waterDuDvTexture.ID, islandHeightMap.ID};
-		Shader waterShader("water.vs", "", "", "", "water.fs");
+		Shader waterShader("water.vs", "water.fs");
 		water.init(waterShader, waterTextureIDs, sizeof(waterTextureIDs)/sizeof(unsigned int), 100000.0, 64);
+		lastTime = glfwGetTime();
 	}
 
 	void exit()
@@ -196,6 +211,9 @@ namespace Race
 
 	void update()
 	{
+		float curTime = glfwGetTime();
+		float dT = curTime - lastTime;
+		lastTime = curTime;
 		glfwPollEvents(); // 97% of CPU time goes to this function lol
 		vec3 controls = Window::handleInput(dT);
 		if (!Window::isSpectate) {
@@ -220,7 +238,7 @@ namespace Race
 				float newTime = glfwGetTime();
 				lapTimes[lapsCompleted] = newTime - lapStartTime;
 				lapStartTime = newTime;
-				courseTime += lapTime;
+				courseTime += lapTimes[lapsCompleted];
 				if (lapsCompleted == NUM_LAPS) raceStatus = RACE_ENDED;
 			}
 		}
@@ -230,6 +248,7 @@ namespace Race
 
 		if (boosts.isHit(&playerAirplane)) playerAirplane.performBoost();
 		boosts.sortByDistance(); // so transparency works correctly
+		frameCount++;
 
 		if (raceStatus == RACE_ENDED) {
 			screen = RACE_RESULTS_SCREEN;
@@ -245,18 +264,52 @@ namespace Race
 		Camera::pitch = -Camera::pitch;
 
 		renderPrepare(reflectionBuffer, reflectionRes);
-		renderScene(terrain, playerAirplane, aiAirplanes, NUM_AI_AIRPLANES, checkpoints, startLine, skybox, textureShader, colorShader, textureFullShader, colorFullShader, reflectionRes, frameCount);
-		renderTransparents(boosts, textureFullShader, colorFullShader);
+		renderScene(reflectionRes);
+		renderTransparents();
 
 		Camera::y += 2.0*(WATER_HEIGHT - Camera::y);
 		Camera::pitch = -Camera::pitch;
 
 		renderPrepare(0, 1);
-		renderScene(terrain, playerAirplane, aiAirplanes, NUM_AI_AIRPLANES, checkpoints, startLine, skybox, textureShader, colorShader, textureFullShader, colorFullShader, 1, frameCount);
+		renderScene(1);
 		water.render();
-		renderTransparents(boosts, textureFullShader, colorFullShader);
+		renderTransparents();
 
-		renderFinish();
+		glfwSwapBuffers(Window::ptr);
+	}
+
+	void renderPrepare(unsigned int framebuffer, unsigned int resDivisor)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		glViewport(0, 0, Window::width/resDivisor, Window::height/resDivisor);
+
+		setViewMatrix(Camera::viewMatrix, Camera::pitch, Camera::yaw, Camera::x, Camera::y, Camera::z);
+		updateUniforms();
+		glClearColor(0.0, 0.0, 0.0, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	void renderScene(unsigned int resDivisor)
+	{
+		terrain.render((float)resDivisor);
+		playerAirplane.render(textureShader, colorShader, frameCount);
+		aiAirplane1.render(textureShader, colorShader, frameCount);
+		aiAirplane2.render(textureShader, colorShader, frameCount);
+		aiAirplane3.render(textureShader, colorShader, frameCount);
+		aiAirplane4.render(textureShader, colorShader, frameCount);
+		aiAirplane5.render(textureShader, colorShader, frameCount);
+		aiAirplane6.render(textureShader, colorShader, frameCount);
+		aiAirplane7.render(textureShader, colorShader, frameCount);
+		checkpoints.render(textureFullShader, colorFullShader);
+		startLine.render(textureShader, colorShader);
+		skybox.render();
+	}
+
+	void renderTransparents()
+	{
+		glEnable(GL_BLEND);
+		boosts.render(textureFullShader, colorFullShader);
+		glDisable(GL_BLEND);
 	}
 }
 
@@ -288,7 +341,7 @@ namespace RaceResults
 
 	void exit()
 	{
-		exit(0);
+		std::exit(0);
 	}
 }
 

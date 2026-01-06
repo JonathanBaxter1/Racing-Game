@@ -10,6 +10,7 @@ class Airplane;
 class AiAirplane;
 class Checkpoints;
 class Boosts;
+class Terrain;
 
 namespace Game
 {
@@ -21,7 +22,7 @@ namespace Game
 	inline constexpr unsigned int RACE_RESULTS_SCREEN = 5;
 
 	inline constexpr unsigned int NUM_AI_AIRPLANES = 7;
-	inline constexpr unsigned int NUM_LAPS 3;
+	inline constexpr unsigned int NUM_LAPS = 3;
 
 	inline unsigned int screen = MAIN_MENU_SCREEN;
 	inline unsigned int screenCurFrame = screen;
@@ -53,19 +54,13 @@ namespace Game
 	inline Object aiAirplane5Obj;
 	inline Object aiAirplane6Obj;
 	inline Object aiAirplane7Obj;
-	inline AiAirplane1;
-	inline AiAirplane2;
-	inline AiAirplane3;
-	inline AiAirplane4;
-	inline AiAirplane5;
-	inline AiAirplane6;
-	inline AiAirplane7;
-	inline Airplane* aiAirplanes[NUM_AI_AIRPLANES];
+	inline Airplane playerAirplane;
 	inline Model startLineModel;
 	inline Object startLineObj;
 	inline StartLine startLine;
+	inline Terrain terrain;
 
-	void isRunning();
+	bool isRunning();
 	void init();
 	void exit();
 	void update();
@@ -80,6 +75,13 @@ namespace Game
 		inline constexpr unsigned int MAP_WIDTH = 4096;
 		inline constexpr unsigned int MAP_HEIGHT = 4096;
 
+		inline AiAirplane aiAirplane1;
+		inline AiAirplane aiAirplane2;
+		inline AiAirplane aiAirplane3;
+		inline AiAirplane aiAirplane4;
+		inline AiAirplane aiAirplane5;
+		inline AiAirplane aiAirplane6;
+		inline AiAirplane aiAirplane7;
 		inline unsigned int raceStatus = RACE_NOT_STARTED;
 		inline float lapStartTime;
 		inline unsigned int lapsCompleted = 0;
@@ -87,17 +89,22 @@ namespace Game
 		inline float courseTime = 0.0;
 		inline unsigned short* heightMap;
 		inline Model checkpointModel;
-		inline Checkpoint checkpoints;
+		inline Checkpoints checkpoints;
 		inline Model boostModel;
 		inline Boosts boosts;
 		inline unsigned int reflectionBuffer;
 		inline unsigned int reflectionRes;
 		inline Water water;
+		inline float lastTime = 0.0;
+		inline unsigned int frameCount = 0;
 
 		void init(unsigned int course);
 		void exit();
 		void update();
 		void render();
+		void renderPrepare(unsigned int framebuffer, unsigned int resDivisor);
+		void renderScene(unsigned int resDivisor);
+		void renderTransparents();
 	}
 
 	namespace MainMenu

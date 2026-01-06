@@ -2,7 +2,14 @@
 
 std::vector<Model*> Model::models;
 
+Model::Model() {}
+
 Model::Model(std::string path)
+{
+	this->init(path);
+}
+
+void Model::init(std::string path)
 {
 	loadModel("models/" + path);
 }

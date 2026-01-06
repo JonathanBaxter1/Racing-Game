@@ -6,11 +6,12 @@ AiAirplane::AiAirplane() : Airplane() {}
 
 AiAirplane::AiAirplane(Object* object, Checkpoints checkpoints, float speed, float corneringSpeed) : Airplane(object)
 {
-	this->init(object, checkpoints, speed, corneringSpeed
+	this->init(object, checkpoints, speed, corneringSpeed);
 }
 
-void AiAirplane::init(Object* object, Checkpoints checkpoints, float speed, float corneringSpeed) : Airplane(object)
+void AiAirplane::init(Object* object, Checkpoints checkpoints, float speed, float corneringSpeed)
 {
+	this->Airplane::init(object);
 	this->speed = speed;
 	this->corneringSpeed = corneringSpeed;
 	this->hermiteT = 0.05;

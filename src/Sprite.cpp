@@ -19,7 +19,6 @@ void Sprite::init(Texture texture, Shader shader, float x, float y, float width,
 		x, y + height, 0.0, 1.0,
 		x + width, y, 1.0, 0.0,
 	};
-	std::cout<<sizeof(squareVertices)/sizeof(float)<<std::endl;
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);

@@ -4,6 +4,21 @@ std::vector<unsigned int> Shader::shaders;
 
 Shader::Shader() {}
 
+Shader::Shader(std::string vertexFileName, std::string fragmentFileName)
+{
+	this->init(vertexFileName, fragmentFileName);
+}
+
+Shader::Shader(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string fragmentFileName)
+{
+	this->init(vertexFileName, tessControlFileName, tessEvalFileName, fragmentFileName);
+}
+
+Shader::Shader(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string geometryFileName, std::string fragmentFileName)
+{
+	this->init(vertexFileName, tessControlFileName, tessEvalFileName, geometryFileName);
+}
+
 unsigned int Shader::compileShader(unsigned int type, char* source)
 {
 	unsigned int shaderId = glCreateShader(type);
@@ -12,7 +27,7 @@ unsigned int Shader::compileShader(unsigned int type, char* source)
 	int result;
 	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &result);
 	if (!result) {
-		std::cout << "Failed to compile shader" << std::endl;
+		std::cout << "Failed to compile shader: " << type << std::endl;
 		return 0;
 	}
 	return shaderId;
