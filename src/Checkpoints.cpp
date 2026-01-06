@@ -9,6 +9,10 @@ Checkpoints::Checkpoints(Model* model, float radius)
 
 void Checkpoints::init(Model* model, float radius)
 {
+	this->objects.clear();
+	this->colors.clear();
+	this->tangentMagsStart.clear();
+	this->tangentMagsEnd.clear();
 	this->checkpointsPassed = 0;
 	this->lapsCompleted = 0;
 	this->model = model;

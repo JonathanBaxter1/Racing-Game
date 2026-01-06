@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types.h"
-#include "Object.h"
+class Object;
 class Checkpoints;
 
 class Airplane

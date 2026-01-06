@@ -11,6 +11,8 @@ class AiAirplane;
 class Checkpoints;
 class Boosts;
 class Terrain;
+class Texture;
+class TextureArray;
 
 namespace Game
 {
@@ -36,6 +38,7 @@ namespace Game
 	inline Shader depthShader;
 	inline Shader skyboxShader;
 	inline Shader terrainShader;
+	inline Shader waterShader;
 	inline Sprite loadingSprite;
 	inline Skybox skybox;
 	inline Model airplaneModel1;
@@ -93,8 +96,14 @@ namespace Game
 		inline Model boostModel;
 		inline Boosts boosts;
 		inline unsigned int reflectionBuffer;
+		inline unsigned int reflectionTexture;
+		inline unsigned int reflectionDepth;
 		inline unsigned int reflectionRes;
 		inline Water water;
+		inline TextureArray terrainMaps;
+		inline TextureArray terrainTextures;
+		inline Texture islandHeightMaps;
+		inline Texture waterDuDvTexture;
 		inline float lastTime = 0.0;
 		inline unsigned int frameCount = 0;
 
@@ -109,18 +118,34 @@ namespace Game
 
 	namespace MainMenu
 	{
+		void init();
+		void exit();
+		void update();
+		void render();
 	}
 
 	namespace Settings
 	{
+		void init();
+		void exit();
+		void update();
+		void render();
 	}
 
 	namespace LevelSelect
 	{
+		void init();
+		void exit();
+		void update();
+		void render();
 	}
 
 	namespace PauseMenu
 	{
+		void init();
+		void exit();
+		void update();
+		void render();
 	}
 
 	namespace RaceResults
@@ -130,5 +155,7 @@ namespace Game
 
 		void init();
 		void exit();
+		void update();
+		void render();
 	}
 }

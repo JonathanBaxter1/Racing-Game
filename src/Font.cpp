@@ -9,6 +9,12 @@ void Font::init(std::string fontFileName, unsigned int fontSize)
 
 void Font::init(std::string fontFileName, unsigned int fontSize, unsigned int numChars)
 {
+	this->textureID.clear();
+	this->width.clear();
+	this->height.clear();
+	this->bearingX.clear();
+	this->bearingY.clear();
+	this->advance.clear();
 	std::string path = "fonts/" + fontFileName;
 
 	FT_Face face;

@@ -9,6 +9,8 @@ Boosts::Boosts(Model* model, float radius)
 
 void Boosts::init(Model* model, float radius)
 {
+	this->objects.clear();
+	this->sortIndices.clear();
 	this->model = model;
 	this->radius = radius;
 }

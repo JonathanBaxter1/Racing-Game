@@ -10,4 +10,5 @@ namespace Text
 	void init(Shader shader);
 	void exit();
 	void render(std::string text, float x, float y, Font font);
+	void render(std::string text, float x, float y, Font font, bool isCentered);
 }

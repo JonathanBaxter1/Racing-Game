@@ -33,6 +33,12 @@ void exit()
 
 void render(std::string text, float x, float y, Font font)
 {
+	render(text, x, y, font, false);
+}
+
+void render(std::string text, float x, float y, Font font, bool isCentered)
+{
+	if (text == "") return;
 	glEnable(GL_BLEND);
 	glUseProgram(shaderID);
 	glBindVertexArray(vao);
@@ -40,6 +46,18 @@ void render(std::string text, float x, float y, Font font)
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	float scale = 1.0/(float)Window::height*2.0;
+
+	if (isCentered) {
+		unsigned int textWidthPixels = -font.bearingX[text[0]];
+		for (unsigned int i = 0; i < text.size() - 1; i++) {
+			unsigned char c = text[i];
+			textWidthPixels += font.advance[c] >> 6;
+		}
+		textWidthPixels += font.bearingX[text.back()] + font.width[text.back()];
+		float textWidth = (float)textWidthPixels*scale/Window::aspectRatio;
+		x -= textWidth/2.0;
+	}
+
 	for (unsigned int i = 0; i < text.size(); i++) {
 		unsigned char c = text[i];
 
@@ -47,7 +65,6 @@ void render(std::string text, float x, float y, Font font)
 		float yPos = y - ((float)font.height[c] - (float)font.bearingY[c])*scale;
 		float width = (float)font.width[c]*scale/Window::aspectRatio;
 		float height = (float)font.height[c]*scale;
-
 		float vertices[6*4] = { // x, y, u, v
 			xPos, yPos, 0.0, 1.0,
 			xPos + width, yPos, 1.0, 1.0,

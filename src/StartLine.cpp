@@ -25,5 +25,7 @@ bool StartLine::isIntersect(Airplane* airplane)
 
 void StartLine::render(Shader textureShader, Shader colorShader)
 {
+	glEnable(GL_CLIP_DISTANCE0);
 	this->object->render(textureShader, colorShader);
+	glDisable(GL_CLIP_DISTANCE0);
 }

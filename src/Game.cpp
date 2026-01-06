@@ -27,6 +27,7 @@ void init()
 	depthShader.init("colorFull.vs", "depth.fs");
 	skyboxShader.init("skybox.vs", "skybox.fs");
 	terrainShader.init("terrain.vs", "terrain.tcs", "terrain.tes", "terrain.fs");
+	waterShader.init("water.vs", "water.fs");
 
 	// Load fonts
 	Text::init(textShader);
@@ -53,23 +54,9 @@ void init()
 	airplaneModel7.init("airplane/airplane7.obj");
 	airplaneModel8.init("airplane/airplane8.obj");
 
-	playerAirplaneObj.init(&airplaneModel1, 2200.0, 65.0, 3347.0, 1.0, M_PI*0.48, 0.0, 0.0);
-	playerAirplane.init(&playerAirplaneObj);
-	aiAirplane1Obj.init(&airplaneModel2, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	aiAirplane2Obj.init(&airplaneModel3, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	aiAirplane3Obj.init(&airplaneModel4, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	aiAirplane4Obj.init(&airplaneModel5, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	aiAirplane5Obj.init(&airplaneModel6, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	aiAirplane6Obj.init(&airplaneModel7, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-	aiAirplane7Obj.init(&airplaneModel8, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
-
-	startLineModel.init("startFinishLine/startFinishLine.obj");
-	startLineObj.init(&startLineModel, 1865.0, 90.0, 3349.0, START_LINE_SIZE, M_PI*0.5, 0.0, 0.0);
-	startLine.init(&startLineObj);
-
 	// Temp
-	screen = RACE_SCREEN;
-	Race::init(0);
+	screen = MAIN_MENU_SCREEN;
+	MainMenu::init();
 }
 
 void exit()
@@ -85,14 +72,19 @@ void update()
 		Race::update();
 		break;
 	case MAIN_MENU_SCREEN:
+		MainMenu::update();
 		break;
 	case SETTINGS_SCREEN:
+		Settings::update();
 		break;
 	case LEVEL_SELECT_SCREEN:
+		LevelSelect::update();
 		break;
 	case PAUSE_MENU_SCREEN:
+		PauseMenu::update();
 		break;
 	case RACE_RESULTS_SCREEN:
+		RaceResults::update();
 		break;
 	}
 }
@@ -105,14 +97,19 @@ void render()
 		Race::render();
 		break;
 	case MAIN_MENU_SCREEN:
+		MainMenu::render();
 		break;
 	case SETTINGS_SCREEN:
+		Settings::render();
 		break;
 	case LEVEL_SELECT_SCREEN:
+		LevelSelect::render();
 		break;
 	case PAUSE_MENU_SCREEN:
+		PauseMenu::render();
 		break;
 	case RACE_RESULTS_SCREEN:
+		RaceResults::render();
 		break;
 	}
 }
@@ -130,6 +127,26 @@ namespace Race
 	void init(unsigned int course)
 	{
 		renderLoadingScreen();
+
+		Window::desiredPitch = 0.0;
+		Window::desiredTurnAngle = 0.0;
+		Window::desiredSpeed = 240.0;
+		Window::isSpectate = false;
+
+		playerAirplaneObj.init(&airplaneModel1, 2200.0, 65.0, 3347.0, 1.0, M_PI*0.48, 0.0, 0.0);
+		playerAirplane.init(&playerAirplaneObj);
+		aiAirplane1Obj.init(&airplaneModel2, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+		aiAirplane2Obj.init(&airplaneModel3, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+		aiAirplane3Obj.init(&airplaneModel4, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+		aiAirplane4Obj.init(&airplaneModel5, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+		aiAirplane5Obj.init(&airplaneModel6, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+		aiAirplane6Obj.init(&airplaneModel7, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+		aiAirplane7Obj.init(&airplaneModel8, 0.0, 70.0, 0.0, 1.0, M_PI/2.0, 0.0, 0.0);
+
+		startLineModel.init("startFinishLine/startFinishLine.obj");
+		startLineObj.init(&startLineModel, 1865.0, 90.0, 3349.0, START_LINE_SIZE, M_PI*0.5, 0.0, 0.0);
+		startLine.init(&startLineObj);
+
 		stbi_set_flip_vertically_on_load(false);
 		heightMap = loadRaw16("islandHeightMap.r16", MAP_WIDTH, MAP_HEIGHT, 1);
 		unsigned char* normalMap = loadRaw8("islandNormalMap.rgb8", MAP_WIDTH, MAP_HEIGHT, 3);
@@ -138,13 +155,13 @@ namespace Race
 
 		void* mapData[] = {(void*)heightMapRGB8, (void*)normalMap, (void*)colorMap};
 		unsigned int numMapData = sizeof(mapData)/sizeof(void*);
-		TextureArray terrainMaps(mapData, numMapData, MAP_WIDTH, MAP_HEIGHT, 3, 8, GL_CLAMP_TO_EDGE);
-		Texture islandHeightMap(heightMap, MAP_WIDTH, MAP_HEIGHT, 1, GL_CLAMP_TO_EDGE);
+		terrainMaps.init(mapData, numMapData, MAP_WIDTH, MAP_HEIGHT, 3, 8, GL_CLAMP_TO_EDGE);
+		islandHeightMap.init(heightMap, MAP_WIDTH, MAP_HEIGHT, 1, GL_CLAMP_TO_EDGE);
 
 		stbi_set_flip_vertically_on_load(true);
 		std::string terrainTextureFiles[] = {"stone2.png", "grass2.png", "snow2.png"};
 		unsigned int numTerrainTextures = sizeof(terrainTextureFiles)/sizeof(std::string);
-		TextureArray terrainTextures(terrainTextureFiles, numTerrainTextures, 3, 8, GL_REPEAT);
+		terrainTextures.init(terrainTextureFiles, numTerrainTextures, 3, 8, GL_REPEAT);
 
 		terrain.init(terrainShader, depthShader, terrainMaps, terrainTextures, 4096.0, 64, heightMap, normalMap);
 
@@ -189,23 +206,34 @@ namespace Race
 		aiAirplane6.init(&aiAirplane6Obj, checkpoints, 277, 1.0); // Dark blue/Purple
 		aiAirplane7.init(&aiAirplane7Obj, checkpoints, 350, 0.5); // Magenta
 
-		unsigned int reflectionTexture;
 		if (GRAPHICS_SETTING == 3) {
 			reflectionRes = 1;
 		} else {
 			reflectionRes = 2;
 		}
-		setupReflectionBuffer(&reflectionTexture, &reflectionBuffer, reflectionRes);
+		setupReflectionBuffer(&reflectionTexture, &reflectionDepth, &reflectionBuffer, reflectionRes);
 
-		Texture waterDuDvTexture("waterDuDv.png", 8, GL_REPEAT);
+		waterDuDvTexture.init("waterDuDv.png", 8, GL_REPEAT);
 		unsigned int waterTextureIDs[] = {reflectionTexture, waterDuDvTexture.ID, islandHeightMap.ID};
-		Shader waterShader("water.vs", "water.fs");
 		water.init(waterShader, waterTextureIDs, sizeof(waterTextureIDs)/sizeof(unsigned int), 100000.0, 64);
 		lastTime = glfwGetTime();
 	}
 
 	void exit()
 	{
+		glDeleteTextures(1, &terrainMaps.ID);
+		glDeleteTextures(1, &terrainTextures.ID);
+		glDeleteTextures(1, &islandHeightMaps.ID);
+		glDeleteTextures(1, &waterDuDvTexture.ID);
+		glDeleteTextures(1, &reflectionTexture);
+		glDeleteTextures(1, &reflectionDepth);
+		glDeleteFramebuffers(1, &reflectionBuffer);
+		glDeleteVertexArrays(1, &terrain.vao);
+		glDeleteBuffers(1, &terrain.vbo);
+		glDeleteVertexArrays(1, &terrain.occluderVao);
+		glDeleteBuffers(1, &terrain.occluderVbo);
+		glDeleteVertexArrays(1, &water.vao);
+		glDeleteBuffers(1, &water.vbo);
 		free(heightMap);
 	}
 
@@ -216,6 +244,12 @@ namespace Race
 		lastTime = curTime;
 		glfwPollEvents(); // 97% of CPU time goes to this function lol
 		vec3 controls = Window::handleInput(dT);
+		if (Window::isKeyDown(GLFW_KEY_5)) {
+			screen = MAIN_MENU_SCREEN;
+			Race::exit();
+			MainMenu::init();
+			return;
+		}
 		if (!Window::isSpectate) {
 			aiAirplane1.update(dT, checkpoints);
 			aiAirplane2.update(dT, checkpoints);
@@ -315,18 +349,89 @@ namespace Race
 
 namespace MainMenu
 {
+	void init()
+	{
+	}
+
+	void exit()
+	{
+	}
+
+	void update()
+	{
+		glfwPollEvents();
+		if (Window::isKeyDown(GLFW_KEY_1)) {
+			screen = RACE_SCREEN;
+			MainMenu::exit();
+			Race::init(0);
+			return;
+		}
+	}
+
+	void render()
+	{
+		glClearColor(0.5, 0.0, 0.5, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		Text::render("Main Menu", 0.0, 0.0, arial48, true);
+		glfwSwapBuffers(Window::ptr);
+	}
 }
 
 namespace Settings
 {
+	void init()
+	{
+	}
+
+	void exit()
+	{
+	}
+
+	void update()
+	{
+	}
+
+	void render()
+	{
+	}
 }
 
 namespace LevelSelect
 {
+	void init()
+	{
+	}
+
+	void exit()
+	{
+	}
+
+	void update()
+	{
+	}
+
+	void render()
+	{
+	}
 }
 
 namespace PauseMenu
 {
+	void init()
+	{
+	}
+
+	void exit()
+	{
+	}
+
+	void update()
+	{
+	}
+
+	void render()
+	{
+	}
 }
 
 namespace RaceResults
@@ -342,6 +447,14 @@ namespace RaceResults
 	void exit()
 	{
 		std::exit(0);
+	}
+
+	void update()
+	{
+	}
+
+	void render()
+	{
 	}
 }
 

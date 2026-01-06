@@ -9,7 +9,6 @@ class Water
 private:
 	unsigned int vao;
 	unsigned int vbo;
-	unsigned int ibo;
 	unsigned int shader;
 	unsigned int textures[WATER_MAX_TEXTURES];
 	unsigned int numTextures;

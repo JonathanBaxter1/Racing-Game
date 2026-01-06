@@ -26,4 +26,4 @@ extern void eulerRotationMatrix4(mat4 matrix, float size, float yaw, float pitch
 extern unsigned char* loadRaw8(std::string fileName, unsigned int width, unsigned int height, unsigned int numChannels);
 extern unsigned short* loadRaw16(std::string fileName, unsigned int width, unsigned int height, unsigned int numChannels);
 extern unsigned char* R16ToRGB8(unsigned short* r16Data, unsigned int width, unsigned int height);
-extern void setupReflectionBuffer(unsigned int* texturePtr, unsigned int* bufferPtr, unsigned int resDivisor);
+extern void setupReflectionBuffer(unsigned int* texturePtr, unsigned int* depthPtr, unsigned int* bufferPtr, unsigned int resDivisor);
