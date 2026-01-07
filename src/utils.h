@@ -1,13 +1,6 @@
 #pragma once
 
 #include "types.h"
-#include "Model.h"
-#include "Terrain.h"
-#include "Airplane.h"
-#include "Checkpoints.h"
-#include "StartLine.h"
-#include "Skybox.h"
-#include "Boosts.h"
 
 extern float clamp(float number, float min, float max);
 extern void mat3Multiply(mat3 output, mat3 input1, mat3 input2);
@@ -26,4 +19,3 @@ extern void eulerRotationMatrix4(mat4 matrix, float size, float yaw, float pitch
 extern unsigned char* loadRaw8(std::string fileName, unsigned int width, unsigned int height, unsigned int numChannels);
 extern unsigned short* loadRaw16(std::string fileName, unsigned int width, unsigned int height, unsigned int numChannels);
 extern unsigned char* R16ToRGB8(unsigned short* r16Data, unsigned int width, unsigned int height);
-extern void setupReflectionBuffer(unsigned int* texturePtr, unsigned int* depthPtr, unsigned int* bufferPtr, unsigned int resDivisor);

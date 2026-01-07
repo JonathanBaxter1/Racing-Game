@@ -1,17 +1,8 @@
 #include "include.h"
 
-std::vector<Model*> Model::models;
-
-Model::Model() {}
-
 Model::Model(std::string path)
 {
-	this->init(path);
-}
-
-void Model::init(std::string path)
-{
-	loadModel("models/" + path);
+	this->loadModel("models/" + path);
 }
 
 void Model::render(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix, unsigned int frame, Color color)
@@ -35,25 +26,23 @@ void Model::loadModel(std::string path)
 	}
 	directory = path.substr(0, path.find_last_of('/'));
 	processNode(scene->mRootNode, scene);
-	Model::models.push_back(this);
 }
 
 void Model::processNode(aiNode *node, const aiScene *scene)
 {
 	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 		aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-		meshes.push_back(processMesh(mesh, scene));
+		processMesh(mesh, scene);
 	}
 	for (unsigned int i = 0; i < node->mNumChildren; i++) {
 		processNode(node->mChildren[i], scene);
 	}
 }
 
-Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
+void Model::processMesh(aiMesh *mesh, const aiScene *scene)
 {
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
-	std::vector<TextureFull> textures;
 
 	// Process Vertices
 	vertices.reserve(mesh->mNumVertices);
@@ -94,15 +83,16 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 
 	// Process Material
 	Material mat;
+	std::vector<GLuint> textureIDs;
 	if (mesh->mMaterialIndex >= 0) {
 		aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 		mat = loadMaterial(material);
-		std::vector<TextureFull> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "diffuse");
-		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-		std::vector<TextureFull> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "specular");
-		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+		std::vector<GLuint> diffuseIDs = loadMaterialTextures(material, aiTextureType_DIFFUSE, "diffuse");
+		textureIDs.insert(textureIDs.end(), diffuseIDs.begin(), diffuseIDs.end());
+		std::vector<GLuint> specularIDs = loadMaterialTextures(material, aiTextureType_SPECULAR, "specular");
+		textureIDs.insert(textureIDs.end(), specularIDs.begin(), specularIDs.end());
 	}
-	return Mesh(vertices, indices, textures, mat);
+	meshes.emplace_back(vertices, indices, textureIDs, mat);
 }
 
 Material Model::loadMaterial(aiMaterial *mat)
@@ -127,30 +117,24 @@ Material Model::loadMaterial(aiMaterial *mat)
 	return material;
 }
 
-std::vector<TextureFull> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
+std::vector<GLuint> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
 {
-	std::vector<TextureFull> textures;
+	std::vector<GLuint> textureIDs;
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
 		aiString str;
 		mat->GetTexture(type, i, &str);
 		bool skip = false;
-		for (unsigned int j = 0; j < textures_loaded.size(); j++) {
-			if (std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0) {
-				textures.push_back(textures_loaded[j]);
+		for (unsigned int j = 0; j < this->texturePaths.size(); j++) {
+			if (str.C_Str() == this->texturePaths[j]) {
 				skip = true;
 				break;
 			}
 		}
 		if (!skip) {
-			TextureFull texture;
-			Texture textureTemp(str.C_Str(), directory, 8, GL_REPEAT);
-			texture.id = textureTemp.ID;
-			texture.type = typeName;
-			texture.path = str.C_Str();
-			textures.push_back(texture);
-			textures_loaded.push_back(texture);
+			this->textures.emplace_back(str.C_Str(), this->directory, 8, GL_REPEAT);
+			this->texturePaths.push_back(str.C_Str());
+			textureIDs.push_back(this->textures.back().ID);
 		}
 	}
-	return textures;
+	return textureIDs;
 }
-

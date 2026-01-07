@@ -1,10 +1,10 @@
 #include "include.h"
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<TextureFull> textures, Material material)
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<GLuint> textureIDs, Material material)
 {
 	this->vertices = vertices;
 	this->indices = indices;
-	this->textures = textures;
+	this->textureIDs = textureIDs;
 	this->material = material;
 	setupMesh();
 }
@@ -27,14 +27,14 @@ void Mesh::render(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix, bo
 	mat4 finalMatrix;
 	mat4Multiply(finalMatrix, propMatrix, modelMatrix);
 
-	if (this->textures.size() > 0) {
+	if (this->textureIDs.size() > 0) {
 		glUseProgram(shaderTexture.ID);
 		int diffuseMapUniformLoc = glGetUniformLocation(shaderTexture.ID, "diffuseMapTex");
 		glUniform1i(diffuseMapUniformLoc, 0);
 		int specularMapUniformLoc = glGetUniformLocation(shaderTexture.ID, "specularMapTex");
 		glUniform1i(specularMapUniformLoc, 1);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, this->textures[0].id);
+		glBindTexture(GL_TEXTURE_2D, this->textureIDs[0]);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	} else {

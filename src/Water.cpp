@@ -1,34 +1,21 @@
 #include "include.h"
 
-
-Water::Water() {}
-
-Water::Water(Shader shader, unsigned int textures[], unsigned int numTextures, float mapSize, unsigned int patchRes)
+Water::Water(Shader shader, Texture heightMapTex, Texture dudvTex, float mapSize, unsigned int patchRes, unsigned int resDivisor)
 {
-	this->init(shader, textures, numTextures, mapSize, patchRes);
-}
-
-void Water::init(Shader shader, unsigned int textures[], unsigned int numTextures, float mapSize, unsigned int patchRes)
-{
-	this->patchRes = patchRes;
 	unsigned int patchSize = mapSize/patchRes;
-	if (numTextures > WATER_MAX_TEXTURES) {
-		std::cout << "Too many textures in terrain. Max is " << WATER_MAX_TEXTURES << std::endl;
-		exit(-1);
-	}
 
+	this->setupReflectionBuffer(resDivisor);
+	this->patchRes = patchRes;
+	this->numPatches = patchRes*patchRes;
 	this->shader = shader.ID;
+	this->heightMapTexID = heightMapTex.ID;
+	this->dudvTexID = dudvTex.ID;
+
 	glUseProgram(this->shader);
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(this->vao);
-	for (unsigned int i = 0; i < numTextures; i++) {
-		this->textures[i] = textures[i];
-	}
-	this->numTextures = numTextures;
 
 	float* surfaceVertices;
-	this->numPatches = patchRes*patchRes;
-
 	unsigned int surfaceVerticesSize = 12*numPatches*sizeof(float);
 	surfaceVertices = (float*)malloc(surfaceVerticesSize);
 	unsigned int offset = 0;
@@ -50,9 +37,12 @@ void Water::init(Shader shader, unsigned int textures[], unsigned int numTexture
 		surfaceVertices[offset + 11] = (y + 1)*patchSize;
 		offset += 12;
 	}
-	int texturesUniformLoc = glGetUniformLocation(this->shader, "textures");
-	int units[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-	glUniform1iv(texturesUniformLoc, numTextures, units);
+	GLint reflectionUniformLoc = glGetUniformLocation(this->shader, "reflectionTex");
+	GLint dudvUniformLoc = glGetUniformLocation(this->shader, "dudvTex");
+	GLint heightMapLoc = glGetUniformLocation(this->shader, "heightMapTex");
+	glUniform1iv(reflectionUniformLoc, 0);
+	glUniform1iv(dudvUniformLoc, 1);
+	glUniform1iv(heightMapUniformLoc, 2);
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
@@ -70,11 +60,36 @@ void Water::render()
 	glUseProgram(this->shader);
 	glBindVertexArray(this->vao);
 
-	for (unsigned int i = 0; i < numTextures; i++) {
-		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, this->textures[i]);
-	}
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, this->reflectionTex.ID);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, this->dudvTex.ID);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, this->heightMapTex.ID);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6*this->numPatches);
 
+}
+
+void Water::setupReflectionBuffer(unsigned int resDivisor)
+{
+	glBindTexture(GL_TEXTURE_2D, this->reflectionTex.ID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Window::width/resDivisor, Window::height/resDivisor, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glBindTexture(GL_TEXTURE_2D, this->depthTex.ID);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, Window::width/resDivisor, Window::height/resDivisor, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer.ID);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, this->reflectionTex.ID, 0);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, this->depthTex.ID, 0);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

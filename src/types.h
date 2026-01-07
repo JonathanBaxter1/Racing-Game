@@ -7,11 +7,6 @@
 typedef float mat3[9];
 typedef float mat4[16];
 typedef struct {
-	unsigned int id;
-	std::string type;
-	std::string path;
-} TextureFull;
-typedef struct {
 	float x;
 	float y;
 } vec2;

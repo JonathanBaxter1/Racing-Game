@@ -75,7 +75,7 @@ void render(std::string text, float x, float y, Font font, bool isCentered)
 			xPos + width, yPos, 1.0, 1.0,
 		};
 
-		glBindTexture(GL_TEXTURE_2D, font.textureID[c]);
+		glBindTexture(GL_TEXTURE_2D, font.glTex[c].ID);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -85,6 +85,5 @@ void render(std::string text, float x, float y, Font font, bool isCentered)
 	}
 	glDisable(GL_BLEND);
 }
-
 
 }//

@@ -242,30 +242,3 @@ unsigned char* R16ToRGB8(unsigned short* r16Data, unsigned int width, unsigned i
 	}
 	return rgb8Data;
 }
-
-void setupReflectionBuffer(unsigned int* texturePtr, unsigned int* depthPtr, unsigned int* bufferPtr, unsigned int resDivisor)
-{
-	glGenTextures(1, texturePtr);
-	glBindTexture(GL_TEXTURE_2D, *texturePtr);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Window::width/resDivisor, Window::height/resDivisor, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glGenTextures(1, depthPtr);
-	glBindTexture(GL_TEXTURE_2D, *depthPtr);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, Window::width/resDivisor, Window::height/resDivisor, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glGenFramebuffers(1, bufferPtr);
-	glBindFramebuffer(GL_FRAMEBUFFER, *bufferPtr);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, *texturePtr, 0);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, *depthPtr, 0);
-	glDrawBuffer(GL_COLOR_ATTACHMENT0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-

@@ -1,20 +1,17 @@
 #include "include.h"
 
-Font::Font() {}
-
-void Font::init(std::string fontFileName, unsigned int fontSize)
+Font::Font(std::string fontFileName, unsigned int fontSize)
 {
 	this->init(fontFileName, fontSize, 128);
 }
 
+Font::Font(std::string fontFileName, unsigned int fontSize, unsigned int numChars)
+{
+	this->init(fontFilename, fontSize, numChars);
+}
+
 void Font::init(std::string fontFileName, unsigned int fontSize, unsigned int numChars)
 {
-	this->textureID.clear();
-	this->width.clear();
-	this->height.clear();
-	this->bearingX.clear();
-	this->bearingY.clear();
-	this->advance.clear();
 	std::string path = "fonts/" + fontFileName;
 
 	FT_Face face;
@@ -29,22 +26,19 @@ void Font::init(std::string fontFileName, unsigned int fontSize, unsigned int nu
 			std::cout << "Freetype failed to load character " << c << " from " << path << std::endl;
 			exit(-1);
 		}
-		unsigned int texture;
-		glGenTextures(1, &texture);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		this->textureID.push_back(texture);
 		this->width.push_back(face->glyph->bitmap.width);
 		this->height.push_back(face->glyph->bitmap.rows);
 		this->bearingX.push_back(face->glyph->bitmap_left);
 		this->bearingY.push_back(face->glyph->bitmap_top);
 		this->advance.push_back(face->glyph->advance.x);
+		this->glTex.emplace_back();
+
+		glBindTexture(GL_TEXTURE_2D, glTex.back().ID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
 	FT_Done_Face(face);
 }

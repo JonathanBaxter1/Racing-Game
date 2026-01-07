@@ -1,13 +1,6 @@
 #include "include.h"
 
-Terrain::Terrain() {}
-
 Terrain::Terrain(Shader shader, Shader occluderShader, TextureArray mapArray, TextureArray textureArray, float mapSize, unsigned int patchRes, unsigned short* heightMap, unsigned char* normalMap)
-{
-	this->init(shader, occluderShader, mapArray, textureArray, mapSize, patchRes, heightMap, normalMap);
-}
-
-void Terrain::init(Shader shader, Shader occluderShader, TextureArray mapArray, TextureArray textureArray, float mapSize, unsigned int patchRes, unsigned short* heightMap, unsigned char* normalMap)
 {
 	this->patchRes = patchRes;
 	unsigned int patchSize = mapSize/patchRes;

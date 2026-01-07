@@ -20,6 +20,8 @@
 #include "types.h"
 #include "utils.h"
 
+#include "GlTex.h"
+
 #include "Texture.h"
 #include "TextureArray.h"
 #include "Shader.h"
@@ -40,3 +42,4 @@
 #include "Text.h"
 #include "Camera.h"
 #include "Game.h"
+#include "Race.h"

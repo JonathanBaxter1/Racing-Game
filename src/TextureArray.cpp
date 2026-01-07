@@ -63,14 +63,13 @@ TextureArray::TextureArray(std::string fileNames[], unsigned int numTextures, un
 		exit(-1);
 	}
 
-	unsigned int textureArray = genTextureID();
+	this->genTextureID();
 
 	for (unsigned int i = 0; i < numTextures; i++) {
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, width, height, 1, baseFormat, dataType, texData[i]);
 		stbi_image_free(texData[i]);
 	}
 	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
-	this->ID = textureArray;
 }
 
 TextureArray::TextureArray(void* textureData[], unsigned int numTextures, unsigned int width, unsigned int height, unsigned int numChannels, unsigned int bits, GLint param)
@@ -104,25 +103,21 @@ TextureArray::TextureArray(void* textureData[], unsigned int numTextures, unsign
 		exit(-1);
 	}
 
-	unsigned int textureArray = genTextureID();
+	this->genTextureID();
 
 	for (unsigned int i = 0; i < numTextures; i++) {
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, width, height, 1, baseFormat, dataType, textureData[i]);
 	}
 	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
-	this->ID = textureArray;
 }
 
-unsigned int TextureArray::genTextureID()
+void TextureArray::genTextureID()
 {
-	unsigned int textureArray;
-	glGenTextures(1, &textureArray);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, glTex.ID);
 	unsigned int levels = 1 + floor(log2(width));
 	glTexStorage3D(GL_TEXTURE_2D_ARRAY, levels, this->texFormat, this->width, this->height, this->numTextures);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, param);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, param);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	return textureArray;
 }

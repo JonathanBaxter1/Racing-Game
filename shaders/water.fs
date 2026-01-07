@@ -1,10 +1,8 @@
 #version 430
 
-#define reflectionTex textures[0]
-#define dudvTex textures[1]
-#define heightMapTex textures[2]
-
-uniform sampler2D textures[8];
+uniform sampler2D relfectionTex;
+uniform sampler2D dudvTex;
+uniform sampler2D heightMapTex;
 uniform vec3 viewPos;
 uniform vec3 lightDir;
 uniform float time;

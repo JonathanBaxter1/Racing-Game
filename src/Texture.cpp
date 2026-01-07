@@ -21,21 +21,18 @@ Texture::Texture(std::string fileName, std::string directory, unsigned int bits,
 	initFile(fileName, directory, bits, param);
 }
 
-unsigned int Texture::genTextureID(GLint param)
+void Texture::bindTexture(GLint param)
 {
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindTexture(GL_TEXTURE_2D, this->glTex.ID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, param);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, param);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	return texture;
 }
 
 void Texture::initFile(std::string fileName, std::string directory, unsigned int bits, GLint param)
 {
-	unsigned int texture = this->genTextureID(param);
+	this->bindTexture(param);
 
 	GLenum dataType;
 	void* tex1data;
@@ -68,7 +65,7 @@ void Texture::initFile(std::string fileName, std::string directory, unsigned int
 
 void Texture::initData(void* data, unsigned int width, unsigned int height, unsigned int numChannels, unsigned int bits, GLint param)
 {
-	unsigned int texture = this->genTextureID(param);
+	this->bindTexture(param);
 	GLenum dataType;
 	if (bits == 8) {
 		dataType = GL_UNSIGNED_BYTE;
