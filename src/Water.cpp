@@ -8,8 +8,8 @@ Water::Water(Shader shader, Texture heightMapTex, Texture dudvTex, float mapSize
 	this->patchRes = patchRes;
 	this->numPatches = patchRes*patchRes;
 	this->shader = shader.ID;
-	this->heightMapTexID = heightMapTex.ID;
-	this->dudvTexID = dudvTex.ID;
+	this->heightMapTexID = heightMapTex.glTex.ID;
+	this->dudvTexID = dudvTex.glTex.ID;
 
 	glUseProgram(this->shader);
 	glGenVertexArrays(1, &vao);
@@ -39,10 +39,10 @@ Water::Water(Shader shader, Texture heightMapTex, Texture dudvTex, float mapSize
 	}
 	GLint reflectionUniformLoc = glGetUniformLocation(this->shader, "reflectionTex");
 	GLint dudvUniformLoc = glGetUniformLocation(this->shader, "dudvTex");
-	GLint heightMapLoc = glGetUniformLocation(this->shader, "heightMapTex");
-	glUniform1iv(reflectionUniformLoc, 0);
-	glUniform1iv(dudvUniformLoc, 1);
-	glUniform1iv(heightMapUniformLoc, 2);
+	GLint heightMapUniformLoc = glGetUniformLocation(this->shader, "heightMapTex");
+	glUniform1i(reflectionUniformLoc, 0);
+	glUniform1i(dudvUniformLoc, 1);
+	glUniform1i(heightMapUniformLoc, 2);
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
@@ -63,9 +63,9 @@ void Water::render()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->reflectionTex.ID);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, this->dudvTex.ID);
+	glBindTexture(GL_TEXTURE_2D, this->dudvTexID);
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, this->heightMapTex.ID);
+	glBindTexture(GL_TEXTURE_2D, this->heightMapTexID);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6*this->numPatches);
 

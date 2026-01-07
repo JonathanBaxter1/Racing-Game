@@ -60,7 +60,6 @@ void Texture::initFile(std::string fileName, std::string directory, unsigned int
 	glTexImage2D(GL_TEXTURE_2D, 0, tex1Format, tex1width, tex1height, 0, tex1Format, dataType, tex1data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(tex1data);
-	this->ID = texture;
 }
 
 void Texture::initData(void* data, unsigned int width, unsigned int height, unsigned int numChannels, unsigned int bits, GLint param)
@@ -88,5 +87,4 @@ void Texture::initData(void* data, unsigned int width, unsigned int height, unsi
 	}
 	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, dataType, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
-	this->ID = texture;
 }

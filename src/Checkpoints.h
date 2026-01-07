@@ -18,9 +18,7 @@ public:
 	std::vector<float> tangentMagsEnd;
 	unsigned int lapsCompleted;
 
-	Checkpoints();
 	Checkpoints(Model* model, float radius);
-	void init(Model* model, float radius);
 	void add(float x, float y, float z, float yaw, float tangentMagStart, float tangentMagEnd);
 	void render(Shader textureShader, Shader colorShader);
 	void checkIntersect(Airplane* airplane);

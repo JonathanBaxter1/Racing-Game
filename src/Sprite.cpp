@@ -1,10 +1,8 @@
 #include "include.h"
 
-Sprite::Sprite() {}
-
-void Sprite::init(Texture texture, Shader shader, float x, float y, float width, float height)
+Sprite::Sprite(Texture texture, Shader shader, float x, float y, float width, float height)
 {
-	this->textureID = texture.ID;
+	this->textureID = texture.glTex.ID;
 	this->shaderID = shader.ID;
 	glUseProgram(this->shaderID);
 	glGenVertexArrays(1, &vao);

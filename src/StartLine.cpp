@@ -1,13 +1,6 @@
 #include "include.h"
 
-StartLine::StartLine() {}
-
 StartLine::StartLine(Object* object)
-{
-	this->init(object);
-}
-
-void StartLine::init(Object* object)
 {
 	// For now hopefully
 	bool yawCorrect = object->yaw < M_PI*0.5 + 0.01 && object->yaw > M_PI*0.5 - 0.01;

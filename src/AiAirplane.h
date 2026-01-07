@@ -15,9 +15,7 @@ private:
 	float lastPseudoRand2;
 public:
 	static float staticRand;
-	AiAirplane();
 	AiAirplane(Object* object, Checkpoints checkpoints, float speed, float corneringSpeed);
-	void init(Object* object, Checkpoints checkpoints, float speed, float corneringSpeed);
 	void update(float deltaT, Checkpoints checkpoints);
 	void updateSplinePoints(Checkpoints checkpoints);
 };

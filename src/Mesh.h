@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types.h"
-#include "Shader.h"
+class Shader;
 
 class Mesh
 {

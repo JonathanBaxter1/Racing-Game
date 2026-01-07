@@ -133,7 +133,7 @@ std::vector<GLuint> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType t
 		if (!skip) {
 			this->textures.emplace_back(str.C_Str(), this->directory, 8, GL_REPEAT);
 			this->texturePaths.push_back(str.C_Str());
-			textureIDs.push_back(this->textures.back().ID);
+			textureIDs.push_back(this->textures.back().glTex.ID);
 		}
 	}
 	return textureIDs;

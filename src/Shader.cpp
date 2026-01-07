@@ -2,23 +2,6 @@
 
 std::vector<unsigned int> Shader::shaders;
 
-Shader::Shader() {}
-
-Shader::Shader(std::string vertexFileName, std::string fragmentFileName)
-{
-	this->init(vertexFileName, fragmentFileName);
-}
-
-Shader::Shader(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string fragmentFileName)
-{
-	this->init(vertexFileName, tessControlFileName, tessEvalFileName, fragmentFileName);
-}
-
-Shader::Shader(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string geometryFileName, std::string fragmentFileName)
-{
-	this->init(vertexFileName, tessControlFileName, tessEvalFileName, geometryFileName);
-}
-
 unsigned int Shader::compileShader(unsigned int type, char* source)
 {
 	unsigned int shaderId = glCreateShader(type);
@@ -68,14 +51,19 @@ unsigned int Shader::createShaderProgram(char* vertexShader, char* tessControlSh
 	return program;
 }
 
-void Shader::init(std::string vertexFileName, std::string fragmentFileName)
+Shader::Shader(std::string vertexFileName, std::string fragmentFileName)
 {
 	this->init(vertexFileName, "", "", "", fragmentFileName);
 }
 
-void Shader::init(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string fragmentFileName)
+Shader::Shader(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string fragmentFileName)
 {
 	this->init(vertexFileName, tessControlFileName, tessEvalFileName, "", fragmentFileName);
+}
+
+Shader::Shader(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string geometryFileName, std::string fragmentFileName)
+{
+	this->init(vertexFileName, tessControlFileName, tessEvalFileName, geometryFileName, fragmentFileName);
 }
 
 void Shader::init(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string geometryFileName, std::string fragmentFileName)

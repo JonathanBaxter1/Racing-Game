@@ -1,13 +1,6 @@
 #include "include.h"
 
-Checkpoints::Checkpoints() {}
-
 Checkpoints::Checkpoints(Model* model, float radius)
-{
-	this->init(model, radius);
-}
-
-void Checkpoints::init(Model* model, float radius)
 {
 	this->objects.clear();
 	this->colors.clear();

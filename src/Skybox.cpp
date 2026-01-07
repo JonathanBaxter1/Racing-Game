@@ -1,15 +1,13 @@
 #include "include.h"
 
-Skybox::Skybox() {}
-
-void Skybox::init(Shader shader, Texture textures[])
+Skybox::Skybox(Shader shader, Texture textures[])
 {
 	this->shaderID = shader.ID;
 	glUseProgram(this->shaderID);
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(this->vao);
 	for (unsigned int i = 0; i < 6; i++) {
-		this->textures[i] = textures[i].ID;
+		this->textures[i] = textures[i].glTex.ID;
 	}
 
 	float vertices[6*36] = { // up (x, y, z, u, v, texIndex)

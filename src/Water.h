@@ -15,13 +15,14 @@ private:
 	unsigned int heightMapTexID;
 	GlTex depthTex;
 	GlTex reflectionTex;
-	GlFramebuffer framebuffer;
 	unsigned int numTextures;
 	unsigned int patchRes;
 	unsigned int numPatches;
 
 	void setupReflectionBuffer(unsigned int resDivisor);
 public:
-	Water(Shader shader, float mapSize, unsigned int patchRes, unsigned int resDivisor);
+	GlFramebuffer framebuffer;
+
+	Water(Shader shader, Texture heightMapTex, Texture dudvTex, float mapSize, unsigned int patchRes, unsigned int resDivisor);
 	void render();
 };

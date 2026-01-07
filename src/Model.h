@@ -2,6 +2,7 @@
 
 #include "types.h"
 class Mesh;
+class Texture;
 
 class Model
 {

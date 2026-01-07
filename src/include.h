@@ -20,7 +20,7 @@
 #include "types.h"
 #include "utils.h"
 
-#include "GlTex.h"
+#include "GlObjects.h"
 
 #include "Texture.h"
 #include "TextureArray.h"
@@ -43,3 +43,4 @@
 #include "Camera.h"
 #include "Game.h"
 #include "Race.h"
+#include "MainMenu.h"

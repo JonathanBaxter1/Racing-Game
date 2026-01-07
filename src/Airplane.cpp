@@ -1,13 +1,6 @@
 #include "include.h"
 
-Airplane::Airplane() {}
-
 Airplane::Airplane(Object* object)
-{
-	this->init(object);
-}
-
-void Airplane::init(Object* object)
 {
 	this->timeSinceBoost = 100.0;
 	this->object = object;

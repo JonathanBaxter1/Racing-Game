@@ -7,7 +7,7 @@ Font::Font(std::string fontFileName, unsigned int fontSize)
 
 Font::Font(std::string fontFileName, unsigned int fontSize, unsigned int numChars)
 {
-	this->init(fontFilename, fontSize, numChars);
+	this->init(fontFileName, fontSize, numChars);
 }
 
 void Font::init(std::string fontFileName, unsigned int fontSize, unsigned int numChars)
@@ -21,6 +21,7 @@ void Font::init(std::string fontFileName, unsigned int fontSize, unsigned int nu
 	}
 	FT_Set_Pixel_Sizes(face, 0, fontSize);
 
+	this->glTex.reserve(numChars);
 	for (unsigned char c = 0; c < (unsigned char)numChars; c++) {
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
 			std::cout << "Freetype failed to load character " << c << " from " << path << std::endl;

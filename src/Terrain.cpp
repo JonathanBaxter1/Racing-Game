@@ -196,8 +196,8 @@ Terrain::Terrain(Shader shader, Shader occluderShader, TextureArray mapArray, Te
 	glUseProgram(this->shader);
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(this->vao);
-	this->mapArrayID = mapArray.ID;
-	this->textureArrayID = textureArray.ID;
+	this->mapArrayID = mapArray.glTex.ID;
+	this->textureArrayID = textureArray.glTex.ID;
 
 	int mapsUniformLoc = glGetUniformLocation(this->shader, "maps");
 	glUniform1i(mapsUniformLoc, 0);
