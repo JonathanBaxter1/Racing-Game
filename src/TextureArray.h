@@ -1,6 +1,6 @@
 #pragma once
 
-class GlTex;
+#include "GlObject.h"
 
 class TextureArray
 {

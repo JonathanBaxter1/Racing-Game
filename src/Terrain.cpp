@@ -1,6 +1,6 @@
 #include "include.h"
 
-Terrain::Terrain(Shader shader, Shader occluderShader, TextureArray mapArray, TextureArray textureArray, float mapSize, unsigned int patchRes, unsigned short* heightMap, unsigned char* normalMap)
+Terrain::Terrain(Shader shader, Shader occluderShader, TextureArray* mapArray, TextureArray* textureArray, float mapSize, unsigned int patchRes, unsigned short* heightMap, unsigned char* normalMap)
 {
 	this->patchRes = patchRes;
 	unsigned int patchSize = mapSize/patchRes;
@@ -196,8 +196,8 @@ Terrain::Terrain(Shader shader, Shader occluderShader, TextureArray mapArray, Te
 	glUseProgram(this->shader);
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(this->vao);
-	this->mapArrayID = mapArray.glTex.ID;
-	this->textureArrayID = textureArray.glTex.ID;
+	this->mapArrayID = mapArray->glTex.ID;
+	this->textureArrayID = textureArray->glTex.ID;
 
 	int mapsUniformLoc = glGetUniformLocation(this->shader, "maps");
 	glUniform1i(mapsUniformLoc, 0);

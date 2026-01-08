@@ -8,7 +8,7 @@ void run()
 	// Render loading screen first
 	Shader spriteShader("sprite.vs", "sprite.fs");
 	Texture loadingTex("loading.png", 8, GL_CLAMP_TO_EDGE);
-	Sprite loadingSprite(loadingTex, spriteShader, -1.0, -0.25*Window::aspectRatio, 2.0, 0.5*Window::aspectRatio);
+	Sprite loadingSprite(&loadingTex, spriteShader, -1.0, -0.25*Window::aspectRatio, 2.0, 0.5*Window::aspectRatio);
 	glClearColor(0.0, 0.6, 0.9, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	loadingSprite.render();
@@ -29,7 +29,6 @@ void run()
 	Shader skyboxShader("skybox.vs", "skybox.fs");
 	Shader terrainShader("terrain.vs", "terrain.tcs", "terrain.tes", "terrain.fs");
 	Shader waterShader("water.vs", "water.fs");
-
 	// Load fonts
 	Text::setShader(textShader);
 	Font arial48("arial.ttf", 48);
@@ -42,7 +41,7 @@ void run()
 	Texture skyboxEast("skyboxEast.bmp", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxSouth("skyboxSouth.bmp", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxWest("skyboxWest.bmp", 8, GL_CLAMP_TO_EDGE);
-	Texture skyboxTextures[6] = {skyboxUp, skyboxDown, skyboxNorth, skyboxEast, skyboxSouth, skyboxWest};
+	Texture* skyboxTextures[6] = {&skyboxUp, &skyboxDown, &skyboxNorth, &skyboxEast, &skyboxSouth, &skyboxWest};
 	Skybox skybox(skyboxShader, skyboxTextures);
 	skyboxPtr = &skybox;
 
@@ -132,7 +131,7 @@ void run()
 	std::string terrainTextureFiles[] = {"stone2.png", "grass2.png", "snow2.png"};
 	unsigned int numTerrainTextures = sizeof(terrainTextureFiles)/sizeof(std::string);
 	TextureArray terrainTextures(terrainTextureFiles, numTerrainTextures, 3, 8, GL_REPEAT);
-	Terrain terrain(terrainShader, depthShader, terrainMaps, terrainTextures, 4096.0, 64, heightMap, normalMap);
+	Terrain terrain(terrainShader, depthShader, &terrainMaps, &terrainTextures, 4096.0, 64, heightMap, normalMap);
 	terrainPtr = &terrain;
 
 	// Wait to free heightMap so it can be used for collision detection
@@ -148,7 +147,7 @@ void run()
 	}
 
 	Texture waterDuDvTexture("waterDuDv.png", 8, GL_REPEAT);
-	Water water(waterShader, islandHeightMap, waterDuDvTexture, 100000.0, 64, reflectionRes);
+	Water water(waterShader, &islandHeightMap, &waterDuDvTexture, 100000.0, 64, reflectionRes);
 
 	unsigned int raceStatus = RACE_NOT_STARTED;
 	float lapStartTime, courseTime;

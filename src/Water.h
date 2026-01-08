@@ -1,9 +1,8 @@
 #pragma once
 
+#include "GlObject.h"
 class Shader;
 class Texture;
-class GlTex;
-class GlFramebuffer;
 
 class Water
 {
@@ -23,6 +22,6 @@ private:
 public:
 	GlFramebuffer framebuffer;
 
-	Water(Shader shader, Texture heightMapTex, Texture dudvTex, float mapSize, unsigned int patchRes, unsigned int resDivisor);
+	Water(Shader shader, Texture* heightMapTex, Texture* dudvTex, float mapSize, unsigned int patchRes, unsigned int resDivisor);
 	void render();
 };

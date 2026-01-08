@@ -1,6 +1,6 @@
 #version 430
 
-uniform sampler2D relfectionTex;
+uniform sampler2D reflectionTex;
 uniform sampler2D dudvTex;
 uniform sampler2D heightMapTex;
 uniform vec3 viewPos;

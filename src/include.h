@@ -20,7 +20,7 @@
 #include "types.h"
 #include "utils.h"
 
-#include "GlObjects.h"
+#include "GlObject.h"
 
 #include "Texture.h"
 #include "TextureArray.h"

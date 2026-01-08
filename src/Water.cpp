@@ -1,6 +1,6 @@
 #include "include.h"
 
-Water::Water(Shader shader, Texture heightMapTex, Texture dudvTex, float mapSize, unsigned int patchRes, unsigned int resDivisor)
+Water::Water(Shader shader, Texture* heightMapTex, Texture* dudvTex, float mapSize, unsigned int patchRes, unsigned int resDivisor)
 {
 	unsigned int patchSize = mapSize/patchRes;
 
@@ -8,8 +8,8 @@ Water::Water(Shader shader, Texture heightMapTex, Texture dudvTex, float mapSize
 	this->patchRes = patchRes;
 	this->numPatches = patchRes*patchRes;
 	this->shader = shader.ID;
-	this->heightMapTexID = heightMapTex.glTex.ID;
-	this->dudvTexID = dudvTex.glTex.ID;
+	this->heightMapTexID = heightMapTex->glTex.ID;
+	this->dudvTexID = dudvTex->glTex.ID;
 
 	glUseProgram(this->shader);
 	glGenVertexArrays(1, &vao);
