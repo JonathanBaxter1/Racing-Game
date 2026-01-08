@@ -22,7 +22,7 @@ void Checkpoints::add(float x, float y, float z, float yaw, float tangentMagStar
 	this->tangentMagsEnd.push_back(tangentMagEnd);
 }
 
-void Checkpoints::render(Shader textureShader, Shader colorShader)
+void Checkpoints::render(Shader* textureShader, Shader* colorShader)
 {
 	for (unsigned int i = 0; i < this->objects.size(); i++) {
 		this->objects[i].render(textureShader, colorShader, 0, this->colors[i]);

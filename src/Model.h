@@ -3,12 +3,13 @@
 #include "types.h"
 class Mesh;
 class Texture;
+class Shader;
 
 class Model
 {
 public:
 	Model(std::string path);
-	void render(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix, unsigned int frame, Color color);
+	void render(Shader* shaderTexture, Shader* shaderColor, mat4 modelMatrix, unsigned int frame, Color color);
 
 private:
 	std::vector<Mesh> meshes;

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "types.h"
-#include "Object.h"
-#include "Shader.h"
+class Object;
+class Shader;
 class Airplane;
 
 class Checkpoints
@@ -20,7 +20,7 @@ public:
 
 	Checkpoints(Model* model, float radius);
 	void add(float x, float y, float z, float yaw, float tangentMagStart, float tangentMagEnd);
-	void render(Shader textureShader, Shader colorShader);
+	void render(Shader* textureShader, Shader* colorShader);
 	void checkIntersect(Airplane* airplane);
 	void updateColors();
 	bool allPassed();

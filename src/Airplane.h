@@ -3,6 +3,7 @@
 #include "types.h"
 class Object;
 class Checkpoints;
+class Shader;
 
 class Airplane
 {
@@ -17,5 +18,5 @@ public:
 	void aiUpdate(float deltaT, Checkpoints checkpoints);
 	void playerUpdate(float deltaT, vec3 controls);
 	void checkCollision(float waterHeight, unsigned short* heightMap, unsigned int heightMapWidth, unsigned int heightMapHeight, float heightMapMax);
-	void render(Shader textureShader, Shader colorShader, unsigned int frameCount);
+	void render(Shader* textureShader, Shader* colorShader, unsigned int frameCount);
 };

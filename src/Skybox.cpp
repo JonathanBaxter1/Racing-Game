@@ -1,8 +1,8 @@
 #include "include.h"
 
-Skybox::Skybox(Shader shader, Texture* textures[])
+Skybox::Skybox(Shader* shader, Texture* textures[])
 {
-	this->shaderID = shader.ID;
+	this->shaderID = shader->ID;
 	glUseProgram(this->shaderID);
 	glBindVertexArray(this->vao.ID);
 	for (unsigned int i = 0; i < 6; i++) {

@@ -15,10 +15,10 @@ void run()
 	loadingSprite.render();
 	glfwSwapBuffers(Window::ptr);
 
-	Window::desiredPitch = 0.0;
-	Window::desiredTurnAngle = 0.0;
-	Window::desiredSpeed = 240.0;
-	Window::isSpectate = false;
+	desiredPitch = 0.0;
+	desiredTurnAngle = 0.0;
+	desiredSpeed = 240.0;
+	isSpectate = false;
 
 	// Compile shaders
 	Shader textShader("text.vs", "text.fs");
@@ -44,7 +44,7 @@ void run()
 	Texture skyboxSouth("skyboxSouth.bmp", 8, GL_CLAMP_TO_EDGE);
 	Texture skyboxWest("skyboxWest.bmp", 8, GL_CLAMP_TO_EDGE);
 	Texture* skyboxTextures[6] = {&skyboxUp, &skyboxDown, &skyboxNorth, &skyboxEast, &skyboxSouth, &skyboxWest};
-	Skybox skybox(skyboxShader, skyboxTextures);
+	Skybox skybox(&skyboxShader, skyboxTextures);
 	skyboxPtr = &skybox;
 
 	Model checkpointModel("checkpoint/checkpoint.obj");
@@ -133,7 +133,7 @@ void run()
 	std::string terrainTextureFiles[] = {"stone2.png", "grass2.png", "snow2.png"};
 	unsigned int numTerrainTextures = sizeof(terrainTextureFiles)/sizeof(std::string);
 	TextureArray terrainTextures(terrainTextureFiles, numTerrainTextures, 3, 8, GL_REPEAT);
-	Terrain terrain(terrainShader, depthShader, &terrainMaps, &terrainTextures, 4096.0, 64, heightMap, normalMap);
+	Terrain terrain(&terrainShader, &depthShader, &terrainMaps, &terrainTextures, 4096.0, 64, heightMap, normalMap);
 	terrainPtr = &terrain;
 
 	// Wait to free heightMap so it can be used for collision detection
@@ -149,7 +149,7 @@ void run()
 	}
 
 	Texture waterDuDvTexture("waterDuDv.png", 8, GL_REPEAT);
-	Water water(waterShader, &islandHeightMap, &waterDuDvTexture, 100000.0, 64, reflectionRes);
+	Water water(&waterShader, &islandHeightMap, &waterDuDvTexture, 100000.0, 64, reflectionRes);
 
 	unsigned int raceStatus = RACE_NOT_STARTED;
 	float lapStartTime, courseTime;
@@ -163,12 +163,13 @@ void run()
 		float dT = curTime - lastTime;
 		lastTime = curTime;
 		glfwPollEvents(); // 97% of CPU time goes to this function lol
-		vec3 controls = Window::handleInput(dT);
+		handleInput(dT);
+		vec3 controls = {desiredTurnAngle, desiredPitch, desiredSpeed};
 		if (Window::isKeyDown(GLFW_KEY_5)) {
 			Game::screen = Game::MAIN_MENU_SCREEN;
 			break;
 		}
-		if (!Window::isSpectate) {
+		if (!isSpectate) {
 			aiAirplane1.update(dT, checkpoints);
 			aiAirplane2.update(dT, checkpoints);
 			aiAirplane3.update(dT, checkpoints);
@@ -204,16 +205,16 @@ void run()
 		Camera::pitch = -Camera::pitch;
 
 		renderPrepare(water.framebuffer.ID, reflectionRes);
-		renderScene(reflectionRes, frameCount, textureShader, colorShader, textureFullShader, colorFullShader);
-		renderTransparents(textureFullShader, colorFullShader);
+		renderScene(reflectionRes, frameCount, &textureShader, &colorShader, &textureFullShader, &colorFullShader);
+		renderTransparents(&textureFullShader, &colorFullShader);
 
 		Camera::y += 2.0*(WATER_HEIGHT - Camera::y);
 		Camera::pitch = -Camera::pitch;
 
 		renderPrepare(0, 1);
-		renderScene(1, frameCount, textureShader, colorShader, textureFullShader, colorFullShader);
+		renderScene(1, frameCount, &textureShader, &colorShader, &textureFullShader, &colorFullShader);
 		water.render();
-		renderTransparents(textureFullShader, colorFullShader);
+		renderTransparents(&textureFullShader, &colorFullShader);
 
 		glfwSwapBuffers(Window::ptr);
 		frameCount++;
@@ -233,7 +234,7 @@ void renderPrepare(GLuint framebuffer, unsigned int resDivisor)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void renderScene(unsigned int resDivisor, unsigned int frameCount, Shader textureShader, Shader colorShader, Shader textureFullShader, Shader colorFullShader)
+void renderScene(unsigned int resDivisor, unsigned int frameCount, Shader* textureShader, Shader* colorShader, Shader* textureFullShader, Shader* colorFullShader)
 {
 	terrainPtr->render((float)resDivisor);
 	playerAirplanePtr->render(textureShader, colorShader, frameCount);
@@ -245,11 +246,60 @@ void renderScene(unsigned int resDivisor, unsigned int frameCount, Shader textur
 	skyboxPtr->render();
 }
 
-void renderTransparents(Shader texShader, Shader colorShader)
+void renderTransparents(Shader* texShader, Shader* colorShader)
 {
 	glEnable(GL_BLEND);
 	boostsPtr->render(texShader, colorShader);
 	glDisable(GL_BLEND);
+}
+
+void handleInput(float deltaT)
+{
+	if (Window::isKeyDown(GLFW_KEY_1)) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	} else if (Window::isKeyDown(GLFW_KEY_2)) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	} else if (Window::isKeyDown(GLFW_KEY_3)) {
+		isSpectate = false;
+	} else if (Window::isKeyDown(GLFW_KEY_4)) {
+		isSpectate = true;
+	}
+
+	if (isSpectate) {
+		if (Window::isKeyDown(GLFW_KEY_S)) {
+			Camera::z += MOVEMENT_SPEED*deltaT*cos(Camera::yaw);
+			Camera::x -= MOVEMENT_SPEED*deltaT*sin(Camera::yaw);
+		} else if (Window::isKeyDown(GLFW_KEY_W)) {
+			Camera::z -= MOVEMENT_SPEED*deltaT*cos(Camera::yaw);
+			Camera::x += MOVEMENT_SPEED*deltaT*sin(Camera::yaw);
+		}
+		if (Window::isKeyDown(GLFW_KEY_D)) {
+			Camera::z += MOVEMENT_SPEED*deltaT*sin(Camera::yaw);
+			Camera::x += MOVEMENT_SPEED*deltaT*cos(Camera::yaw);
+		} else if (Window::isKeyDown(GLFW_KEY_A)) {
+			Camera::z -= MOVEMENT_SPEED*deltaT*sin(Camera::yaw);
+			Camera::x -= MOVEMENT_SPEED*deltaT*cos(Camera::yaw);
+		}
+		if (Window::isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+			Camera::y += MOVEMENT_SPEED*10*deltaT;
+		} else if (Window::isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+			Camera::y -= MOVEMENT_SPEED*10*deltaT;
+		}
+		if (Window::isKeyDown(GLFW_KEY_SPACE)) {
+			Camera::z -= MOVEMENT_SPEED*50.0*deltaT*cos(Camera::yaw);
+			Camera::x += MOVEMENT_SPEED*50.0*deltaT*sin(Camera::yaw);
+		}
+	} else {
+		if (Window::isKeyDown(GLFW_KEY_W)) {
+			desiredSpeed += 100.0*deltaT;
+		} else if (Window::isKeyDown(GLFW_KEY_S)) {
+			desiredSpeed -= 100.0*deltaT;
+		}
+		desiredSpeed = clamp(desiredSpeed, 50.0, 240.0);
+		float q = sqrt(desiredSpeed)*0.06;
+		desiredPitch = clamp(desiredPitch, -M_PI/2.0, M_PI/2.0);
+		desiredTurnAngle = clamp(desiredTurnAngle, -M_PI/2.0*q, M_PI/2.0*q);
+	}
 }
 
 }//

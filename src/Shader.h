@@ -5,6 +5,7 @@
 class Shader
 {
 private:
+	GlProgram program;
 	void init(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string geometryFileName, std::string fragmentFileName);
 public:
 	static std::vector<unsigned int> shaders;

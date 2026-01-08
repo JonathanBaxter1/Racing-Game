@@ -20,6 +20,11 @@ struct glBufferStruct {
 	static void destroy(GLuint* ID) { glDeleteBuffers(1, ID); }
 };
 
+struct glProgramStruct {
+	static void create(GLuint* ID) { *ID = glCreateProgram(); }
+	static void destroy(GLuint* ID) { glDeleteProgram(*ID); }
+};
+
 template <class Type>
 class GlObject
 {
@@ -47,3 +52,4 @@ using GlTex = GlObject<glTexStruct>;
 using GlFramebuffer = GlObject<glFramebufferStruct>;
 using GlVertexArray = GlObject<glVertexArrayStruct>;
 using GlBuffer = GlObject<glBufferStruct>;
+using GlProgram = GlObject<glProgramStruct>;

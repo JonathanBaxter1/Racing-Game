@@ -12,6 +12,6 @@ private:
 	unsigned int shaderID;
 	unsigned int textures[6];
 public:
-	Skybox(Shader shader, Texture* textures[]);
+	Skybox(Shader* shader, Texture* textures[]);
 	void render();
 };

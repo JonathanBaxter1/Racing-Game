@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+class Shader;
 class Object;
 
 class StartLine
@@ -10,5 +11,5 @@ private:
 public:
 	StartLine(Object* object);
 	bool isIntersect(Airplane* airplane);
-	void render(Shader textureShader, Shader colorShader);
+	void render(Shader* textureShader, Shader* colorShader);
 };

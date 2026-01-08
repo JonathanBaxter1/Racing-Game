@@ -1,13 +1,13 @@
 #include "include.h"
 
-Water::Water(Shader shader, Texture* heightMapTex, Texture* dudvTex, float mapSize, unsigned int patchRes, unsigned int resDivisor)
+Water::Water(Shader* shader, Texture* heightMapTex, Texture* dudvTex, float mapSize, unsigned int patchRes, unsigned int resDivisor)
 {
 	unsigned int patchSize = mapSize/patchRes;
 
 	this->setupReflectionBuffer(resDivisor);
 	this->patchRes = patchRes;
 	this->numPatches = patchRes*patchRes;
-	this->shader = shader.ID;
+	this->shader = shader->ID;
 	this->heightMapTexID = heightMapTex->glTex.ID;
 	this->dudvTexID = dudvTex->glTex.ID;
 

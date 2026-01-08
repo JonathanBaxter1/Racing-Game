@@ -9,38 +9,54 @@ unsigned int Shader::compileShader(unsigned int type, char* source)
 	glCompileShader(shaderId);
 	int result;
 	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &result);
-	if (!result) {
-		std::cout << "Failed to compile shader: " << type << std::endl;
-		return 0;
-	}
+	if (!result) return 0;
 	return shaderId;
 }
 
 unsigned int Shader::createShaderProgram(char* vertexShader, char* tessControlShader, char* tessEvalShader, char* geometryShader, char* fragmentShader)
 {
-	unsigned int program = glCreateProgram();
 	unsigned int vs, tcs, tes, gs, fs;
 	vs = tcs = tes = gs = fs = 0;
 
 	vs = compileShader(GL_VERTEX_SHADER, vertexShader);
-	glAttachShader(program, vs);
+	if (vs == 0) {
+		std::cout<<"Failed to compile vertex shader"<<std::endl;
+		exit(-1);
+	}
+	glAttachShader(program.ID, vs);
 	if (tessControlShader[0] != '\0') {
 		tcs = compileShader(GL_TESS_CONTROL_SHADER, tessControlShader);
-		glAttachShader(program, tcs);
+		glAttachShader(program.ID, tcs);
+		if (tcs == 0) {
+			std::cout<<"Failed to compile tesselation control shader"<<std::endl;
+			exit(-1);
+		}
 	}
 	if (tessEvalShader[0] != '\0') {
 		tes = compileShader(GL_TESS_EVALUATION_SHADER, tessEvalShader);
-		glAttachShader(program, tes);
+		glAttachShader(program.ID, tes);
+		if (tes == 0) {
+			std::cout<<"Failed to compile tesselation evaluation shader"<<std::endl;
+			exit(-1);
+		}
 	}
 	if (geometryShader[0] != '\0') {
 		gs = compileShader(GL_GEOMETRY_SHADER, geometryShader);
-		glAttachShader(program, gs);
+		glAttachShader(program.ID, gs);
+		if (gs == 0) {
+			std::cout<<"Failed to compile geometry shader"<<std::endl;
+			exit(-1);
+		}
 	}
 	fs = compileShader(GL_FRAGMENT_SHADER, fragmentShader);
-	glAttachShader(program, fs);
+	if (fs == 0) {
+		std::cout<<"Failed to compile fragment shader"<<std::endl;
+		exit(-1);
+	}
+	glAttachShader(program.ID, fs);
 
-	glLinkProgram(program);
-	glValidateProgram(program);
+	glLinkProgram(program.ID);
+	glValidateProgram(program.ID);
 
 	glDeleteShader(vs);
 	glDeleteShader(tcs);
@@ -48,7 +64,7 @@ unsigned int Shader::createShaderProgram(char* vertexShader, char* tessControlSh
 	glDeleteShader(gs);
 	glDeleteShader(fs);
 
-	return program;
+	return program.ID;
 }
 
 Shader::Shader(std::string vertexFileName, std::string fragmentFileName)
@@ -77,7 +93,6 @@ void Shader::init(std::string vertexFileName, std::string tessControlFileName, s
 	std::string shaderFileNames[5] = {vertexFileName, tessControlFileName, tessEvalFileName, geometryFileName, fragmentFileName};
 	std::string shaderFilePaths[5] = {vertexFilePath, tessControlFilePath, tessEvalFilePath, geometryFilePath, fragmentFilePath};
 	char shaderFiles[5][MAX_SHADER_SIZE];
-
 
 	for (int i = 0; i < 5; i++) {
 		shaderFiles[i][0] = '\0';

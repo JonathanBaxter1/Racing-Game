@@ -46,7 +46,7 @@ void Airplane::checkCollision(float waterHeight, unsigned short* heightMap, unsi
 	}
 }
 
-void Airplane::render(Shader textureShader, Shader colorShader, unsigned int frame)
+void Airplane::render(Shader* textureShader, Shader* colorShader, unsigned int frame)
 {
 	this->object->render(textureShader, colorShader, frame);
 }

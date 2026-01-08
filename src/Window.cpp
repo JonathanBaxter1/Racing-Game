@@ -9,10 +9,6 @@ int trueWidth;
 int trueHeight;
 float aspectRatio;
 GLFWwindow* ptr;
-bool isSpectate = false;
-float desiredPitch = 0.0;
-float desiredTurnAngle = 0.0;
-float desiredSpeed = 240.0;
 float mouseX = 0.0;
 float mouseY = 0.0;
 
@@ -109,7 +105,7 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 		double deltaX = (xpos - lastX)*MOUSE_SENSITIVITY;
 		double deltaY = (ypos - lastY)*MOUSE_SENSITIVITY;
 
-		if (isSpectate) {
+		if (Race::isSpectate) {
 			float newCameraPitch = Camera::pitch - deltaY;
 			float newCameraYaw = Camera::yaw + deltaX;
 			if (newCameraPitch > M_PI/2.0) {
@@ -121,8 +117,8 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 			}
 			Camera::yaw = fmod(newCameraYaw, 2*M_PI);
 		} else {
-			desiredPitch = desiredPitch - deltaY*1.0;
-			desiredTurnAngle = desiredTurnAngle + deltaX*1.0;
+			Race::desiredPitch = Race::desiredPitch - deltaY*1.0;
+			Race::desiredTurnAngle = Race::desiredTurnAngle + deltaX*1.0;
 		}
 	}
 	lastX = xpos;
@@ -133,57 +129,6 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 bool isMouseClick()
 {
 	return glfwGetMouseButton(ptr, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
-}
-
-vec3 handleInput(float deltaT)
-{
-	if (isKeyDown(GLFW_KEY_1)) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	} else if (isKeyDown(GLFW_KEY_2)) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	} else if (isKeyDown(GLFW_KEY_3)) {
-		isSpectate = false;
-	} else if (isKeyDown(GLFW_KEY_4)) {
-		isSpectate = true;
-	}
-
-	if (isSpectate) {
-		if (isKeyDown(GLFW_KEY_S)) {
-			Camera::z += MOVEMENT_SPEED*deltaT*cos(Camera::yaw);
-			Camera::x -= MOVEMENT_SPEED*deltaT*sin(Camera::yaw);
-		} else if (isKeyDown(GLFW_KEY_W)) {
-			Camera::z -= MOVEMENT_SPEED*deltaT*cos(Camera::yaw);
-			Camera::x += MOVEMENT_SPEED*deltaT*sin(Camera::yaw);
-		}
-		if (isKeyDown(GLFW_KEY_D)) {
-			Camera::z += MOVEMENT_SPEED*deltaT*sin(Camera::yaw);
-			Camera::x += MOVEMENT_SPEED*deltaT*cos(Camera::yaw);
-		} else if (isKeyDown(GLFW_KEY_A)) {
-			Camera::z -= MOVEMENT_SPEED*deltaT*sin(Camera::yaw);
-			Camera::x -= MOVEMENT_SPEED*deltaT*cos(Camera::yaw);
-		}
-		if (isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-			Camera::y += MOVEMENT_SPEED*10*deltaT;
-		} else if (isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-			Camera::y -= MOVEMENT_SPEED*10*deltaT;
-		}
-		if (isKeyDown(GLFW_KEY_SPACE)) {
-			Camera::z -= MOVEMENT_SPEED*50.0*deltaT*cos(Camera::yaw);
-			Camera::x += MOVEMENT_SPEED*50.0*deltaT*sin(Camera::yaw);
-		}
-	} else {
-		if (isKeyDown(GLFW_KEY_W)) {
-			desiredSpeed += 100.0*deltaT;
-		} else if (isKeyDown(GLFW_KEY_S)) {
-			desiredSpeed -= 100.0*deltaT;
-		}
-		desiredSpeed = clamp(desiredSpeed, 50.0, 240.0);
-		float q = sqrt(desiredSpeed)*0.06;
-		desiredPitch = clamp(desiredPitch, -M_PI/2.0, M_PI/2.0);
-		desiredTurnAngle = clamp(desiredTurnAngle, -M_PI/2.0*q, M_PI/2.0*q);
-	}
-	vec3 controls = {desiredTurnAngle, desiredPitch, desiredSpeed};
-	return controls;
 }
 
 bool isKeyDown(int key)

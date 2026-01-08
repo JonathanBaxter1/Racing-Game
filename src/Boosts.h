@@ -1,8 +1,8 @@
 #pragma once
 
 #include "types.h"
-#include "Object.h"
-#include "Shader.h"
+class Object;
+class Shader;
 
 class Boosts
 {
@@ -16,5 +16,5 @@ public:
 	void add(float x, float y, float z, float yaw, float pitch);
 	bool isHit(Airplane* airplane);
 	void sortByDistance();
-	void render(Shader textureShader, Shader colorShader);
+	void render(Shader* textureShader, Shader* colorShader);
 };

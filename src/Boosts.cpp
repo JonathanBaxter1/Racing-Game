@@ -50,7 +50,7 @@ void Boosts::sortByDistance()
 	}
 }
 
-void Boosts::render(Shader textureShader, Shader colorShader)
+void Boosts::render(Shader* textureShader, Shader* colorShader)
 {
 	for (unsigned int i = 0; i < this->objects.size(); i++) {
 		this->objects[this->sortIndices[i]].render(textureShader, colorShader);
