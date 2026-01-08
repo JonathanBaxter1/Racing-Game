@@ -5,9 +5,10 @@ namespace MainMenu
 
 void run()
 {
+	Text text;
 	Shader textShader("text.vs", "text.fs");
-	Text::setShader(textShader);
-	Font arial72("arial.ttf", 48);
+	text.setShader(textShader);
+	Font arial72(&text, "arial.ttf", 72);
 
 	while (Game::isRunning()) {
 		glfwPollEvents();
@@ -17,7 +18,7 @@ void run()
 		}
 		glClearColor(0.5, 0.0, 0.5, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		Text::render("Main Menu", 0.0, 0.0, &arial72, true);
+		text.render("Main Menu", 0.0, 0.0, &arial72, true);
 		glfwSwapBuffers(Window::ptr);
 	}
 }

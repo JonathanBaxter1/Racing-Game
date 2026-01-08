@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+#include "GlObject.h"
 class Shader;
 
 class Mesh
@@ -15,7 +16,10 @@ public:
 	void render(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix, bool isPropeller, unsigned int frame, Color color);
 
 private:
-	unsigned int VAO, VBO, IBO, LBO;
+	GlVertexArray Vao;
+	GlBuffer Vbo;
+	GlBuffer Ibo;
+	GlBuffer Lbo;
 
 	void setupMesh();
 };

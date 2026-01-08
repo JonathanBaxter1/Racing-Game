@@ -7,8 +7,8 @@ class Texture;
 class Water
 {
 private:
-	unsigned int vao;
-	unsigned int vbo;
+	GlVertexArray vao;
+	GlBuffer vbo;
 	unsigned int shader;
 	unsigned int dudvTexID;
 	unsigned int heightMapTexID;

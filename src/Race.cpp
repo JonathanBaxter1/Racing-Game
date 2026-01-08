@@ -29,9 +29,11 @@ void run()
 	Shader skyboxShader("skybox.vs", "skybox.fs");
 	Shader terrainShader("terrain.vs", "terrain.tcs", "terrain.tes", "terrain.fs");
 	Shader waterShader("water.vs", "water.fs");
+
 	// Load fonts
-	Text::setShader(textShader);
-	Font arial48("arial.ttf", 48);
+	Text text;
+	text.setShader(textShader);
+	Font arial48(&text, "arial.ttf", 48);
 
 	// Load skybox
 	// https://opengameart.org/content/clouds-skybox-1

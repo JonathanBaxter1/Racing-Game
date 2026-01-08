@@ -10,6 +10,16 @@ struct glFramebufferStruct {
 	static void destroy(GLuint* ID) { glDeleteFramebuffers(1, ID); }
 };
 
+struct glVertexArrayStruct {
+	static void create(GLuint* ID) { glGenVertexArrays(1, ID); }
+	static void destroy(GLuint* ID) { glDeleteVertexArrays(1, ID); }
+};
+
+struct glBufferStruct {
+	static void create(GLuint* ID) { glGenBuffers(1, ID); }
+	static void destroy(GLuint* ID) { glDeleteBuffers(1, ID); }
+};
+
 template <class Type>
 class GlObject
 {
@@ -35,3 +45,5 @@ public:
 
 using GlTex = GlObject<glTexStruct>;
 using GlFramebuffer = GlObject<glFramebufferStruct>;
+using GlVertexArray = GlObject<glVertexArrayStruct>;
+using GlBuffer = GlObject<glBufferStruct>;

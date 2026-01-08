@@ -4,8 +4,7 @@ Skybox::Skybox(Shader shader, Texture* textures[])
 {
 	this->shaderID = shader.ID;
 	glUseProgram(this->shaderID);
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(this->vao);
+	glBindVertexArray(this->vao.ID);
 	for (unsigned int i = 0; i < 6; i++) {
 		this->textures[i] = textures[i]->glTex.ID;
 	}
@@ -59,8 +58,7 @@ Skybox::Skybox(Shader shader, Texture* textures[])
 		vertices[i*6 + 2] *= 100000.0;
 	}
 
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, this->vbo.ID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	int texturesUniformLoc = glGetUniformLocation(this->shaderID, "textures");
@@ -79,7 +77,7 @@ void Skybox::render()
 {
 	glEnable(GL_CLIP_DISTANCE0);
 	glUseProgram(this->shaderID);
-	glBindVertexArray(this->vao);
+	glBindVertexArray(this->vao.ID);
 
 	for (unsigned int i = 0; i < 6; i++) {
 		glActiveTexture(GL_TEXTURE0 + i);

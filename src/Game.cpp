@@ -11,12 +11,10 @@ bool isRunning()
 void init()
 {
 	Window::init();
-	Text::init();
 }
 
 void exit()
 {
-	Text::exit();
 	Window::exit();
 }
 

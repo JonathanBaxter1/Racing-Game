@@ -5,8 +5,7 @@ Sprite::Sprite(Texture* texture, Shader shader, float x, float y, float width, f
 	this->textureID = texture->glTex.ID;
 	this->shaderID = shader.ID;
 	glUseProgram(this->shaderID);
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(this->vao);
+	glBindVertexArray(this->vao.ID);
 
 	float squareVertices[] = { // x, y, u, v
 		x, y, 0.0, 0.0,
@@ -18,8 +17,7 @@ Sprite::Sprite(Texture* texture, Shader shader, float x, float y, float width, f
 		x + width, y, 1.0, 0.0,
 	};
 
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, this->vbo.ID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)0);
@@ -34,7 +32,7 @@ Sprite::Sprite(Texture* texture, Shader shader, float x, float y, float width, f
 void Sprite::render()
 {
 	glUseProgram(this->shaderID);
-	glBindVertexArray(this->vao);
+	glBindVertexArray(this->vao.ID);
 	glEnable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 	glActiveTexture(GL_TEXTURE0);

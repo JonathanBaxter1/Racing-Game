@@ -1,12 +1,15 @@
 #pragma once
 
+#include "GlObject.h"
 class Shader;
 class Texture;
 
 class Skybox
 {
 private:
-	unsigned int vao, vbo, shaderID;
+	GlVertexArray vao;
+	GlBuffer vbo;
+	unsigned int shaderID;
 	unsigned int textures[6];
 public:
 	Skybox(Shader shader, Texture* textures[]);

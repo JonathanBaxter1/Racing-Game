@@ -1,18 +1,16 @@
 #pragma once
 
-#include <string>
-#include "consts.h"
-#include "types.h"
-#include "Shader.h"
-#include "TextureArray.h"
+#include "GlObject.h"
+class Shader;
+class TextureArray;
 
 class Terrain
 {
 private:
-	unsigned int vao;
-	unsigned int vbo;
-	unsigned int occluderVao;
-	unsigned int occluderVbo;
+	GlVertexArray vao;
+	GlBuffer vbo;
+	GlVertexArray occluderVao;
+	GlBuffer occluderVbo;
 	unsigned int shader;
 	unsigned int occluderShader;
 	unsigned int mapArrayID;

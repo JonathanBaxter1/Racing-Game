@@ -50,8 +50,8 @@ void Mesh::render(Shader shaderTexture, Shader shaderColor, mat4 modelMatrix, bo
 		int shininessLoc = glGetUniformLocation(shaderColor.ID, "shininess");
 		glUniform1f(shininessLoc, material.shininess);
 	}
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, LBO);
+	glBindVertexArray(Vao.ID);
+	glBindBuffer(GL_ARRAY_BUFFER, Lbo.ID);
 	glBufferData(GL_ARRAY_BUFFER, 16*sizeof(float), finalMatrix, GL_DYNAMIC_DRAW);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
@@ -65,11 +65,9 @@ void Mesh::setupMesh()
 		0.0, 0.0, 0.0, 1.0,
 	};
 
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	glBindVertexArray(Vao.ID);
 
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, Vbo.ID);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
@@ -79,8 +77,7 @@ void Mesh::setupMesh()
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 
-	glGenBuffers(1, &LBO);
-	glBindBuffer(GL_ARRAY_BUFFER, LBO);
+	glBindBuffer(GL_ARRAY_BUFFER, Lbo.ID);
 	glBufferData(GL_ARRAY_BUFFER, 16*sizeof(float), identityMat, GL_DYNAMIC_DRAW);
 
 	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 16*sizeof(float), (void*)0);
@@ -96,8 +93,7 @@ void Mesh::setupMesh()
 	glVertexAttribDivisor(6, 1);
 	glEnableVertexAttribArray(6);
 
-	glGenBuffers(1, &IBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Ibo.ID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 }
 

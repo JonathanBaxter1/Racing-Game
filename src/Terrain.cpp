@@ -194,8 +194,7 @@ Terrain::Terrain(Shader shader, Shader occluderShader, TextureArray* mapArray, T
 
 	this->shader = shader.ID;
 	glUseProgram(this->shader);
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(this->vao);
+	glBindVertexArray(this->vao.ID);
 	this->mapArrayID = mapArray->glTex.ID;
 	this->textureArrayID = textureArray->glTex.ID;
 
@@ -203,8 +202,7 @@ Terrain::Terrain(Shader shader, Shader occluderShader, TextureArray* mapArray, T
 	glUniform1i(mapsUniformLoc, 0);
 	int texturesUniformLoc = glGetUniformLocation(this->shader, "textures");
 	glUniform1i(texturesUniformLoc, 1);
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, this->vbo.ID);
 	glBufferData(GL_ARRAY_BUFFER, surfaceVerticesSize, surfaceVertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -215,10 +213,8 @@ Terrain::Terrain(Shader shader, Shader occluderShader, TextureArray* mapArray, T
 
 	this->occluderShader = occluderShader.ID;
 	glUseProgram(this->occluderShader);
-	glGenVertexArrays(1, &occluderVao);
-	glBindVertexArray(this->occluderVao);
-	glGenBuffers(1, &occluderVbo);
-	glBindBuffer(GL_ARRAY_BUFFER, this->occluderVbo);
+	glBindVertexArray(this->occluderVao.ID);
+	glBindBuffer(GL_ARRAY_BUFFER, this->occluderVbo.ID);
 	glBufferData(GL_ARRAY_BUFFER, occluderVerticesSize, occluderVertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -234,14 +230,14 @@ void Terrain::render(float resolutionDivisor)
 	glDisable(GL_CULL_FACE);
 	glColorMask(0, 0, 0, 0);
 	glUseProgram(this->occluderShader);
-	glBindVertexArray(this->occluderVao);
+	glBindVertexArray(this->occluderVao.ID);
 
 	glDrawArrays(GL_TRIANGLES, 0, 12*patchRes*patchRes);
 
 	glEnable(GL_CULL_FACE);
 	glColorMask(1, 1, 1, 1);
 	glUseProgram(this->shader);
-	glBindVertexArray(this->vao);
+	glBindVertexArray(this->vao.ID);
 	int graphicsSettingLoc = glGetUniformLocation(this->shader, "graphicsSetting");
 	glUniform1f(graphicsSettingLoc, GRAPHICS_SETTING - resolutionDivisor + 1.0);
 

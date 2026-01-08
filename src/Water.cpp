@@ -12,8 +12,7 @@ Water::Water(Shader shader, Texture* heightMapTex, Texture* dudvTex, float mapSi
 	this->dudvTexID = dudvTex->glTex.ID;
 
 	glUseProgram(this->shader);
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(this->vao);
+	glBindVertexArray(this->vao.ID);
 
 	float* surfaceVertices;
 	unsigned int surfaceVerticesSize = 12*numPatches*sizeof(float);
@@ -44,8 +43,7 @@ Water::Water(Shader shader, Texture* heightMapTex, Texture* dudvTex, float mapSi
 	glUniform1i(dudvUniformLoc, 1);
 	glUniform1i(heightMapUniformLoc, 2);
 
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, this->vbo.ID);
 	glBufferData(GL_ARRAY_BUFFER, surfaceVerticesSize, surfaceVertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)0);
@@ -58,7 +56,7 @@ Water::Water(Shader shader, Texture* heightMapTex, Texture* dudvTex, float mapSi
 void Water::render()
 {
 	glUseProgram(this->shader);
-	glBindVertexArray(this->vao);
+	glBindVertexArray(this->vao.ID);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->reflectionTex.ID);
