@@ -52,16 +52,9 @@ void init()
 	cursorImage.width = cursorWidth;
 	cursorImage.height = cursorHeight;
 	cursorImage.pixels = cursorImageData;
-
-	if (CURSOR_ENABLED) {
-		GLFWcursor* cursor = glfwCreateCursor(&cursorImage, 0, 0);
-		glfwSetCursor(ptr, cursor);
-		glfwSetInputMode(ptr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	} else {
-		glfwSetInputMode(ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	}
+	GLFWcursor* cursor = glfwCreateCursor(&cursorImage, 0, 0);
+	glfwSetCursor(ptr, cursor);
 	stbi_image_free(cursorImageData);
-
 	glfwSetCursorPos(ptr, (float)width/2.0, (float)height/2.0);
 	glfwSetCursorPosCallback(ptr, mouseCallback);
 	setProjectionMatrix(Camera::projMatrix, 45.0, aspectRatio, 1.0, 100000.0);
@@ -83,6 +76,16 @@ void init()
 void exit()
 {
 	glfwTerminate();
+}
+
+void enableCursor()
+{
+	glfwSetInputMode(ptr, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+void disableCursor()
+{
+	glfwSetInputMode(ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos)

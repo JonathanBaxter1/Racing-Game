@@ -16,6 +16,8 @@ namespace Window
 
 	void init();
 	void exit();
+	void enableCursor();
+	void disableCursor();
 	void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 	vec3 handleInput(float deltaT);
 	bool isKeyDown(int key);

@@ -6,6 +6,7 @@ namespace Race
 void run()
 {
 	// Render loading screen first
+	Window::disableCursor();
 	Shader spriteShader("sprite.vs", "sprite.fs");
 	Texture loadingTex("loading.png", 8, GL_CLAMP_TO_EDGE);
 	Sprite loadingSprite(&loadingTex, spriteShader, -1.0, -0.25*Window::aspectRatio, 2.0, 0.5*Window::aspectRatio);
@@ -158,7 +159,7 @@ void run()
 	unsigned int frameCount = 0;
 	unsigned int lapsCompleted = 0;
 
-	while (Game::isRunning()) {
+	while (Game::isRunning() && Game::screen == Game::RACE_SCREEN) {
 		float curTime = glfwGetTime();
 		float dT = curTime - lastTime;
 		lastTime = curTime;
