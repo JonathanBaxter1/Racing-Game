@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GlObject.h"
+#include "types.h"
 class Texture;
 class Shader;
 
@@ -12,6 +13,9 @@ private:
 	float x, y, width, height;
 	unsigned int shaderID, textureID;
 public:
-	Sprite(Texture* texture, Shader shader, float x, float y, float width, float height);
+	Sprite();
+	Sprite(Texture* texture, Shader* shader, float x, float y, float width, float height);
+	void init(Texture* texture, Shader* shader, float x, float y, float width, float height);
 	void render();
+	void render(Color color);
 };

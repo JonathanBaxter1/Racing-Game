@@ -1,21 +1,11 @@
 #include "include.h"
 
-Font::Font(Text* text, std::string fontFileName, unsigned int fontSize)
-{
-	this->init(text, fontFileName, fontSize, 128);
-}
-
-Font::Font(Text* text, std::string fontFileName, unsigned int fontSize, unsigned int numChars)
-{
-	this->init(text, fontFileName, fontSize, numChars);
-}
-
-void Font::init(Text* text, std::string fontFileName, unsigned int fontSize, unsigned int numChars)
+Font::Font(std::string fontFileName, unsigned int fontSize, unsigned int numChars)
 {
 	std::string path = "fonts/" + fontFileName;
 
 	FT_Face face;
-	if (FT_New_Face(text->ft, path.c_str(), 0, &face)) {
+	if (FT_New_Face(Text::ft, path.c_str(), 0, &face)) {
 		std::cout << "Failed to load font " << path << std::endl;
 		exit(-1);
 	}

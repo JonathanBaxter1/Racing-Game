@@ -1,9 +1,16 @@
 #include "include.h"
 
-Sprite::Sprite(Texture* texture, Shader shader, float x, float y, float width, float height)
+Sprite::Sprite() {}
+
+Sprite::Sprite(Texture* texture, Shader* shader, float x, float y, float width, float height)
+{
+	this->init(texture, shader, x, y, width, height);
+}
+
+void Sprite::init(Texture* texture, Shader* shader, float x, float y, float width, float height)
 {
 	this->textureID = texture->glTex.ID;
-	this->shaderID = shader.ID;
+	this->shaderID = shader->ID;
 	glUseProgram(this->shaderID);
 	glBindVertexArray(this->vao.ID);
 
@@ -31,7 +38,16 @@ Sprite::Sprite(Texture* texture, Shader shader, float x, float y, float width, f
 
 void Sprite::render()
 {
+	Color white = {1.0, 1.0, 1.0};
+	this->render(white);
+}
+
+void Sprite::render(Color color)
+{
 	glUseProgram(this->shaderID);
+	GLint colorLoc = glGetUniformLocation(this->shaderID, "color");
+	glUniform3f(colorLoc, color.r, color.g, color.b);
+
 	glBindVertexArray(this->vao.ID);
 	glEnable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);

@@ -1,22 +1,20 @@
 #pragma once
 
 #include "GlObject.h"
+#include "types.h"
 class Font;
 class Shader;
 
-class Text
+namespace Text
 {
-private:
-	GlVertexArray vao;
-	GlBuffer vbo;
-	unsigned int shaderID;
+	inline GlVertexArray* vao;
+	inline GlBuffer* vbo;
+	inline unsigned int shaderID;
 
-public:
-	FT_Library ft;
+	inline FT_Library ft;
 
-	Text();
-	~Text();
-	void setShader(Shader shader);
-	void render(std::string text, float x, float y, Font* font);
-	void render(std::string text, float x, float y, Font* font, bool isCentered);
-};
+	void init(GlVertexArray* inVao, GlBuffer* inVbo);
+	void exit();
+	void setShader(Shader* shader);
+	void render(std::string text, float x, float y, Color color, Font* font, bool isCentered);
+}

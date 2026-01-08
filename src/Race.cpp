@@ -9,7 +9,7 @@ void run()
 	Window::disableCursor();
 	Shader spriteShader("sprite.vs", "sprite.fs");
 	Texture loadingTex("loading.png", 8, GL_CLAMP_TO_EDGE);
-	Sprite loadingSprite(&loadingTex, spriteShader, -1.0, -0.25*Window::aspectRatio, 2.0, 0.5*Window::aspectRatio);
+	Sprite loadingSprite(&loadingTex, &spriteShader, -1.0, -0.25*Window::aspectRatio, 2.0, 0.5*Window::aspectRatio);
 	glClearColor(0.0, 0.6, 0.9, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	loadingSprite.render();
@@ -32,9 +32,8 @@ void run()
 	Shader waterShader("water.vs", "water.fs");
 
 	// Load fonts
-	Text text;
-	text.setShader(textShader);
-	Font arial48(&text, "arial.ttf", 48);
+	Text::setShader(&textShader);
+	Font arial48("arial.ttf", 48);
 
 	// Load skybox
 	// https://opengameart.org/content/clouds-skybox-1

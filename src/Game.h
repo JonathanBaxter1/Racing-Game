@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GlObject.h"
+
 namespace Game
 {
 	inline constexpr unsigned int RACE_SCREEN = 0;

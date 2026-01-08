@@ -5,12 +5,16 @@ namespace Window
 
 unsigned int width;
 unsigned int height;
+int trueWidth;
+int trueHeight;
 float aspectRatio;
 GLFWwindow* ptr;
 bool isSpectate = false;
 float desiredPitch = 0.0;
 float desiredTurnAngle = 0.0;
 float desiredSpeed = 240.0;
+float mouseX = 0.0;
+float mouseY = 0.0;
 
 void init()
 {
@@ -37,8 +41,11 @@ void init()
 		std::exit(-1);
 	}
 	glfwMakeContextCurrent(ptr);
+	glfwGetWindowSize(ptr, &trueWidth, &trueHeight);
+
 	glewInit();
 	glViewport(0, 0, width, height);
+
 
 	// Cursor setup
 	int cursorWidth, cursorHeight, cursorNumChannels;
@@ -93,6 +100,8 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 	static double lastX;
 	static double lastY;
 	static unsigned int frameCount = 0;
+	mouseX = xpos;
+	mouseY = ypos;
 	if (frameCount < 4) {
 		lastX = xpos;
 		lastY = ypos;
@@ -121,11 +130,13 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 	frameCount++;
 }
 
+bool isMouseClick()
+{
+	return glfwGetMouseButton(ptr, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+}
+
 vec3 handleInput(float deltaT)
 {
-	if (isKeyDown(GLFW_KEY_ESCAPE)) {
-		glfwSetWindowShouldClose(ptr, GLFW_TRUE);
-	}
 	if (isKeyDown(GLFW_KEY_1)) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	} else if (isKeyDown(GLFW_KEY_2)) {

@@ -6,16 +6,23 @@ namespace MainMenu
 void run()
 {
 	Window::enableCursor();
-	Text text;
-	Shader textShader("text.vs", "text.fs");
-	text.setShader(textShader);
-	Font arial72(&text, "arial.ttf", 72);
+	Shader textShader("text.vs", "text.fs"); // combine these?
+	Shader spriteShader("sprite.vs", "sprite.fs");
+	Text::setShader(&textShader);
+	Font arial48("arial.ttf", 48);
+	Texture buttonTex("button.png", 8, GL_CLAMP_TO_EDGE);
+	Color buttonColor = {0.0, 1.0, 1.0};
+	Button startButton("Play", &buttonTex, &spriteShader, &startGame, buttonColor, &arial48, 0.0, 0.0, 0.3, 0.2, true);
+	Button settingsButton("Settings", &buttonTex, &spriteShader, &gotoSettings, buttonColor, &arial48, 0.0, -0.25, 0.3, 0.2, true);
+	Button exitButton("Exit", &buttonTex, &spriteShader, &exitGame, buttonColor, &arial48, 0.0, -0.5, 0.3, 0.2, true);
 
 	while (Game::isRunning() && Game::screen == Game::MAIN_MENU_SCREEN) {
 		handleInput();
-		glClearColor(0.5, 0.0, 0.5, 1.0);
+		glClearColor(0.2, 0.0, 0.2, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		text.render("Main Menu", 0.0, 0.0, &arial72, true);
+		startButton.update();
+		settingsButton.update();
+		exitButton.update();
 		glfwSwapBuffers(Window::ptr);
 	}
 }
@@ -23,9 +30,10 @@ void run()
 void handleInput()
 {
 	glfwPollEvents();
-	if (Window::isKeyDown(GLFW_KEY_1)) {
-		Game::screen = Game::RACE_SCREEN;
-	}
 }
+
+void startGame() { Game::screen = Game::RACE_SCREEN; }
+void gotoSettings() { Game::screen = Game::SETTINGS_SCREEN; }
+void exitGame() { glfwSetWindowShouldClose(Window::ptr, GLFW_TRUE); }
 
 }//

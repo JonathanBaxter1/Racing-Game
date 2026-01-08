@@ -1,14 +1,19 @@
 #include "include.h"
 
-Text::Text()
+namespace Text
+{//
+
+void init(GlVertexArray* inVao, GlBuffer* inVbo)
 {
+	vao = inVao;
+	vbo = inVbo;
 	if (FT_Init_FreeType(&ft)) {
 		std::cout << "Could not init freetype" << std::endl;
 		std::exit(-1);
 	}
 
-	glBindVertexArray(vao.ID);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo.ID);
+	glBindVertexArray(vao->ID);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo->ID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*6*4, NULL, GL_DYNAMIC_DRAW);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)0);
@@ -17,29 +22,27 @@ Text::Text()
 	glEnableVertexAttribArray(1);
 }
 
-Text::~Text()
+void exit()
 {
 	FT_Done_FreeType(ft);
 }
 
-void Text::setShader(Shader shader)
+void setShader(Shader* shader)
 {
-	shaderID = shader.ID;
+	shaderID = shader->ID;
 }
 
-void Text::render(std::string text, float x, float y, Font* font)
-{
-	render(text, x, y, font, false);
-}
-
-void Text::render(std::string text, float x, float y, Font* font, bool isCentered)
+void render(std::string text, float x, float y, Color color, Font* font, bool isCentered)
 {
 	if (text == "") return;
 	glEnable(GL_BLEND);
 	glUseProgram(shaderID);
-	glBindVertexArray(vao.ID);
+	GLint colorLoc = glGetUniformLocation(shaderID, "color");
+	glUniform3f(colorLoc, color.r, color.g, color.b);
+
+	glBindVertexArray(vao->ID);
 	glActiveTexture(GL_TEXTURE0);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo.ID);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo->ID);
 
 	float scale = 1.0/(float)Window::height*2.0;
 
@@ -51,7 +54,9 @@ void Text::render(std::string text, float x, float y, Font* font, bool isCentere
 		}
 		textWidthPixels += font->bearingX[text.back()] + font->width[text.back()];
 		float textWidth = (float)textWidthPixels*scale/Window::aspectRatio;
+		float textHeight = (float)font->height[0]*scale;
 		x -= textWidth/2.0;
+		y -= textHeight/2.0;
 	}
 
 	for (unsigned int i = 0; i < text.size(); i++) {
@@ -81,3 +86,5 @@ void Text::render(std::string text, float x, float y, Font* font, bool isCentere
 	}
 	glDisable(GL_BLEND);
 }
+
+}//
