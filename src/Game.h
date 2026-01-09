@@ -8,8 +8,7 @@ namespace Game
 	inline constexpr unsigned int MAIN_MENU_SCREEN = 1;
 	inline constexpr unsigned int SETTINGS_SCREEN = 2;
 	inline constexpr unsigned int LEVEL_SELECT_SCREEN = 3;
-	inline constexpr unsigned int PAUSE_MENU_SCREEN = 4;
-	inline constexpr unsigned int RACE_RESULTS_SCREEN = 5;
+	inline constexpr unsigned int RACE_RESULTS_SCREEN = 4;
 
 	inline unsigned int screen = MAIN_MENU_SCREEN;
 

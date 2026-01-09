@@ -27,14 +27,11 @@ void run()
 	case MAIN_MENU_SCREEN:
 		MainMenu::run();
 		break;
-//	case SETTINGS_SCREEN:
-//		Settings::run();
-//		break;
+	case SETTINGS_SCREEN:
+		Settings::run();
+		break;
 //	case LEVEL_SELECT_SCREEN:
 //		LevelSelect::run();
-//		break;
-//	case PAUSE_MENU_SCREEN:
-//		PauseMenu::run();
 //		break;
 //	case RACE_RESULTS_SCREEN:
 //		RaceResults::run();

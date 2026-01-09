@@ -6,15 +6,19 @@ namespace MainMenu
 void run()
 {
 	Window::enableCursor();
-	Shader textShader("text.vs", "text.fs"); // combine these?
+	Shader textShader("text.vs", "text.fs");
 	Shader spriteShader("sprite.vs", "sprite.fs");
 	Text::setShader(&textShader);
 	Font arial48("arial.ttf", 48);
+
+	// Buttons
 	Texture buttonTex("button.png", 8, GL_CLAMP_TO_EDGE);
 	Color buttonColor = {0.0, 1.0, 1.0};
 	Button startButton("Play", &buttonTex, &spriteShader, &startGame, buttonColor, &arial48, 0.0, 0.0, 0.3, 0.2, true);
 	Button settingsButton("Settings", &buttonTex, &spriteShader, &gotoSettings, buttonColor, &arial48, 0.0, -0.25, 0.3, 0.2, true);
 	Button exitButton("Exit", &buttonTex, &spriteShader, &exitGame, buttonColor, &arial48, 0.0, -0.5, 0.3, 0.2, true);
+
+	while (Window::isMouseClick()) { glfwPollEvents(); }
 
 	while (Game::isRunning() && Game::screen == Game::MAIN_MENU_SCREEN) {
 		handleInput();

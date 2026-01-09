@@ -116,7 +116,7 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 				Camera::pitch = newCameraPitch;
 			}
 			Camera::yaw = fmod(newCameraYaw, 2*M_PI);
-		} else {
+		} else if (!Race::isPaused) {
 			Race::desiredPitch = Race::desiredPitch - deltaY*1.0;
 			Race::desiredTurnAngle = Race::desiredTurnAngle + deltaX*1.0;
 		}

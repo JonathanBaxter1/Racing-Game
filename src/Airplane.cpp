@@ -42,7 +42,8 @@ void Airplane::checkCollision(float waterHeight, unsigned short* heightMap, unsi
 	float terrainHeight = heightMap[roundedPlayerX + roundedPlayerZ*heightMapWidth]/65536.0*heightMapMax;
 	if (this->object->y < waterHeight || this->object->y < terrainHeight) {
 		std::cout << "You crashed your plane!" << std::endl;
-		exit(0);
+		Race::raceExit = true;
+		Game::screen = Game::MAIN_MENU_SCREEN;
 	}
 }
 

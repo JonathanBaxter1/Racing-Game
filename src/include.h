@@ -41,7 +41,9 @@
 #include "Font.h"
 #include "Text.h"
 #include "Camera.h"
+#include "Button.h"
+
 #include "Game.h"
 #include "Race.h"
 #include "MainMenu.h"
-#include "Button.h"
+#include "Settings.h"

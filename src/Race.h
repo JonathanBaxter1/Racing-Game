@@ -23,6 +23,9 @@ namespace Race
 	inline float desiredTurnAngle;
 	inline float desiredSpeed;
 	inline bool isSpectate;
+	inline bool escReadyToPress;
+	inline bool isPaused;
+	inline bool raceExit;
 
 	// So the render function can be separate
 	inline Terrain* terrainPtr;
@@ -38,4 +41,7 @@ namespace Race
 	void renderScene(unsigned int resDivisor, unsigned int frameCount, Shader* textureShader, Shader* colorShader, Shader* textureFullShader, Shader* colorFullShader);
 	void renderTransparents(Shader* texShader, Shader* colorShader);
 	void handleInput(float deltaT);
+	void runPauseScreen();
+	void unpause();
+	void gotoMainMenu();
 }

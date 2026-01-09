@@ -15,6 +15,9 @@ void run()
 	loadingSprite.render();
 	glfwSwapBuffers(Window::ptr);
 
+	raceExit = false;
+	isPaused = false;
+	escReadyToPress = true;
 	desiredPitch = 0.0;
 	desiredTurnAngle = 0.0;
 	desiredSpeed = 240.0;
@@ -33,7 +36,6 @@ void run()
 
 	// Load fonts
 	Text::setShader(&textShader);
-	Font arial48("arial.ttf", 48);
 
 	// Load skybox
 	// https://opengameart.org/content/clouds-skybox-1
@@ -159,16 +161,13 @@ void run()
 	unsigned int lapsCompleted = 0;
 
 	while (Game::isRunning() && Game::screen == Game::RACE_SCREEN) {
+		glfwPollEvents(); // 97% of CPU time goes to this function lol
 		float curTime = glfwGetTime();
 		float dT = curTime - lastTime;
-		lastTime = curTime;
-		glfwPollEvents(); // 97% of CPU time goes to this function lol
 		handleInput(dT);
+		lastTime = glfwGetTime();
+		if (raceExit) continue;
 		vec3 controls = {desiredTurnAngle, desiredPitch, desiredSpeed};
-		if (Window::isKeyDown(GLFW_KEY_5)) {
-			Game::screen = Game::MAIN_MENU_SCREEN;
-			break;
-		}
 		if (!isSpectate) {
 			aiAirplane1.update(dT, checkpoints);
 			aiAirplane2.update(dT, checkpoints);
@@ -300,6 +299,54 @@ void handleInput(float deltaT)
 		desiredPitch = clamp(desiredPitch, -M_PI/2.0, M_PI/2.0);
 		desiredTurnAngle = clamp(desiredTurnAngle, -M_PI/2.0*q, M_PI/2.0*q);
 	}
+
+//	if (Window::isKeyDown(GLFW_KEY_5)) {
+//		Game::screen = Game::MAIN_MENU_SCREEN;
+//	}
+	if (Window::isKeyDown(GLFW_KEY_ESCAPE) && escReadyToPress) { runPauseScreen(); }
+	if (!Window::isKeyDown(GLFW_KEY_ESCAPE) && !escReadyToPress) {
+		escReadyToPress = true;
+	}
+}
+
+void runPauseScreen()
+{
+	isPaused = true;
+	Window::enableCursor();
+	Font arial48("arial.ttf", 48);
+	Shader spriteShader("sprite.vs", "sprite.fs");
+	bool escReadyToPress = false;
+
+	// Buttons
+	Texture buttonTex("button.png", 8, GL_CLAMP_TO_EDGE);
+	Color buttonColor = {0.0, 1.0, 1.0};
+	Button unpauseButton("Unpause", &buttonTex, &spriteShader, &unpause, buttonColor, &arial48, 0.0, 0.0, 0.3, 0.2, true);
+	Button exitButton("Exit", &buttonTex, &spriteShader, &gotoMainMenu, buttonColor, &arial48, 0.0, -0.25, 0.3, 0.2, true);
+
+	while (Game::isRunning() && Game::screen == Game::RACE_SCREEN && isPaused) {
+		glfwPollEvents();
+		if (Window::isKeyDown(GLFW_KEY_ESCAPE) && escReadyToPress) break;
+		if (!Window::isKeyDown(GLFW_KEY_ESCAPE) && !escReadyToPress) {
+			escReadyToPress = true;
+		}
+		glClearColor(0.5, 0.5, 0.5, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		unpauseButton.update();
+		exitButton.update();
+		glfwSwapBuffers(Window::ptr);
+	}
+	Window::disableCursor();
+	Race::escReadyToPress = false;
+	isPaused = false;
+	glfwPollEvents();
+}
+
+void unpause() { isPaused = false; }
+
+void gotoMainMenu()
+{
+	Game::screen = Game::MAIN_MENU_SCREEN;
+	raceExit = true;
 }
 
 }//
