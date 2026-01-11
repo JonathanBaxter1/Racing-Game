@@ -191,7 +191,7 @@ void run()
 				lapTimes[lapsCompleted] = newTime - lapStartTime;
 				lapStartTime = newTime;
 				courseTime += lapTimes[lapsCompleted];
-				if (lapsCompleted == NUM_LAPS) raceStatus = RACE_ENDED;
+				if (lapsCompleted == NUM_LAPS) Game::screen = Game::MAIN_MENU_SCREEN;
 			}
 		}
 		if (raceStatus == RACE_ACTIVE) checkpoints.checkIntersect(&playerAirplane);
