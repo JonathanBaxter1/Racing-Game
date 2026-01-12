@@ -317,8 +317,8 @@ void runPauseScreen()
 	// Buttons
 	Texture buttonTex("button.png", 8, GL_CLAMP_TO_EDGE);
 	Color buttonColor = {1.0, 1.0, 1.0};
-	Button unpauseButton("Unpause", &buttonTex, &spriteShader, &unpause, buttonColor, &arial48, 0.0, 0.0, 0.3, 0.2, true);
-	Button exitButton("Exit", &buttonTex, &spriteShader, &gotoMainMenu, buttonColor, &arial48, 0.0, -0.25, 0.3, 0.2, true);
+	Button unpauseButton("Unpause", &buttonTex, &spriteShader, &unpause, buttonColor, &arial48, 0.0, 0.0, 0.25, 0.2, true);
+	Button exitButton("Exit", &buttonTex, &spriteShader, &gotoMainMenu, buttonColor, &arial48, 0.0, -0.25, 0.25, 0.2, true);
 
 	while (Game::isRunning() && Game::screen == Game::RACE_SCREEN && isPaused) {
 		glfwPollEvents();

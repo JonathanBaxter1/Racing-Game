@@ -42,6 +42,7 @@
 #include "Text.h"
 #include "Camera.h"
 #include "Button.h"
+#include "Slider.h"
 
 #include "Game.h"
 #include "Race.h"
