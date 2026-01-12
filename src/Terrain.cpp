@@ -239,7 +239,7 @@ void Terrain::render(float resolutionDivisor)
 	glUseProgram(this->shader);
 	glBindVertexArray(this->vao.ID);
 	int graphicsSettingLoc = glGetUniformLocation(this->shader, "graphicsSetting");
-	glUniform1f(graphicsSettingLoc, GRAPHICS_SETTING - resolutionDivisor + 1.0);
+	glUniform1f(graphicsSettingLoc, Game::graphicsSetting - resolutionDivisor + 1.0);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, this->mapArrayID);

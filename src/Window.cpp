@@ -66,7 +66,7 @@ void init()
 
 	// OpenGL settings
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glfwSwapInterval(VSYNC_ON);
+	glfwSwapInterval(Game::vsync);
 	glShadeModel(GL_SMOOTH);
 	glDisable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

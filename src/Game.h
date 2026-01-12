@@ -10,6 +10,8 @@ namespace Game
 	inline constexpr unsigned int LEVEL_SELECT_SCREEN = 3;
 	inline constexpr unsigned int RACE_RESULTS_SCREEN = 4;
 
+	inline bool vsync = true;
+	inline unsigned int graphicsSetting = 2;
 	inline unsigned int screen = MAIN_MENU_SCREEN;
 
 	bool isRunning();

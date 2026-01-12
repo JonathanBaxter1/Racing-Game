@@ -1,11 +1,9 @@
 #pragma once
 
-#define VSYNC_ON 1
 #define GAME_DEBUG false
 #define MAX_SHADER_SIZE 8192 // bytes
 #define MOUSE_SENSITIVITY 0.001
 #define MOVEMENT_SPEED 90.0 // m/s
-#define GRAPHICS_SETTING 2 // 1 = low, 2 = medium, 3 = high
 #define CHECKPOINT_RADIUS 15.0
 #define BOOST_RADIUS 10.0
 #define START_LINE_SIZE 4.0

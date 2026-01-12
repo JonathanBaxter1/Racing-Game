@@ -144,7 +144,7 @@ void run()
 	free(heightMapRGB8);
 
 	unsigned int reflectionRes;
-	if (GRAPHICS_SETTING == 3) {
+	if (Game::graphicsSetting == 3) {
 		reflectionRes = 1;
 	} else {
 		reflectionRes = 2;
@@ -300,9 +300,6 @@ void handleInput(float deltaT)
 		desiredTurnAngle = clamp(desiredTurnAngle, -M_PI/2.0*q, M_PI/2.0*q);
 	}
 
-//	if (Window::isKeyDown(GLFW_KEY_5)) {
-//		Game::screen = Game::MAIN_MENU_SCREEN;
-//	}
 	if (Window::isKeyDown(GLFW_KEY_ESCAPE) && escReadyToPress) { runPauseScreen(); }
 	if (!Window::isKeyDown(GLFW_KEY_ESCAPE) && !escReadyToPress) {
 		escReadyToPress = true;
@@ -319,7 +316,7 @@ void runPauseScreen()
 
 	// Buttons
 	Texture buttonTex("button.png", 8, GL_CLAMP_TO_EDGE);
-	Color buttonColor = {0.0, 1.0, 1.0};
+	Color buttonColor = {1.0, 1.0, 1.0};
 	Button unpauseButton("Unpause", &buttonTex, &spriteShader, &unpause, buttonColor, &arial48, 0.0, 0.0, 0.3, 0.2, true);
 	Button exitButton("Exit", &buttonTex, &spriteShader, &gotoMainMenu, buttonColor, &arial48, 0.0, -0.25, 0.3, 0.2, true);
 
