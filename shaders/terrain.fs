@@ -33,7 +33,7 @@ void main()
 		texColorGrass = vec3(texture(textures, vec3(texCoordY, grassLayer)));
 		texColorSnow = vec3(texture(textures, vec3(texCoordY, snowLayer)));
 	}
-	if (norm.y > 0.85 || distance > 1500.0 || graphicsSetting == 0.0) {
+	if ((norm.y > 0.85 || distance > 1500.0 || graphicsSetting == 0.0) && graphicsSetting != 3.0) {
 		texColorStone = vec3(texture(textures, vec3(texCoordY, stoneLayer)));
 	} else {
 		float nx = abs(norm.x);
