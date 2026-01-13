@@ -14,6 +14,7 @@ void run()
 
 	// Buttons and sliders
 	Texture buttonTex("button.png", 8, GL_CLAMP_TO_EDGE);
+	Texture sliderTex("slider.png", 8, GL_CLAMP_TO_EDGE);
 	Color white = {1.0, 1.0, 1.0};
 	Button backButton("Back", &buttonTex, &spriteShader, &goBack, white, &arial30, -0.95, 0.85, 0.1, 0.1, false);
 	Button vsyncOnButton("On", &buttonTex, &spriteShader, &vsyncOn, white, &arial48, -0.33, 0.5, 0.25, 0.2, true);
@@ -21,7 +22,7 @@ void run()
 	Button graphicsLowButton("Low", &buttonTex, &spriteShader, &graphicsLow, white, &arial48, -0.33, 0.0, 0.25, 0.2, true);
 	Button graphicsMediumButton("Medium", &buttonTex, &spriteShader, &graphicsMedium, white, &arial48, 0.0, 0.0, 0.25, 0.2, true);
 	Button graphicsHighButton("High", &buttonTex, &spriteShader, &graphicsHigh, white, &arial48, 0.33, 0.0, 0.25, 0.2, true);
-	Slider sensitivitySlider(&buttonTex, &buttonTex, &spriteShader, 0.0, -0.5, 0.5, 0.1, 0.5, true);
+	Slider sensitivitySlider(&sliderTex, &buttonTex, &spriteShader, 0.0, -0.5, 0.5, 0.1, 0.5, true);
 
 	while (Game::isRunning() && Game::screen == Game::SETTINGS_SCREEN) {
 		handleInput();
