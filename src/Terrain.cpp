@@ -7,6 +7,9 @@ Terrain::Terrain(Shader* shader, Shader* occluderShader, TextureArray* mapArray,
 	if (patchSize > 4096) {
 		std::cout << "Terrain patch size must be <= 4096 x 4096" << std::endl;
 		exit(-1);
+	} else if (patchSize < 8) {
+		std::cout << "Terrain patch size must be >= 8 x 8" << std::endl;
+		exit(-1);
 	}
 
 	float patchResolutions[patchRes*patchRes] = {0.0};
@@ -68,10 +71,17 @@ Terrain::Terrain(Shader* shader, Shader* occluderShader, TextureArray* mapArray,
 
 		// Pass 4 (Main pass)
 		if (!patchAboveWater) {
+		__m128i signbit = _mm_set1_epi16(0x8000);
+		__m128i threshold = _mm_set1_epi16(waterHeightShort);
+		threshold = _mm_xor_si128(threshold, signbit);
 		for (unsigned int y = 0; y < patchSize; y++) {
 			unsigned int offset = ((yStart + y) << log2MapSize) + xStart;
-			for (unsigned int x = 0; x < patchSize; x++) {
-				if (heightMap[offset + x] >= waterHeightShort) {
+			unsigned short* address = &heightMap[offset];
+			for (unsigned int x = 0; x < patchSize; x += 8) {
+				__m128i values = _mm_loadu_si128((const __m128i*)(address + x));
+				values = _mm_xor_si128(values, signbit);
+				__m128i results = _mm_cmpgt_epi16(values, threshold);
+				if (_mm_movemask_epi8(results) != 0) {
 					patchAboveWater = true;
 					break;
 				}
@@ -124,7 +134,7 @@ Terrain::Terrain(Shader* shader, Shader* occluderShader, TextureArray* mapArray,
 		patchMinY[curPatch] = patchMinY[curPatch] > WATER_HEIGHT ? patchMinY[curPatch] : WATER_HEIGHT;
 	}
 
-	float normalTime = glfwGetTime();
+	float waterTime = glfwGetTime();
 
 	// Normal Variance Calcs (for terrain LOD)
 	for (unsigned int curPatch = 0; curPatch < patchRes*patchRes; curPatch++) {
@@ -217,7 +227,7 @@ Terrain::Terrain(Shader* shader, Shader* occluderShader, TextureArray* mapArray,
 		}
 
 	}
-	std::cout<<"Normal calcs: "<<1000*(glfwGetTime()-normalTime)<<"ms"<<std::endl;
+	std::cout<<"Normal calcs: "<<1000*(glfwGetTime()-waterTime)<<"ms"<<std::endl;
 
 	unsigned int surfaceVerticesSize = 12*numPatches*sizeof(float);
 	float* surfaceVertices = (float*)malloc(surfaceVerticesSize);

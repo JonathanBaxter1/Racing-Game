@@ -6,6 +6,7 @@
 #include <string>
 #include <cfloat>
 #include <cstdint>
+#include <emmintrin.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <math.h>
