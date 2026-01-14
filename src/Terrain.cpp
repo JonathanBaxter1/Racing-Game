@@ -15,29 +15,77 @@ Terrain::Terrain(Shader* shader, Shader* occluderShader, TextureArray* mapArray,
 	int mapWidth = (float)mapSize;
 	int mapHeight = (float)mapSize;
 
-	std::cout<<glfwGetTime()<<" terrain water culling:"<<std::endl;
+	float waterCullTime = glfwGetTime();
+
+	unsigned int numTestPoints = (patchSize*patchSize)>>4;
+	unsigned short waterHeightShort = WATER_HEIGHT*65536.0/274.0;
+	unsigned char log2MapSize = (unsigned char)(std::log2(mapSize));
+
 	// Cull underwater terrain patches
 	for (unsigned int curPatch = 0; curPatch < patchRes*patchRes; curPatch++) {
-		unsigned int xStart = curPatch%patchRes;
-		unsigned int yStart = curPatch/patchRes;
+		unsigned int xStart = (curPatch%patchRes)*patchSize;
+		unsigned int yStart = (curPatch/patchRes)*patchSize;
 		bool patchAboveWater = false;
-		unsigned int numPoints = (patchSize + 1)*(patchSize + 1);
-		for (unsigned int i = 0; i < numPoints; i++) {
-			unsigned int dx = i%(patchSize + 1);
-			unsigned int dy = i/(patchSize + 1);
-			unsigned int x = xStart*patchSize + dx;
-			unsigned int y = yStart*patchSize + dy;
-			x = x < (unsigned int)mapWidth - 1 ? x : (unsigned int)mapWidth - 1;
-			y = y < (unsigned int)mapHeight - 1 ? y : (unsigned int)mapHeight - 1;
-			float height = ((float)heightMap[y*mapWidth + x])/65536.0*274.0;
-			if (height >= WATER_HEIGHT) {
+
+		// Pass 1
+		for (unsigned int i = 0; i < numTestPoints; i++) {
+			unsigned int dx = (i%(patchSize>>2))<<2;
+			unsigned int dy = (i/(patchSize>>2))<<2;
+			unsigned int x = xStart + dx;
+			unsigned int y = yStart + dy;
+			unsigned short height = heightMap[y*mapWidth + x];
+			if (height >= waterHeightShort) {
 				patchAboveWater = true;
 				break;
 			}
 		}
+
+		// Pass 2
+		if (!patchAboveWater) {
+		for (unsigned int i = 0; i < patchSize + 1; i++) {
+			unsigned int x = xStart + i;
+			unsigned int y = yStart + patchSize;
+			x = x < (unsigned int)mapWidth - 1 ? x : (unsigned int)mapWidth - 1;
+			y = y < (unsigned int)mapHeight - 1 ? y : (unsigned int)mapHeight - 1;
+			unsigned short height = heightMap[y*mapWidth + x];
+			if (height >= waterHeightShort) {
+				patchAboveWater = true;
+				break;
+			}
+		} }
+
+		// Pass 3
+		if (!patchAboveWater) {
+		for (unsigned int i = 0; i < patchSize + 1; i++) {
+			unsigned int x = xStart + patchSize;
+			unsigned int y = yStart + i;
+			x = x < (unsigned int)mapWidth - 1 ? x : (unsigned int)mapWidth - 1;
+			y = y < (unsigned int)mapHeight - 1 ? y : (unsigned int)mapHeight - 1;
+			unsigned short height = heightMap[y*mapWidth + x];
+			if (height >= waterHeightShort) {
+				patchAboveWater = true;
+				break;
+			}
+		} }
+
+		// Pass 4 (Main pass)
+		if (!patchAboveWater) {
+		for (unsigned int y = 0; y < patchSize; y++) {
+			unsigned int offset = ((yStart + y) << log2MapSize) + xStart;
+			for (unsigned int x = 0; x < patchSize; x++) {
+				if (heightMap[offset + x] >= waterHeightShort) {
+					patchAboveWater = true;
+					break;
+				}
+			}
+			if (patchAboveWater) break;
+		} }
+
 		patchResolutions[curPatch] = patchAboveWater;
 		numPatches += (unsigned int)patchAboveWater;
 	}
+
+	std::cout<<"Water cull: "<<1000*(glfwGetTime()-waterCullTime)<<"ms"<<std::endl;
 
 	float patchMinX[patchRes*patchRes] = {0.0};
 	float patchMinY[patchRes*patchRes] = {0.0};

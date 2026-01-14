@@ -5,6 +5,8 @@ namespace Race
 
 void run()
 {
+	float loadStart = glfwGetTime();
+
 	// Render loading screen first
 	Window::disableCursor();
 	Shader spriteShader("sprite.vs", "sprite.fs");
@@ -159,6 +161,9 @@ void run()
 	float lastTime = glfwGetTime();
 	unsigned int frameCount = 0;
 	unsigned int lapsCompleted = 0;
+
+	float loadEnd = glfwGetTime();
+	std::cout<<"start: "<<loadStart<<", end: "<<loadEnd<<std::endl;
 
 	while (Game::isRunning() && Game::screen == Game::RACE_SCREEN) {
 		glfwPollEvents(); // 97% of CPU time goes to this function lol
