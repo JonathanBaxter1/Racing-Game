@@ -2,7 +2,6 @@
 
 #define GAME_DEBUG false
 #define MAX_SHADER_SIZE 8192 // bytes
-#define MOUSE_SENSITIVITY 0.001
 #define MOVEMENT_SPEED 90.0 // m/s
 #define CHECKPOINT_RADIUS 15.0
 #define BOOST_RADIUS 10.0

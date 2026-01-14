@@ -61,6 +61,7 @@ void run()
 		graphicsMediumButton.update();
 		graphicsHighButton.update();
 		sensitivitySlider.update();
+		Game::mouseSensitivity = 0.0002 + sensitivitySlider.getPos()*0.0016;
 
 		glfwSwapBuffers(Window::ptr);
 	}

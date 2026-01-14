@@ -56,6 +56,9 @@ void Checkpoints::updateColors()
 			this->colors[i] = {1.0, 0.0, 0.0};
 		}
 	}
+	if (this->checkpointsPassed == 0) {
+		this->colors[this->objects.size() - 1] = {0.0, 1.0, 0.0};
+	}
 }
 
 bool Checkpoints::allPassed()

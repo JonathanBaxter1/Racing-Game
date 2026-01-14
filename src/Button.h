@@ -4,6 +4,7 @@
 class Texture;
 class Shader;
 class Font;
+class Sprite;
 
 class Button
 {

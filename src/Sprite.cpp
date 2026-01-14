@@ -11,6 +11,11 @@ void Sprite::init(Texture* texture, Shader* shader, float x, float y, float widt
 {
 	this->textureID = texture->glTex.ID;
 	this->shaderID = shader->ID;
+	this->update(x, y, width, height);
+}
+
+void Sprite::update(float x, float y, float width, float height)
+{
 	glUseProgram(this->shaderID);
 	glBindVertexArray(this->vao.ID);
 

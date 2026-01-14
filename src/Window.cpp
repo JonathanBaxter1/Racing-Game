@@ -102,8 +102,8 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 		lastX = xpos;
 		lastY = ypos;
 	} else {
-		double deltaX = (xpos - lastX)*MOUSE_SENSITIVITY;
-		double deltaY = (ypos - lastY)*MOUSE_SENSITIVITY;
+		double deltaX = (xpos - lastX)*Game::mouseSensitivity;
+		double deltaY = (ypos - lastY)*Game::mouseSensitivity;
 
 		if (Race::isSpectate) {
 			float newCameraPitch = Camera::pitch - deltaY;
