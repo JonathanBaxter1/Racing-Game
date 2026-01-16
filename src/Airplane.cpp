@@ -2,6 +2,7 @@
 
 Airplane::Airplane(Object* object)
 {
+	this->propellerAngle = 0.0;
 	this->timeSinceBoost = 100.0;
 	this->object = object;
 }
@@ -27,7 +28,9 @@ void Airplane::playerUpdate(float deltaT, vec3 controls)
 	this->object->z += deltaT*this->speed*cos(this->object->yaw)*cos(this->object->pitch);
 	this->object->x -= deltaT*this->speed*sin(this->object->yaw)*cos(this->object->pitch);
 	this->object->y -= deltaT*this->speed*sin(this->object->pitch);
-	this->object->update();
+	this->propellerAngle += 2.0*M_PI/16.0*60.0*(float)deltaT; // duplicate
+	std::vector<float> meshAngles = {0.0, 0.0, 0.0, propellerAngle};
+	this->object->update(meshAngles); // duplicate
 }
 
 void Airplane::performBoost()
@@ -43,11 +46,11 @@ void Airplane::checkCollision(float waterHeight, unsigned short* heightMap, unsi
 	if (this->object->y < waterHeight || this->object->y < terrainHeight) {
 		std::cout << "You crashed your plane!" << std::endl;
 		Race::raceExit = true;
-		Game::screen = Game::MAIN_MENU_SCREEN;
+		Game::screen = Game::MAIN_MENU;
 	}
 }
 
 void Airplane::render(Shader* textureShader, Shader* colorShader, unsigned int frame)
 {
-	this->object->render(textureShader, colorShader, frame);
+	this->object->render(textureShader, colorShader);
 }

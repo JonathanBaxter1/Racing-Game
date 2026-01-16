@@ -9,6 +9,10 @@ class Airplane
 {
 private:
 	float timeSinceBoost;
+
+protected:
+	float propellerAngle;
+
 public:
 	Object* object;
 	float speed;

@@ -22,9 +22,9 @@ void run()
 	Button graphicsLowButton("Low", &buttonTex, &spriteShader, &graphicsLow, white, &arial48, -0.33, 0.0, 0.25, 0.2, true);
 	Button graphicsMediumButton("Medium", &buttonTex, &spriteShader, &graphicsMedium, white, &arial48, 0.0, 0.0, 0.25, 0.2, true);
 	Button graphicsHighButton("High", &buttonTex, &spriteShader, &graphicsHigh, white, &arial48, 0.33, 0.0, 0.25, 0.2, true);
-	Slider sensitivitySlider(&sliderTex, &buttonTex, &spriteShader, 0.0, -0.5, 0.5, 0.1, 0.5, true);
+	Slider sensitivitySlider(&sliderTex, &buttonTex, &spriteShader, &adjustMouseSensitivity, 0.0, -0.5, 0.5, 0.1, 0.5, true);
 
-	while (Game::isRunning() && Game::screen == Game::SETTINGS_SCREEN) {
+	while (Game::isRunning() && Game::screen == Game::SETTINGS) {
 		handleInput();
 
 		// Update button colors
@@ -61,7 +61,6 @@ void run()
 		graphicsMediumButton.update();
 		graphicsHighButton.update();
 		sensitivitySlider.update();
-		Game::mouseSensitivity = 0.0002 + sensitivitySlider.getPos()*0.0016;
 
 		glfwSwapBuffers(Window::ptr);
 	}
@@ -73,7 +72,7 @@ void handleInput()
 	if (Window::isKeyDown(GLFW_KEY_ESCAPE)) goBack();
 }
 
-void goBack() { Game::screen = Game::MAIN_MENU_SCREEN; }
+void goBack() { Game::screen = Game::MAIN_MENU; }
 void vsyncOn()
 {
 	Game::vsync = true;
@@ -88,5 +87,9 @@ void vsyncOff()
 void graphicsLow() { Game::graphicsSetting = 1; }
 void graphicsMedium() { Game::graphicsSetting = 2; }
 void graphicsHigh() { Game::graphicsSetting = 3; }
+
+void adjustMouseSensitivity(float sliderPos) {
+	Game::mouseSensitivity = 0.0002 + sliderPos*0.0016;
+}
 
 }//

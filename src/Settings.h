@@ -10,4 +10,5 @@ namespace Settings
 	void graphicsLow();
 	void graphicsMedium();
 	void graphicsHigh();
+	void adjustMouseSensitivity(float sliderPos);
 }

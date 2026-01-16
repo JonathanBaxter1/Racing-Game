@@ -84,11 +84,12 @@ Shader::Shader(std::string vertexFileName, std::string tessControlFileName, std:
 
 void Shader::init(std::string vertexFileName, std::string tessControlFileName, std::string tessEvalFileName, std::string geometryFileName, std::string fragmentFileName)
 {
-	std::string vertexFilePath = "shaders/" + vertexFileName;
-	std::string tessControlFilePath = "shaders/" + tessControlFileName;
-	std::string tessEvalFilePath = "shaders/" + tessEvalFileName;
-	std::string geometryFilePath = "shaders/" + geometryFileName;
-	std::string fragmentFilePath = "shaders/" + fragmentFileName;
+	std::string directory = "shaders/";
+	std::string vertexFilePath = directory + vertexFileName;
+	std::string tessControlFilePath = directory + tessControlFileName;
+	std::string tessEvalFilePath = directory + tessEvalFileName;
+	std::string geometryFilePath = directory + geometryFileName;
+	std::string fragmentFilePath = directory + fragmentFileName;
 
 	std::string shaderFileNames[5] = {vertexFileName, tessControlFileName, tessEvalFileName, geometryFileName, fragmentFileName};
 	std::string shaderFilePaths[5] = {vertexFilePath, tessControlFilePath, tessEvalFilePath, geometryFilePath, fragmentFilePath};

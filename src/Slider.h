@@ -14,10 +14,10 @@ private:
 	float position;
 	bool isSliding;
 	bool lastMouseClick;
+	void (*onSlide)(float);
 	Sprite buttonSprite;
 	Sprite sliderSprite;
 public:
-	Slider(Texture* sliderTexture, Texture* buttonTexture, Shader* shader, float x, float y, float width, float height, float startPos, bool isCentered = false);
+	Slider(Texture* sliderTexture, Texture* buttonTexture, Shader* shader, void (*onSlide)(float), float x, float y, float width, float height, float startPos, bool isCentered = false);
 	void update();
-	float getPos();
 };

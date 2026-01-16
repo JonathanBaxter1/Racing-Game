@@ -1,6 +1,8 @@
 #pragma once
 
 #include "types.h"
+class Airplane;
+class Model;
 class Object;
 class Shader;
 

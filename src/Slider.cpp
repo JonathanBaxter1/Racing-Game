@@ -1,6 +1,6 @@
 #include "include.h"
 
-Slider::Slider(Texture* sliderTexture, Texture* buttonTexture, Shader* shader, float x, float y, float width, float height, float startPos, bool isCentered)
+Slider::Slider(Texture* sliderTexture, Texture* buttonTexture, Shader* shader, void (*onSlide)(float), float x, float y, float width, float height, float startPos, bool isCentered)
 {
 	if (isCentered) {
 		x -= width/2.0;
@@ -13,6 +13,7 @@ Slider::Slider(Texture* sliderTexture, Texture* buttonTexture, Shader* shader, f
 	this->position = startPos;
 	this->isSliding  = false;
 	this->lastMouseClick = false;
+	this->onSlide = onSlide;
 	sliderSprite.init(sliderTexture, shader, x, y + height/2.0*0.75, width, height*0.25);
 	buttonSprite.init(buttonTexture, shader, x + startPos*width - height*0.25/2.0, y, height*0.25, height);
 }
@@ -38,9 +39,5 @@ void Slider::update()
 	sliderSprite.render();
 	buttonSprite.render();
 	this->lastMouseClick = isMouseClick;
-}
-
-float Slider::getPos()
-{
-	return this->position;
+	onSlide(this->position);
 }

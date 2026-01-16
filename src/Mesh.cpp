@@ -9,23 +9,18 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 	setupMesh();
 }
 
-void Mesh::render(Shader* shaderTexture, Shader* shaderColor, mat4 modelMatrix, bool isPropeller, unsigned int frame, Color color)
+void Mesh::render(Shader* shaderTexture, Shader* shaderColor, mat4 modelMatrix, float angle, Color color)
 {
-	mat4 propMatrix = {0.0};
-	propMatrix[10] = 1.0;
-	propMatrix[15] = 1.0;
-	if (isPropeller) {
-		float angle = 2.0*M_PI/16.0*(float)frame;
-		propMatrix[0] = cos(angle);
-		propMatrix[1] = sin(angle);
-		propMatrix[4] = -sin(angle);
-		propMatrix[5] = cos(angle);
-	} else {
-		propMatrix[0] = 1.0;
-		propMatrix[5] = 1.0;
-	}
+	mat4 rotationMatrix = {0.0};
+	rotationMatrix[10] = 1.0;
+	rotationMatrix[15] = 1.0;
+	rotationMatrix[0] = cos(angle);
+	rotationMatrix[1] = sin(angle);
+	rotationMatrix[4] = -sin(angle);
+	rotationMatrix[5] = cos(angle);
+
 	mat4 finalMatrix;
-	mat4Multiply(finalMatrix, propMatrix, modelMatrix);
+	mat4Multiply(finalMatrix, rotationMatrix, modelMatrix);
 
 	if (this->textureIDs.size() > 0) {
 		glUseProgram(shaderTexture->ID);

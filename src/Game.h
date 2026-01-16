@@ -1,19 +1,13 @@
 #pragma once
 
-#include "GlObject.h"
-
 namespace Game
 {
-	inline constexpr unsigned int RACE_SCREEN = 0;
-	inline constexpr unsigned int MAIN_MENU_SCREEN = 1;
-	inline constexpr unsigned int SETTINGS_SCREEN = 2;
-	inline constexpr unsigned int LEVEL_SELECT_SCREEN = 3;
-	inline constexpr unsigned int RACE_RESULTS_SCREEN = 4;
+	enum Screen { RACE, MAIN_MENU, SETTINGS, LEVEL_SELECT, RACE_RESULTS };
 
-	inline float mouseSensitivity = 0.001;
+	inline Screen screen = MAIN_MENU;
 	inline bool vsync = true;
 	inline unsigned int graphicsSetting = 2;
-	inline unsigned int screen = MAIN_MENU_SCREEN;
+	inline float mouseSensitivity = 0.001;
 
 	bool isRunning();
 	void init();

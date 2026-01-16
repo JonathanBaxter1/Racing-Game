@@ -165,7 +165,7 @@ void run()
 	float loadEnd = glfwGetTime();
 	std::cout<<"start: "<<loadStart<<", end: "<<loadEnd<<std::endl;
 
-	while (Game::isRunning() && Game::screen == Game::RACE_SCREEN) {
+	while (Game::isRunning() && Game::screen == Game::RACE) {
 		glfwPollEvents(); // 97% of CPU time goes to this function lol
 		float curTime = glfwGetTime();
 		float dT = curTime - lastTime;
@@ -196,7 +196,7 @@ void run()
 				lapTimes[lapsCompleted] = newTime - lapStartTime;
 				lapStartTime = newTime;
 				courseTime += lapTimes[lapsCompleted];
-				if (lapsCompleted == NUM_LAPS) Game::screen = Game::MAIN_MENU_SCREEN;
+				if (lapsCompleted == NUM_LAPS) Game::screen = Game::MAIN_MENU;
 			}
 		}
 		if (raceStatus == RACE_ACTIVE) checkpoints.checkIntersect(&playerAirplane);
@@ -325,7 +325,7 @@ void runPauseScreen()
 	Button unpauseButton("Unpause", &buttonTex, &spriteShader, &unpause, buttonColor, &arial48, 0.0, 0.0, 0.25, 0.2, true);
 	Button exitButton("Exit", &buttonTex, &spriteShader, &gotoMainMenu, buttonColor, &arial48, 0.0, -0.25, 0.25, 0.2, true);
 
-	while (Game::isRunning() && Game::screen == Game::RACE_SCREEN && isPaused) {
+	while (Game::isRunning() && Game::screen == Game::RACE && isPaused) {
 		glfwPollEvents();
 		if (Window::isKeyDown(GLFW_KEY_ESCAPE) && escReadyToPress) break;
 		if (!Window::isKeyDown(GLFW_KEY_ESCAPE) && !escReadyToPress) {
@@ -347,7 +347,7 @@ void unpause() { isPaused = false; }
 
 void gotoMainMenu()
 {
-	Game::screen = Game::MAIN_MENU_SCREEN;
+	Game::screen = Game::MAIN_MENU;
 	raceExit = true;
 }
 

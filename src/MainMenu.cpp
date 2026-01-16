@@ -20,7 +20,7 @@ void run()
 
 	while (Window::isMouseClick()) { glfwPollEvents(); }
 
-	while (Game::isRunning() && Game::screen == Game::MAIN_MENU_SCREEN) {
+	while (Game::isRunning() && Game::screen == Game::MAIN_MENU) {
 		handleInput();
 		glClearColor(0.2, 0.0, 0.2, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -36,8 +36,8 @@ void handleInput()
 	glfwPollEvents();
 }
 
-void startGame() { Game::screen = Game::RACE_SCREEN; }
-void gotoSettings() { Game::screen = Game::SETTINGS_SCREEN; }
+void startGame() { Game::screen = Game::RACE; }
+void gotoSettings() { Game::screen = Game::SETTINGS; }
 void exitGame() { glfwSetWindowShouldClose(Window::ptr, GLFW_TRUE); }
 
 }//

@@ -72,7 +72,9 @@ void AiAirplane::update(float deltaT, Checkpoints checkpoints)
 	this->object->roll = (this->object->roll*(1.0 - deltaT*3.0) + yawRate*deltaT*3.0); // LPF
 	this->object->pitch = -atan(dy/sqrt(dx*dx + dz*dz));
 	this->object->yaw = atan2(dz, dx) - M_PI*0.5;
-	this->object->update();
+	this->propellerAngle += 2.0*M_PI/16.0*60.0*(float)deltaT; // duplicate
+	std::vector<float> meshAngles = {0.0, 0.0, 0.0, propellerAngle}; // duplicate
+	this->object->update(meshAngles); // duplicate
 	float corneringMult = abs(clamp(yawRate, -M_PI*0.5, M_PI*0.5)/(M_PI*0.5));
 	float trueSpeed = this->speed*(1.0 - (1.0 - this->corneringSpeed)*corneringMult);
 	this->hermiteT += deltaT*trueSpeed/dl;

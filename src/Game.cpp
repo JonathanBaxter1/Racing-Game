@@ -21,19 +21,19 @@ void exit()
 void run()
 {
 	switch (screen) {
-	case RACE_SCREEN:
+	case RACE:
 		Race::run();
 		break;
-	case MAIN_MENU_SCREEN:
+	case MAIN_MENU:
 		MainMenu::run();
 		break;
-	case SETTINGS_SCREEN:
+	case SETTINGS:
 		Settings::run();
 		break;
-//	case LEVEL_SELECT_SCREEN:
+//	case LEVEL_SELECT:
 //		LevelSelect::run();
 //		break;
-//	case RACE_RESULTS_SCREEN:
+//	case RACE_RESULTS:
 //		RaceResults::run();
 //		break;
 	}

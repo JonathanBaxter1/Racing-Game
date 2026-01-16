@@ -16,22 +16,22 @@ Object::Object(Model* model, float x, float y, float z, float size, float yaw, f
 
 void Object::render(Shader* shaderTexture, Shader* shaderColor)
 {
-	this->render(shaderTexture, shaderColor, 0);
-}
-
-void Object::render(Shader* shaderTexture, Shader* shaderColor, unsigned int frame)
-{
 	Color white = {1.0, 1.0, 1.0};
-	this->render(shaderTexture, shaderColor, frame, white);
+	this->render(shaderTexture, shaderColor, white);
 }
 
-void Object::render(Shader* shaderTexture, Shader* shaderColor, unsigned int frame, Color color)
+void Object::render(Shader* shaderTexture, Shader* shaderColor, Color color)
 {
 	this->update();
-	model->render(shaderTexture, shaderColor, modelMatrix, frame, color);
+	model->render(shaderTexture, shaderColor, modelMatrix, this->angles, color);
 }
 
-void Object::update()
+void Object::update(std::vector<float> angles)
 {
+	this->angles.assign(angles.begin(), angles.end());
+	this->update();
+}
+
+void Object::update() {
 	eulerRotationMatrix4(modelMatrix, size, yaw, pitch, roll, x, y, z);
 }
