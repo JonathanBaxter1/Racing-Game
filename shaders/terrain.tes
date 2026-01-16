@@ -6,15 +6,15 @@
 
 layout (quads, equal_spacing, ccw) in;
 
-uniform mat4 projection;
-uniform mat4 view;
-
-uniform sampler2DArray maps;
-uniform sampler2DArray textures;
-
 out vec3 coord;
 out vec3 normal;
 out vec3 color;
+
+uniform float waterHeight;
+uniform mat4 projection;
+uniform mat4 view;
+uniform sampler2DArray maps;
+uniform sampler2DArray textures;
 
 void main()
 {
@@ -30,13 +30,11 @@ void main()
 	vec4 pb = mix(p3, p2, u);
 	vec4 worldPos = mix(pa, pb, v);
 
-
 	vec2 mapCoord = worldPos.xz/4096.0;
 	float height = texture(maps, vec3(mapCoord, heightLayer)).x*274.0;
 	height += texture(maps, vec3(mapCoord, heightLayer)).y*274.0/256.0;
 	worldPos.y = height;
 
-	float waterHeight = 50.0;
 	gl_ClipDistance[0] = height - waterHeight;
 
 	normal = 2.0*(texture(maps, vec3(mapCoord, normalLayer)).xzy - 0.5);

@@ -85,6 +85,9 @@ void updateUniforms()
 		int timeUniformLoc = glGetUniformLocation(shaderID, "time");
 		glUniform1f(timeUniformLoc, glfwGetTime());
 
+		int waterHeightUniformLoc = glGetUniformLocation(shaderID, "waterHeight");
+		glUniform1f(waterHeightUniformLoc, WATER_HEIGHT);
+
 		int lightDirUniformLoc = glGetUniformLocation(shaderID, "lightDir");
 		vec3 lightDir = {1.0, 0.7, 0.5};
 		lightDir = normalize(lightDir);

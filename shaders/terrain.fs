@@ -65,7 +65,6 @@ void main()
 	float diffuseScalar = 1.0*max(dot(normal, lightDir), 0.0);
 	float ambientScalar = 0.4;
 
-//	FragColor = vec4(1.0, 0.0, 1.0, 1.0);
 	FragColor = vec4(ambientScalar*texColor + diffuseScalar*texColor, 1.0);
 }
 

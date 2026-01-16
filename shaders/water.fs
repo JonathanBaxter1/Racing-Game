@@ -1,23 +1,23 @@
 #version 430
 
-uniform sampler2D reflectionTex;
-uniform sampler2D dudvTex;
-uniform sampler2D heightMapTex;
-uniform vec3 viewPos;
-uniform vec3 lightDir;
-uniform float time;
-
 in vec4 clipSpace;
 in vec3 fragPos;
 
 out vec4 FragColor;
+
+uniform float waterHeight;
+uniform float time;
+uniform vec3 viewPos;
+uniform vec3 lightDir;
+uniform sampler2D reflectionTex;
+uniform sampler2D dudvTex;
+uniform sampler2D heightMapTex;
 
 void main()
 {
 	vec3 cameraVec = viewPos - fragPos;
 	float distance = length(cameraVec);
 	vec2 mapCoord = fragPos.xz/4096.0;
-	float waterHeight = 50.0;
 	float depth = waterHeight - texture(heightMapTex, mapCoord).x*274.0;
 
 	vec2 dudvCoord1 = vec2(fragPos.x + time*2.0, fragPos.z)/50.0;

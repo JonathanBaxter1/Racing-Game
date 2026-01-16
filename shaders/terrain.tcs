@@ -1,13 +1,13 @@
 #version 430
 
+flat in float resolutionDivisor2[];
+
 layout (vertices = 4) out;
 
 uniform vec3 viewPos;
 uniform mat4 view;
 uniform mat4 projection;
 uniform float graphicsSetting;
-
-flat in float resolutionDivisor2[];
 
 void main()
 {
